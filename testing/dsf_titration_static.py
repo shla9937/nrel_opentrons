@@ -64,12 +64,12 @@ def setup(protocol):
     metals = 8
     samples = 2
     samples_loc = [temp_buffs.wells()[i] for i in range(0, samples)]
-    metals_loc = [templ_buffs.wells()[i] for i in range(samples, metals+samples)]
+    metals_loc = [temp_buffs.wells()[i] for i in range(samples, metals+samples)]
     len_titration = 6
 
 def pickup_tips(number, pipette, protocol):
     nozzle_dict = {2: "G1", 3: "F1", 4: "E1", 5: "D1", 6: "C1", 7: "B1"}
-    elif pipette == p20m:
+    if pipette == p20m:
         if number == 1:
             p20m.configure_nozzle_layout(style=SINGLE,start="H1")
         elif number > 1 and number < 8:
@@ -134,13 +134,13 @@ def titrate(protocol):
 def add_protein(protocol): # add 10µL of protein
     # for each sample, pipette into first well
     for sample in range(0, samples):
+        pickup_tips(1, p300m, protocol)
         for metal in range(0, metals):
-            pickup_tips(1, p300m, protocol)
             p300m.aspirate(60, samples_loc[sample])            
             row = metal % 8 
             col = (metal // 8) + (sample * 6)
             p300m.dispense(60, pcr1.rows()[row][col])
-            p300m.drop_tip()
+        p300m.drop_tip()
 
     # pick up eight tips (eventually change to number of metals) and distrribute
     for sample in range(0, samples):
