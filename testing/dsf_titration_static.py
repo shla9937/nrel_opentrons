@@ -47,65 +47,45 @@ def run(protocol):
 def setup(protocol):
     # equiptment
     global tempdeck, temp_buffs, rt_5ml, metal_plate, tips300, tips20, pcr1, p300m, p20m
-    tempdeck = protocol.load_module('temperature module gen2', 10)
+    tempdeck = protocol.load_module('temperature module gen2', 1)
     temp_buffs = tempdeck.load_labware('opentrons_24_aluminumblock_nest_1.5ml_snapcap')
-    rt_5ml = protocol.load_labware('opentrons_15_tuberack_falcon_15ml_conical', 11)
-    metal_plate = protocol.load_labware('thermoscientificnunc_96_wellplate_2000ul', 8)
-    tips300 = protocol.load_labware('opentrons_96_tiprack_300ul', 7)
-    tips20 = protocol.load_labware('opentrons_96_tiprack_20ul', 9)
-    pcr1 = protocol.load_labware('biorad_96_wellplate_200ul_pcr', 5)
+    rt_5ml = protocol.load_labware('opentrons_15_tuberack_falcon_15ml_conical', 4)
+    metal_plate = protocol.load_labware('thermoscientificnunc_96_wellplate_2000ul', 5)
+    tips300 = protocol.load_labware('opentrons_96_tiprack_300ul', 3)
+    tips20 = protocol.load_labware('opentrons_96_tiprack_20ul', 2)
+    pcr1 = protocol.load_labware('biorad_96_wellplate_200ul_pcr', 6)
     p300m = protocol.load_instrument('p300_multi_gen2', 'left', tip_racks=[tips300])
     p20m = protocol.load_instrument('p20_multi_gen2', 'right', tip_racks=[tips20])    
     
     # reagents
-    global sypro2, sypro4, metals_loc, metals, samples, samples_loc, len_titration
+    global sypro2, sypro4, metals, samples, samples_loc, metals_loc, len_titration
     sypro2 = rt_5ml.wells()[0].top(-95)
     sypro4 = rt_5ml.wells()[1].top(-95)
-    metals_loc = [rt_5ml.wells()[i].top(-95) for i in range(2, 10)]
     metals = 8
     samples = 2
-    samples_loc = [temp_buffs.wells()[i] for i in range(0, 2)]
+    samples_loc = [temp_buffs.wells()[i] for i in range(0, samples)]
+    metals_loc = [templ_buffs.wells()[i] for i in range(samples, metals+samples)]
     len_titration = 6
 
-    # tips
-    global tip20_dict, tip300_dict
-    tip20_dict = {key: ['H','G','F','E','D','C','B','A'] for key in range(1, 12 + 1)}
-    tip300_dict = {key: ['H','G','F','E','D','C','B','A'] for key in range(1, 12 + 1)}
-
 def pickup_tips(number, pipette, protocol):
-    nozzle_dict = {2: "B1", 3: "C1", 4: "D1", 5: "E1", 6: "F1", 7: "G1"}
-    if number > 8 or number < 1 or pipette not in [p20m, p300m]:
-        protocol.comment(f"Custom tip pick up function doesn't support combination of \
-                           {pipette} for pipette and {number} for tips.")
-        raise ValueError(f"Custom tip pick up function doesn't support combination of \
-                           {pipette} for pipette and {number} for tips.")
+    nozzle_dict = {2: "G1", 3: "F1", 4: "E1", 5: "D1", 6: "C1", 7: "B1"}
     elif pipette == p20m:
         if number == 1:
-            p20m.configure_nozzle_layout(style=SINGLE,start="A1")
+            p20m.configure_nozzle_layout(style=SINGLE,start="H1")
         elif number > 1 and number < 8:
-            p20m.configure_nozzle_layout(style=PARTIAL_COLUMN, start="A1", end=nozzle_dict[number])
+            p20m.configure_nozzle_layout(style=PARTIAL_COLUMN, start="H1", end=nozzle_dict[number])
         else:
             p20m.configure_nozzle_layout(style=ALL)
-        for col in tip20_dict:
-            if len(tip20_dict[col]) >= number:
-                p20m.pick_up_tip(tips20[str(tip20_dict[col][number-1] + str(col))])
-                tip20_dict[col] = tip20_dict[col][number:]
-                break
+        p20m.pick_up_tip(tips20)
+
     elif pipette == p300m:
         if number == 1:
-            p300m.configure_nozzle_layout(style=SINGLE,start="A1")
+            p300m.configure_nozzle_layout(style=SINGLE,start="H1")
         elif number > 1 and number < 8:
-            p300m.configure_nozzle_layout(style=PARTIAL_COLUMN,start="A1", end=nozzle_dict[number])
+            p300m.configure_nozzle_layout(style=PARTIAL_COLUMN,start="H1", end=nozzle_dict[number])
         else:
             p300m.configure_nozzle_layout(style=ALL)
-        for col in tip300_dict:
-            if len(tip300_dict[col]) >= number:
-                p300m.pick_up_tip(tips300[str(tip300_dict[col][number-1] + str(col))])
-                tip300_dict[col] = tip300_dict[col][number:]
-                break
-    else:
-        protocol.comment("Custom tip pick up function doesn't recognize inputs.")
-        raise ValueError("Custom tip pick up function doesn't recognize inputs.")
+        p300m.pick_up_tip(tips300)
 
 def titrate(protocol):
     # add 2x spyro to last well of deep well
@@ -140,6 +120,7 @@ def titrate(protocol):
         row = metal % 8 
         col = (metal // 8)
         p300m.dispense(40, metal_plate.rows()[row][col])
+        p300m.mix(3, 40)
         p300m.drop_tip()
 
     # titrate 10 rxn + 10 rxn + 20 extra
