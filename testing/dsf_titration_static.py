@@ -1,5 +1,6 @@
 from opentrons import protocol_api
 from opentrons.protocol_api import ALL, PARTIAL_COLUMN, SINGLE
+from opentrons.types import Point
 import time
 import sys
 import math
@@ -50,7 +51,7 @@ def setup(protocol):
     tempdeck = protocol.load_module('temperature module gen2', 1)
     temp_buffs = tempdeck.load_labware('opentrons_24_aluminumblock_nest_1.5ml_snapcap')
     rt_5ml = protocol.load_labware('opentrons_15_tuberack_falcon_15ml_conical', 4)
-    metal_plate = protocol.load_labware('thermoscientificnunc_96_wellplate_2000ul', 5)
+    metal_plate = protocol.load_labware('greiner_96_wellplate_300ul', 5)
     tips300 = protocol.load_labware('opentrons_96_tiprack_300ul', 3)
     tips20 = protocol.load_labware('opentrons_96_tiprack_20ul', 2)
     pcr1 = protocol.load_labware('biorad_96_wellplate_200ul_pcr', 6)
@@ -159,7 +160,7 @@ def add_titration(protocol): # add 10µL of titration
         p20m.aspirate(20, metal_plate.rows()[row][col])
         for sample in range(0, samples):
             pcr_col = col + (sample * 6)
-            p20m.dispense(10, pcr1.rows().move(Point(2.5,0,0))[row][pcr_col].top(-3))
+            p20m.dispense(10, pcr1.rows()[row][pcr_col].top(-3).move(Point(2.5,0,0)))
     p20m.drop_tip()
 
 def message(protocol):
