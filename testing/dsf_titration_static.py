@@ -159,7 +159,7 @@ def add_titration(protocol): # add 10µL of titration
         p20m.aspirate(20, metal_plate.rows()[row][col])
         for sample in range(0, samples):
             pcr_col = col + (sample * 6)
-            p20m.dispense(10, pcr1.rows()[row][pcr_col].top(-3))
+            p20m.dispense(10, pcr1.rows().move(Point(2.5,0,0))[row][pcr_col].top(-3))
     p20m.drop_tip()
 
 def message(protocol):
