@@ -153,14 +153,16 @@ def add_protein(protocol): # add 10µL of protein
 
 def add_titration(protocol): # add 10µL of titration
     # plate titration into each sample, go from least to most, only to top
-    pickup_tips(8, p20m, protocol) # need to adjust to metals later
+    
     for col in range(len_titration -1 , -1, -1):
         row = 0
-        p20m.aspirate(20, metal_plate.rows()[row][col])
         for sample in range(0, samples):
+            pickup_tips(8, p20m, protocol) # need to adjust to metals later
+            p20m.aspirate(10, metal_plate.rows()[row][col])
             pcr_col = col + (sample * 6)
-            p20m.dispense(10, pcr1.rows()[row][pcr_col].top(-3).move(Point(1,0,0)))
-    p20m.drop_tip()
+            p20m.dispense(10, pcr1.rows()[row][pcr_col])
+            p20m.mix(3, 10)
+            p20m.drop_tip()
 
 def message(protocol):
     protocol.pause(msg="Protcol complete, please spin plate and equillibrate for 30 \
