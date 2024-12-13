@@ -9,7 +9,7 @@ import subprocess
 
 
 metadata = {
-    'protocolName': 'DSF metal titration - static',
+    'protocolName': 'DSF metal titration - static with mix',
     'author': 'Shawn Laursen',
     'description': '''Follow up on hits from DSF screen
     Variables:
