@@ -35,6 +35,16 @@ metadata = {
     ''',
     'apiLevel': '2.20'}
 
+def add_parameters(parameters: protocol_api.Parameters):
+    parameters.add_int(
+        variable_name="samples",
+        display_name="Number of samples",
+        description="Number of proteins to test",
+        default=1,
+        minimum=1,
+        maximum=2,
+        unit="proteins")
+
 def run(protocol):
     protocol.set_rail_lights(True)
     setup(protocol)
@@ -62,7 +72,7 @@ def setup(protocol):
     sypro2 = rt_5ml.wells()[0].top(-95)
     sypro4 = temp_buffs.wells()[23]
     metals = 8
-    samples = 2
+    samples = protocol.params.samples
     samples_loc = [temp_buffs.wells()[i] for i in range(0, samples)]
     metals_loc = [temp_buffs.wells()[i] for i in range(samples, metals+samples)]
     len_titration = 6
@@ -162,9 +172,9 @@ def add_protein(protocol): # add 10µL of protein
 def add_titration(protocol): # add 10µL of titration
     # plate titration into each sample, go from least to most, only to top
     pickup_tips(8, p20m, protocol) # need to adjust to metals later
-    for col in range(len_titration -1 , -1, -1):
+    for col in range(len_titration -1, -1, -1):
         row = 0
-        p20m.aspirate(20, metal_plate.rows()[row][col])
+        p20m.aspirate(samples*10, metal_plate.rows()[row][col])
         for sample in range(0, samples):
             pcr_col = col + (sample * 6)
             p20m.dispense(10, pcr1.rows()[row][pcr_col].top(-3).move(Point(1,0,0)))
