@@ -62,13 +62,13 @@ def pickup_tips(number, pipette, protocol):
 
 def make_slide(protocol):
     pickup_tips(4, p20m, protocol)
-    for well in range(0, 96, 4):
+    for well in range(3, 96, 4):
         p20m.aspirate(1, pcr1.wells()[well])
-        p20m.dispense(1, slide.wells()[well])
+        p20m.dispense(1, slide.wells()[well+(6-3*((well-3)%3))])
         clean_tips(p20m, protocol)
-    for well in range(0, 96, 4):
+    for well in range(3, 96, 4):
         p20m.aspirate(1, pcr2.wells()[well])
-        p20m.dispense(1, slide.wells()[96+well])
+        p20m.dispense(1, slide.wells()[96+well+(6-3*((well-3)%3))])
         clean_tips(p20m, protocol)
     p20m.drop_tip()
 
