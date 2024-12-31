@@ -21,7 +21,6 @@ def run(protocol):
     protocol.set_rail_lights(True)
     setup(protocol)
     make_slide(protocol)
-    message(protocol)
     protocol.set_rail_lights(False)
 
 def setup(protocol):
@@ -33,7 +32,7 @@ def setup(protocol):
     p20m = protocol.load_instrument('p20_multi_gen2', 'right', tip_racks=[tips20])    
     pcr1 = protocol.load_labware('biorad_96_wellplate_200ul_pcr', 4)
     pcr2 = protocol.load_labware('biorad_96_wellplate_200ul_pcr', 6)
-    slide = protocol.load_labware('custom_quartz_slide', 5)
+    slide = protocol.load_labware('shawn_192_well_slideholder_1ul', 5)
     trough = protocol.load_labware('nest_12_reservoir_15ml', 8)
 
     # reagents
