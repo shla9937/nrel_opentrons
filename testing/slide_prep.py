@@ -25,15 +25,13 @@ def run(protocol):
 
 def setup(protocol):
     # equiptment
-    global tips300, tips20, p300m, p20m, pcr1, pcr2, slide, trough
-    tips300 = protocol.load_labware('opentrons_96_tiprack_300ul', 3)
-    tips20 = protocol.load_labware('opentrons_96_tiprack_20ul', 2)
-    p300m = protocol.load_instrument('p300_multi_gen2', 'left', tip_racks=[tips300])
+    global tips20, p20m, pcr1, pcr2, slide, trough
+    tips20 = protocol.load_labware('opentrons_96_tiprack_20ul', 4)
     p20m = protocol.load_instrument('p20_multi_gen2', 'right', tip_racks=[tips20])    
-    pcr1 = protocol.load_labware('biorad_96_wellplate_200ul_pcr', 4)
-    pcr2 = protocol.load_labware('biorad_96_wellplate_200ul_pcr', 6)
+    pcr1 = protocol.load_labware('biorad_96_wellplate_200ul_pcr', 2)
+    pcr2 = protocol.load_labware('biorad_96_wellplate_200ul_pcr', 8)
     slide = protocol.load_labware('shawn_192_well_slideholder_1ul', 5)
-    trough = protocol.load_labware('nest_12_reservoir_15ml', 8)
+    trough = protocol.load_labware('nest_12_reservoir_15ml', 6)
 
     # reagents
     global water, waste1, ethanol, waste2
