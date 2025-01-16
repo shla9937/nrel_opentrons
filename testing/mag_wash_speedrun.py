@@ -102,7 +102,7 @@ def dispense_beads(protocol):
             p300m.dispense(100, mag_plate.wells()[col*8].top())
         p300m.move_to(mag_plate.wells()[0].top(25))
 
-        mag_mod.engage(height=5))
+        mag_mod.engage(height_from_base=5)
         protocol.delay(minutes=0.1)
         
         for col in range(0, columns):
@@ -126,7 +126,7 @@ def add_protein(protocol):
 
 def wash(protocol):   
     # remove supernatant 
-    mag_mod.engage(height=5))
+    mag_mod.engage(height_from_base=5)
     protocol.delay(minutes=0.1)
 
     pickup_tips(8, p300m, protocol)
@@ -146,7 +146,7 @@ def wash(protocol):
             p300m.dispense(100, mag_plate.wells()[col*8].top())
         p300m.move_to(mag_plate.wells()[0].top(25))
 
-        mag_mod.engage(height=5))
+        mag_mod.engage(height_from_base=5)
         protocol.delay(minutes=0.1)
 
         for col in range(0, columns):
@@ -167,7 +167,7 @@ def elute(protocol):
 
     protocol.pause(msg="Take out plate and shake for 10min at RT (400rpm).")
 
-    mag_mod.engage(height=5))
+    mag_mod.engage(height_from_base=5)
     protocol.delay(minutes=0.1)
 
     # tranfser elution to end plate
@@ -190,7 +190,7 @@ def recharge(protocol):
 
     protocol.delay(minutes=0.1)
 
-    mag_mod.engage(height=5))
+    mag_mod.engage(height_from_base=5)
     protocol.delay(minutes=0.1)
     
     # remove NaOH from beads
@@ -210,7 +210,7 @@ def recharge(protocol):
             p300m.dispense(100, mag_plate.wells()[col*8].top())
         p300m.move_to(mag_plate.wells()[0].top(25))
 
-        mag_mod.engage(height=5))
+        mag_mod.engage(height_from_base=5)
         protocol.delay(minutes=0.1)
         
         for col in range(0, columns):
