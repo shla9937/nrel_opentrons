@@ -96,21 +96,25 @@ def dispense_beads(protocol):
 
     # wash beads
     pickup_tips(8, p300m, protocol)
+    for col in range(0, columns):
+        p300m.aspirate(100, buff)            
+        p300m.dispense(100, mag_plate.wells()[col*8].top())
+    p300m.move_to(mag_plate.wells()[0].top(25))
+    mag_mod.engage(height_from_base=5)
+    protocol.delay(minutes=0.1)
+    for col in range(0, columns):
+        p300m.aspirate(100, mag_plate.wells()[col*8].bottom(2))            
+        p300m.dispense(100, waste.wells()[0].top())
+
     for i in range(0, 2):
         for col in range(0, columns):
             p300m.aspirate(100, buff)            
-            p300m.dispense(100, mag_plate.wells()[col*8].top())
-        p300m.move_to(mag_plate.wells()[0].top(25))
-
-        mag_mod.engage(height_from_base=5)
-        protocol.delay(minutes=0.1)
-        
+            p300m.dispense(100, mag_plate.wells()[col*8].top()) 
         for col in range(0, columns):
             p300m.aspirate(100, mag_plate.wells()[col*8].bottom(2))            
             p300m.dispense(100, waste.wells()[0].top())
 
-        mag_mod.disengage()
-
+    mag_mod.disengage()
     p300m.drop_tip()
 
 def add_protein(protocol):
@@ -135,26 +139,29 @@ def wash(protocol):
         p300m.dispense(100, waste.wells()[0].top())
 
     p300m.drop_tip()
-
     mag_mod.disengage()
 
     # wash beads
     pickup_tips(8, p300m, protocol)
+    for col in range(0, columns):
+        p300m.aspirate(100, buff)            
+        p300m.dispense(100, mag_plate.wells()[col*8].top())
+    p300m.move_to(mag_plate.wells()[0].top(25))
+    mag_mod.engage(height_from_base=5)
+    protocol.delay(minutes=0.1)
+    for col in range(0, columns):
+        p300m.aspirate(100, mag_plate.wells()[col*8].bottom(2))            
+        p300m.dispense(100, waste.wells()[0].top())
+
     for i in range(0, 2):
         for col in range(0, columns):
             p300m.aspirate(100, buff)            
             p300m.dispense(100, mag_plate.wells()[col*8].top())
-        p300m.move_to(mag_plate.wells()[0].top(25))
-
-        mag_mod.engage(height_from_base=5)
-        protocol.delay(minutes=0.1)
-
         for col in range(0, columns):
             p300m.aspirate(100, mag_plate.wells()[col*8].bottom(2))            
             p300m.dispense(100, waste.wells()[0].top())
 
-        mag_mod.disengage()
-
+    mag_mod.disengage()
     p300m.drop_tip()
 
 def elute(protocol):
@@ -164,9 +171,7 @@ def elute(protocol):
         p300m.aspirate(100, elution)            
         p300m.dispense(100, mag_plate.wells()[col*8].top())
     p300m.drop_tip()
-
     protocol.pause(msg="Take out plate and shake for 10min at RT (400rpm).")
-
     mag_mod.engage(height_from_base=5)
     protocol.delay(minutes=0.1)
 
@@ -187,9 +192,7 @@ def recharge(protocol):
         p300m.dispense(100, mag_plate.wells()[col*8])
         p300m.mix(3, 50)
     p300m.drop_tip()
-
     protocol.delay(minutes=0.1)
-
     mag_mod.engage(height_from_base=5)
     protocol.delay(minutes=0.1)
     
@@ -199,25 +202,29 @@ def recharge(protocol):
         p300m.aspirate(100, mag_plate.wells()[col*8].bottom(2))            
         p300m.dispense(100, waste.wells()[0].top())
     p300m.drop_tip()
-
     mag_mod.disengage()
 
     # wash beads with buff
     pickup_tips(8, p300m, protocol)
+    for col in range(0, columns):
+        p300m.aspirate(100, buff)            
+        p300m.dispense(100, mag_plate.wells()[col*8])
+    p300m.move_to(mag_plate.wells()[0].top(25))
+    mag_mod.engage(height_from_base=5)
+    protocol.delay(minutes=0.1)
+    for col in range(0, columns):
+        p300m.aspirate(100, mag_plate.wells()[col*8].bottom(2))            
+        p300m.dispense(100, waste.wells()[0].top())
+
     for i in range(0, 2):
         for col in range(0, columns):
             p300m.aspirate(100, buff)            
-            p300m.dispense(100, mag_plate.wells()[col*8].top())
-        p300m.move_to(mag_plate.wells()[0].top(25))
-
-        mag_mod.engage(height_from_base=5)
-        protocol.delay(minutes=0.1)
-        
+            p300m.dispense(100, mag_plate.wells()[col*8])
         for col in range(0, columns):
             p300m.aspirate(100, mag_plate.wells()[col*8].bottom(2))            
             p300m.dispense(100, waste.wells()[0].top())
 
-        mag_mod.disengage()
+    mag_mod.disengage()
     p300m.drop_tip()
 
 def collect(protocol):
