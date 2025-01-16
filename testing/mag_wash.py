@@ -50,7 +50,7 @@ def setup(protocol):
     trough = protocol.load_labware('nest_12_reservoir_15ml', 4)
     reservoir = protocol.load_labware('nest_1_reservoir_195ml', 11)
     waste = protocol.load_labware('nest_1_reservoir_195ml', 10)
-    tubes = protocol.load_labware('opentrons_24_tuberack_eppendorf_2ml_safelock_snapcap', 8)
+    tubes = protocol.load_labware('opentrons_24_tuberack_generic_2ml_screwcap', 8)
 
     # reagents
     global new_beads, used_beads, buff, elution, naoh
