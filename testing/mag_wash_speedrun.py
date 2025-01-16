@@ -100,9 +100,10 @@ def dispense_beads(protocol):
         for col in range(0, columns):
             p300m.aspirate(100, buff)            
             p300m.dispense(100, mag_plate.wells()[col*8].top())
+        p300m.move_to(mag_plate.wells()[0].top(25))
 
         mag_mod.engage()
-        protocol.delay(minutes=5)
+        protocol.delay(minutes=0.1)
         
         for col in range(0, columns):
             p300m.aspirate(100, mag_plate.wells()[col*8].bottom(2))            
@@ -143,6 +144,7 @@ def wash(protocol):
         for col in range(0, columns):
             p300m.aspirate(100, buff)            
             p300m.dispense(100, mag_plate.wells()[col*8].top())
+        p300m.move_to(mag_plate.wells()[0].top(25))
 
         mag_mod.engage()
         protocol.delay(minutes=0.1)
@@ -206,6 +208,7 @@ def recharge(protocol):
         for col in range(0, columns):
             p300m.aspirate(100, buff)            
             p300m.dispense(100, mag_plate.wells()[col*8].top())
+        p300m.move_to(mag_plate.wells()[0].top(25))
 
         mag_mod.engage()
         protocol.delay(minutes=0.1)
