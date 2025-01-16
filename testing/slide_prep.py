@@ -34,11 +34,13 @@ def setup(protocol):
     trough = protocol.load_labware('nest_12_reservoir_15ml', 6)
 
     # reagents
-    global water, waste1, ethanol, waste2
-    water = trough.wells()[0]
-    waste1 = trough.wells()[1]
-    ethanol = trough.wells()[2]
-    waste2 = trough.wells()[3]
+    global water1, waste1, water2, waste2, water3, waste3
+    water1 = trough.wells()[0]
+    waste1 = trough.wells()[1].top()
+    water2 = trough.wells()[2]
+    waste2 = trough.wells()[3].top()
+    water3 = trough.wells()[4]
+    waste3 = trough.wells()[5].top()
 
 def pickup_tips(number, pipette, protocol):
     nozzle_dict = {2: "G1", 3: "F1", 4: "E1", 5: "D1", 6: "C1", 7: "B1"}
@@ -74,18 +76,18 @@ def make_slide(protocol):
 
 def clean_tips(pipette, protocol):
     if pipette == p20m:
-        p20m.aspirate(20, water)
+        p20m.aspirate(20, water1)
         p20m.dispense(20, waste1)
-        p20m.aspirate(20, ethanol)
+        p20m.aspirate(20, water2)
         p20m.dispense(20, waste2)
-        p20m.aspirate(20, water)
-        p20m.dispense(20, waste1)
+        p20m.aspirate(20, water3)
+        p20m.dispense(20, waste3)
     elif pipette == p300m:
-        p300m.aspirate(300, water)
+        p300m.aspirate(300, water1)
         p300m.dispense(300, waste1)
-        p300m.aspirate(300, ethanol)
+        p300m.aspirate(300, water2)
         p300m.dispense(300, waste2)
-        p300m.aspirate(300, water)
-        p300m.dispense(300, waste1)
+        p300m.aspirate(300, water3)
+        p300m.dispense(300, waste3)
 
 
