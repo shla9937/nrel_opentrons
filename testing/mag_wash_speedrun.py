@@ -57,8 +57,8 @@ def setup(protocol):
     new_beads = tubes.wells()[0]
     used_beads = tubes.wells()[1]
     buff = reservoir.wells()[0]
-    elution = trough.wells()[1]
-    naoh = trough.wells()[2]
+    elution = trough.wells()[0]
+    naoh = trough.wells()[1]
 
     # samples
     global samples, columns
@@ -125,19 +125,16 @@ def add_protein(protocol):
         p300m.dispense(100, mag_plate.wells()[col*8])
         p300m.mix(3, 50)
         p300m.drop_tip()
-
     protocol.pause(msg="Take out plate and shake for 10min at RT (700rpm).")
 
 def wash(protocol):   
     # remove supernatant 
     mag_mod.engage(height_from_base=5)
     protocol.delay(minutes=0.1)
-
     pickup_tips(8, p300m, protocol)
     for col in range(0, columns):
         p300m.aspirate(100, mag_plate.wells()[col*8])            
         p300m.dispense(100, waste.wells()[0].top())
-
     p300m.drop_tip()
     mag_mod.disengage()
 
@@ -193,10 +190,10 @@ def recharge(protocol):
         p300m.mix(3, 50)
     p300m.drop_tip()
     protocol.delay(minutes=0.1)
-    mag_mod.engage(height_from_base=5)
-    protocol.delay(minutes=0.1)
     
     # remove NaOH from beads
+    mag_mod.engage(height_from_base=5)
+    protocol.delay(minutes=0.1)
     pickup_tips(8, p300m, protocol)
     for col in range(0, columns):
         p300m.aspirate(100, mag_plate.wells()[col*8].bottom(2))            
@@ -233,6 +230,7 @@ def collect(protocol):
     for col in range(0, columns):
         p300m.aspirate(20, buff)            
         p300m.dispense(20, mag_plate.wells()[col*8])
+        p300m.mix(3, 20)
     p300m.drop_tip()
     
     # collect beads back into "used" tube
