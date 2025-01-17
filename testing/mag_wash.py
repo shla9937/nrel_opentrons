@@ -24,20 +24,36 @@ def add_parameters(parameters: protocol_api.Parameters):
         minimum=1,
         maximum=96,
         unit="samples")
-    parameters.add_int(
+    parameters.add_float(
+        variable_name="sample_vol",
+        display_name="Sample volume",
+        description="Volume of samples.",
+        default=100,
+        minimum=20,
+        maximum=200,
+        unit="µL")
+    parameters.add_float(
+        variable_name="elution_vol",
+        display_name="Elution volume",
+        description="Volume of elution.",
+        default=100,
+        minimum=20,
+        maximum=200,
+        unit="µL")
+    parameters.add_float(
         variable_name="mag_time",
         display_name="Minutes on magnet",
         description="Minutes on magnet",
         default=5,
-        minimum=1,
+        minimum=0.1,
         maximum=60,
         unit="minutes")
-    parameters.add_int(
+    parameters.add_float(
         variable_name="incubate_time",
         display_name="Minutes to incubate NaOH",
         description="Minutes to incubate NaOH",
         default=2,
-        minimum=1,
+        minimum=0.1,
         maximum=60,
         unit="minutes")
 
@@ -77,8 +93,10 @@ def setup(protocol):
     naoh = trough.wells()[1]
 
     # samples
-    global samples, columns
+    global samples, sample_vol, elution_vol, columns
     samples = protocol.params.samples
+    sample_vol = protocol.params.sample_vol
+    elution_vol = protocol.params.elution_vol
     columns = math.ceil(samples/8)
 
     # time
@@ -142,9 +160,9 @@ def add_protein(protocol):
     # add 100µL assay (protein + metal) from starting plate to beads
     for col in range(0, columns):
         pickup_tips(8, p300m, protocol)
-        p300m.aspirate(100, pcrstart.wells()[col*8])            
-        p300m.dispense(100, mag_plate.wells()[col*8])
-        p300m.mix(3, 50)
+        p300m.aspirate(sample_vol, pcrstart.wells()[col*8])            
+        p300m.dispense(sample_vol, mag_plate.wells()[col*8])
+        p300m.mix(3, sample_vol/2)
         p300m.drop_tip()
     protocol.pause(msg="Take out plate and shake for 10min at RT (700rpm).")
 
@@ -186,8 +204,8 @@ def elute(protocol):
     # add elution buff (50mM biotin)
     pickup_tips(8, p300m, protocol)
     for col in range(0, columns):
-        p300m.aspirate(100, elution)            
-        p300m.dispense(100, mag_plate.wells()[col*8].top())
+        p300m.aspirate(elution_vol, elution)            
+        p300m.dispense(elution_vol, mag_plate.wells()[col*8].top())
     p300m.drop_tip()
     protocol.pause(msg="Take out plate and shake for 10min at RT (400rpm).")
     mag_mod.engage(height_from_base=5)
@@ -196,8 +214,8 @@ def elute(protocol):
     # tranfser elution to end plate
     for col in range(0, columns):
         pickup_tips(8, p300m, protocol)
-        p300m.aspirate(100, mag_plate.wells()[col*8].bottom(2))            
-        p300m.dispense(100, pcrend.wells()[col*8])
+        p300m.aspirate(elution_vol, mag_plate.wells()[col*8].bottom(2))            
+        p300m.dispense(elution_vol, pcrend.wells()[col*8])
         p300m.drop_tip()
 
     mag_mod.disengage()
