@@ -28,8 +28,8 @@ def setup(protocol):
     global tips20, p20m, pcr1, pcr2, slide, trough
     tips20 = protocol.load_labware('opentrons_96_tiprack_20ul', 4)
     p20m = protocol.load_instrument('p20_multi_gen2', 'right', tip_racks=[tips20])    
-    pcr1 = protocol.load_labware('biorad_96_wellplate_200ul_pcr', 2)
-    pcr2 = protocol.load_labware('biorad_96_wellplate_200ul_pcr', 8)
+    pcr1 = protocol.load_labware('greiner_96_wellplate_300ul', 2)
+    pcr2 = protocol.load_labware('greiner_96_wellplate_300ul', 8)
     slide = protocol.load_labware('shawn_192_well_slideholder_1ul', 5)
     trough = protocol.load_labware('nest_12_reservoir_15ml', 6)
 
