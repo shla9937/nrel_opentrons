@@ -78,16 +78,22 @@ def clean_tips(pipette, protocol):
     if pipette == p20m:
         p20m.aspirate(20, water1)
         p20m.dispense(20, waste1)
+        p20m.touch_tip()
         p20m.aspirate(20, water2)
         p20m.dispense(20, waste2)
+        p20m.touch_tip()
         p20m.aspirate(20, water3)
         p20m.dispense(20, waste3)
+        p20m.touch_tip()
     elif pipette == p300m:
         p300m.aspirate(300, water1)
         p300m.dispense(300, waste1)
+        p300m.touch_tip()
         p300m.aspirate(300, water2)
         p300m.dispense(300, waste2)
+        p300m.touch_tip()
         p300m.aspirate(300, water3)
         p300m.dispense(300, waste3)
+        p300m.touch_tip()
 
 
