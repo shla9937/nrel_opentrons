@@ -44,17 +44,17 @@ def add_parameters(parameters: protocol_api.Parameters):
         variable_name="mag_time",
         display_name="seconds on magnet",
         description="seconds on magnet",
-        default=5,
-        minimum=0.1,
-        maximum=60,
+        default=10,
+        minimum=1,
+        maximum=600,
         unit="seconds")
     parameters.add_float(
         variable_name="incubate_time",
         display_name="seconds to incubate NaOH",
         description="seconds to incubate NaOH",
-        default=2,
-        minimum=0.1,
-        maximum=60,
+        default=120,
+        minimum=10,
+        maximum=3600,
         unit="seconds")
 
 def run(protocol):
