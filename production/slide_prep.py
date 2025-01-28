@@ -36,11 +36,11 @@ def setup(protocol):
     # reagents
     global water1, waste1, water2, waste2, water3, waste3
     water1 = trough.wells()[0]
-    waste1 = trough.wells()[1].top()
+    waste1 = trough.wells()[1]
     water2 = trough.wells()[2]
-    waste2 = trough.wells()[3].top()
+    waste2 = trough.wells()[3]
     water3 = trough.wells()[4]
-    waste3 = trough.wells()[5].top()
+    waste3 = trough.wells()[5]
 
 def pickup_tips(number, pipette, protocol):
     nozzle_dict = {2: "G1", 3: "F1", 4: "E1", 5: "D1", 6: "C1", 7: "B1"}
@@ -77,23 +77,21 @@ def make_slide(protocol):
 def clean_tips(pipette, protocol):
     if pipette == p20m:
         p20m.aspirate(20, water1)
-        p20m.dispense(20, waste1)
-        p20m.touch_tip()
+        p20m.dispense(20, waste1.top().move(Point(4,0,-10)))
+        p20m.move_to(waste1.top().move(Point(4,0,0)))
         p20m.aspirate(20, water2)
-        p20m.dispense(20, waste2)
-        p20m.touch_tip()
+        p20m.dispense(20, waste2.top().move(Point(4,0,-10)))
+        p20m.move_to(waste2.top().move(Point(4,0,0)))
         p20m.aspirate(20, water3)
-        p20m.dispense(20, waste3)
-        p20m.touch_tip()
+        p20m.dispense(20, waste3.top().move(Point(4,0,-10)))
+        p20m.move_to(waste3.top().move(Point(4,0,0)))
     elif pipette == p300m:
         p300m.aspirate(300, water1)
-        p300m.dispense(300, waste1)
-        p300m.touch_tip()
+        p300m.dispense(300, waste1.top().move(Point(4,0,-10)))
+        p300m.move_to(waste1.top().move(Point(4,0,0)))
         p300m.aspirate(300, water2)
-        p300m.dispense(300, waste2)
-        p300m.touch_tip()
+        p300m.dispense(300, waste2.top().move(Point(4,0,-10)))
+        p300m.move_to(waste2.top().move(Point(4,0,0)))
         p300m.aspirate(300, water3)
-        p300m.dispense(300, waste3)
-        p300m.touch_tip()
-
-
+        p300m.dispense(300, waste3.top().move(Point(4,0,-10)))
+        p300m.move_to(waste3.top().move(Point(4,0,0)))
