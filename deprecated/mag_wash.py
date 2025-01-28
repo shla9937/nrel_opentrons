@@ -44,9 +44,9 @@ def setup(protocol):
     tips300_2 = protocol.load_labware('opentrons_96_tiprack_300ul', 7)
     p300m = protocol.load_instrument('p300_multi_gen2', 'left', tip_racks=[tips300, tips300_1, tips300_2])
     mag_mod = protocol.load_module('magnetic module gen2', 1)
-    mag_plate = mag_mod.load_labware('biorad_96_wellplate_200ul_pcr')
-    pcrstart = protocol.load_labware('biorad_96_wellplate_200ul_pcr', 5)
-    pcrend = protocol.load_labware('biorad_96_wellplate_200ul_pcr', 6)
+    mag_plate = mag_mod.load_labware('greiner_96_wellplate_300ul')
+    pcrstart = protocol.load_labware('greiner_96_wellplate_300ul', 5)
+    pcrend = protocol.load_labware('greiner_96_wellplate_300ul', 6)
     trough = protocol.load_labware('nest_12_reservoir_15ml', 4)
     reservoir = protocol.load_labware('nest_1_reservoir_195ml', 11)
     waste = protocol.load_labware('nest_1_reservoir_195ml', 10)
@@ -65,10 +65,10 @@ def setup(protocol):
     samples = protocol.params.samples
     columns = math.ceil(samples/8)
 
-    # time
+    # time (in seconds)
     global mag_time, incubate_time
-    mag_time = 5
-    incubate_time = 2
+    mag_time = 10
+    incubate_time = 120
 
 def pickup_tips(number, pipette, protocol):
     # nozzle_dict = {2: "G1", 3: "F1", 4: "E1", 5: "D1", 6: "C1", 7: "B1"}
@@ -106,7 +106,7 @@ def dispense_beads(protocol):
         p300m.dispense(100, mag_plate.wells()[col*8].top())
     p300m.move_to(mag_plate.wells()[0].top(25))
     mag_mod.engage(height_from_base=5)
-    protocol.delay(minutes=mag_time)
+    protocol.delay(seconds=mag_time)
     for col in range(0, columns):
         p300m.aspirate(100, mag_plate.wells()[col*8].bottom(2))            
         p300m.dispense(100, waste.wells()[0].top())
@@ -135,7 +135,7 @@ def add_protein(protocol):
 def wash(protocol):   
     # remove supernatant 
     mag_mod.engage(height_from_base=5)
-    protocol.delay(minutes=mag_time)
+    protocol.delay(seconds=mag_time)
     pickup_tips(8, p300m, protocol)
     for col in range(0, columns):
         p300m.aspirate(100, mag_plate.wells()[col*8])            
@@ -150,7 +150,7 @@ def wash(protocol):
         p300m.dispense(100, mag_plate.wells()[col*8].top())
     p300m.move_to(mag_plate.wells()[0].top(25))
     mag_mod.engage(height_from_base=5)
-    protocol.delay(minutes=mag_time)
+    protocol.delay(seconds=mag_time)
     for col in range(0, columns):
         p300m.aspirate(100, mag_plate.wells()[col*8].bottom(2))            
         p300m.dispense(100, waste.wells()[0].top())
@@ -175,7 +175,7 @@ def elute(protocol):
     p300m.drop_tip()
     protocol.pause(msg="Take out plate and shake for 10min at RT (400rpm).")
     mag_mod.engage(height_from_base=5)
-    protocol.delay(minutes=mag_time)
+    protocol.delay(seconds=mag_time)
 
     # tranfser elution to end plate
     for col in range(0, columns):
@@ -194,11 +194,11 @@ def recharge(protocol):
         p300m.dispense(100, mag_plate.wells()[col*8])
         p300m.mix(3, 50)
     p300m.drop_tip()
-    protocol.delay(minutes=incubate_time)
+    protocol.delay(seconds=incubate_time)
     
     # remove NaOH from beads
     mag_mod.engage(height_from_base=5)
-    protocol.delay(minutes=mag_time)
+    protocol.delay(seconds=mag_time)
     pickup_tips(8, p300m, protocol)
     for col in range(0, columns):
         p300m.aspirate(100, mag_plate.wells()[col*8].bottom(2))            
@@ -213,7 +213,7 @@ def recharge(protocol):
         p300m.dispense(100, mag_plate.wells()[col*8])
     p300m.move_to(mag_plate.wells()[0].top(25))
     mag_mod.engage(height_from_base=5)
-    protocol.delay(minutes=mag_time)
+    protocol.delay(seconds=mag_time)
     for col in range(0, columns):
         p300m.aspirate(100, mag_plate.wells()[col*8].bottom(2))            
         p300m.dispense(100, waste.wells()[0].top())
