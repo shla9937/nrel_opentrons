@@ -60,8 +60,8 @@ def add_parameters(parameters: protocol_api.Parameters):
 def run(protocol):
     protocol.set_rail_lights(True)
     setup(protocol)
-    # dispense_beads(protocol)
-    # add_protein(protocol)
+    dispense_beads(protocol)
+    add_protein(protocol)
     wash(protocol)
     elute(protocol)
     recharge(protocol)
@@ -110,9 +110,8 @@ def setup(protocol):
 
     # washing offsets 
     global wash_z, wash_x
-    wash_z = 3 #height above the well to remove supernatant and not mag beads
-    wash_x = 2 #shift in well (right or left) to remove supernatant and not mag beads -- note value is positive
-
+    wash_z = 3 
+    wash_x = 2
 
 def pickup_tips(number, pipette, protocol):
     # nozzle_dict = {2: "G1", 3: "F1", 4: "E1", 5: "D1", 6: "C1", 7: "B1"}
@@ -154,8 +153,8 @@ def dispense_beads(protocol):
     protocol.delay(seconds=mag_time)
     for col in range(0, columns):
         col_x = ((col % 2) * 2 - 1) * wash_x
-        p300m.aspirate(100, mag_plate.wells()[col*8].bottom().move(Point(col_x,0,wash_z)))           
-        p300m.dispense(100, waste.wells()[0].top())
+        p300m.aspirate(120, mag_plate.wells()[col*8].bottom().move(Point(col_x,0,wash_z)))           
+        p300m.dispense(120, waste.wells()[0].top())
 
     for i in range(0, 2):
         for col in range(0, columns):
@@ -286,7 +285,7 @@ def collect(protocol):
     for col in range(0, columns):
         p300m.aspirate(20, buff)            
         p300m.dispense(20, mag_plate.wells()[col*8])
-        p300m.mix(3, 20)
+        p300m.mix(6, 20)
     p300m.drop_tip()
     
     # collect beads back into "used" tube
@@ -298,12 +297,12 @@ def collect(protocol):
     p300m.drop_tip()
 
 def clean_tips(protocol):
-    p300m.aspirate(300, water1)
-    p300m.dispense(300, waste1.top().move(Point(3,0,-10)))
-    p300m.move_to(waste1.top().move(Point(3,0,0)))
-    p300m.aspirate(300, water2)
-    p300m.dispense(300, waste2.top().move(Point(3,0,-10)))
-    p300m.move_to(waste2.top().move(Point(3,0,0)))
-    p300m.aspirate(300, water3)
-    p300m.dispense(300, waste3.top().move(Point(3,0,-10)))
-    p300m.move_to(waste3.top().move(Point(3,0,0)))
+    p300m.aspirate(100, water1)
+    p300m.dispense(100, waste1.top().move(Point(2,0,-10)))
+    p300m.move_to(waste1.top().move(Point(2,0,0)))
+    p300m.aspirate(100, water2)
+    p300m.dispense(100, waste2.top().move(Point(2,0,-10)))
+    p300m.move_to(waste2.top().move(Point(2,0,0)))
+    p300m.aspirate(100, water3)
+    p300m.dispense(100, waste3.top().move(Point(2,0,-10)))
+    p300m.move_to(waste3.top().move(Point(2,0,0)))
