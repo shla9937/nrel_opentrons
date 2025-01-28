@@ -60,8 +60,8 @@ def add_parameters(parameters: protocol_api.Parameters):
 def run(protocol):
     protocol.set_rail_lights(True)
     setup(protocol)
-    dispense_beads(protocol)
-    add_protein(protocol)
+    # dispense_beads(protocol)
+    # add_protein(protocol)
     wash(protocol)
     elute(protocol)
     recharge(protocol)
@@ -299,11 +299,11 @@ def collect(protocol):
 
 def clean_tips(protocol):
     p300m.aspirate(300, water1)
-    p300m.dispense(300, waste1.top().move(Point(4,0,-10)))
-    p300m.move_to(waste1.top().move(Point(4,0,0)))
+    p300m.dispense(300, waste1.top().move(Point(3,0,-10)))
+    p300m.move_to(waste1.top().move(Point(3,0,0)))
     p300m.aspirate(300, water2)
-    p300m.dispense(300, waste2.top().move(Point(4,0,-10)))
-    p300m.move_to(waste2.top().move(Point(4,0,0)))
+    p300m.dispense(300, waste2.top().move(Point(3,0,-10)))
+    p300m.move_to(waste2.top().move(Point(3,0,0)))
     p300m.aspirate(300, water3)
-    p300m.dispense(300, waste3.top().move(Point(4,0,-10)))
-    p300m.move_to(waste3.top().move(Point(4,0,0)))
+    p300m.dispense(300, waste3.top().move(Point(3,0,-10)))
+    p300m.move_to(waste3.top().move(Point(3,0,0)))
