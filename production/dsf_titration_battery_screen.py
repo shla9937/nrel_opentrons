@@ -56,10 +56,10 @@ def setup(protocol):
     # cleaning
     global water1, waste1, water2, waste2, water3, waste3
     water1 = trough.wells()[3]
-    water2 = trough.wells()[4]
-    water3 = trough.wells()[5]
-    waste1 = trough.wells()[6]
-    waste2 = trough.wells()[7]
+    waste1 = trough.wells()[4]
+    water2 = trough.wells()[5]
+    waste2 = trough.wells()[6]
+    water3 = trough.wells()[7]
     waste3 = trough.wells()[8]
 
 def pickup_tips(number, pipette, protocol):
