@@ -26,7 +26,7 @@ def run(protocol):
     titrate(protocol)
     add_protein(protocol)
     add_water(protocol)
-    add_controls(protcol)
+    add_controls(protocol)
     message(protocol)
     protocol.set_rail_lights(False)
 
@@ -36,8 +36,8 @@ def setup(protocol):
     tips20 = protocol.load_labware('opentrons_96_tiprack_20ul', 1)
     pcr = protocol.load_labware('biorad_96_wellplate_200ul_pcr', 2)
     tips300 = protocol.load_labware('opentrons_96_tiprack_300ul', 3)
-    trough = protocol.load_labware('nest_12_reservoir_15ml', 4)
-    tubes = protocol.load_labware('opentrons_24_tuberack_eppendorf_1.5ml_safelock_snapcap', 5)
+    trough = protocol.load_labware('nest_12_reservoir_15ml', 7)
+    tubes = protocol.load_labware('opentrons_24_tuberack_eppendorf_1.5ml_safelock_snapcap', 8)
     p300m = protocol.load_instrument('p300_multi_gen2', 'left', tip_racks=[tips300])
     p20m = protocol.load_instrument('p20_multi_gen2', 'right', tip_racks=[tips20])    
     
@@ -52,6 +52,9 @@ def setup(protocol):
     buff1 = trough.wells()[0]
     buff2 = trough.wells()[1]
     buff3 = trough.wells()[2]
+
+    # cleaning
+    global water1, waste1, water2, waste2, water3, waste3
     water1 = trough.wells()[3]
     water2 = trough.wells()[4]
     water3 = trough.wells()[5]
@@ -135,23 +138,23 @@ def add_buff(protocol):
         clean_tips(p20m, protocol)
     p20m.drop_tip()
 
-def add_metals(protocol):
+def add_metal(protocol):
     # add 10x metals
-    metals_dict = {Co: ["A1", "H1", "E6"],
-                   Mn: ["B1", "A6", "F6"],
-                   Ni: ["C1", "B6", "G6"],
-                   Li: ["D1", "C6", "H6"],
-                   Cu: ["E1", "D6"],
-                   Al: ["F1"]
-                   Fe: ["G1"]}
+    metals_dict = {"Co": ["A1", "H1", "E6"],
+                   "Mn": ["B1", "A6", "F6"],
+                   "Ni": ["C1", "B6", "G6"],
+                   "Li": ["D1", "C6", "H6"],
+                   "Cu": ["E1", "D6"],
+                   "Al": ["F1"],
+                   "Fe": ["G1"]}
 
     for metal in metals_dict:
         count = 0
         pickup_tips(1, p20m, protocol)
-        for well in metal:
+        for well in metals_dict[metal]:
             p20m.aspirate(1, metals_loc[count])            
             p20m.dispense(1, pcr.wells_by_name()[well])
-            clean_tips(p20m, protcol)
+            clean_tips(p20m, protocol)
         p20m.drop_tip()
         count += 1
 
@@ -159,9 +162,9 @@ def titrate(protocol):
     # titrate 1µL into 10µL
     for i in [0, 5]:
         pickup_tips(8, p20m, protocol)
-        p20m.transfer(1,pcr.rows()[0][0+i:3+i],pcr.rows()[0+i][1+i:5+i],
+        p20m.transfer(1,pcr.rows()[0][0+i:4+i],pcr.rows()[0][1+i:5+i],
                     mix_after=(3, 5),new_tip='never')
-        p20m.aspirate(1, metal_plate.rows()[0][4+i])
+        p20m.aspirate(1, pcr.rows()[0][4+i])
         p20m.drop_tip()
 
 def add_protein(protocol): 
@@ -169,10 +172,10 @@ def add_protein(protocol):
     pickup_tips(1, p20m, protocol)
     for well in range(0, 83):
         p20m.aspirate(10, prot)
-        p20m.dispense(10, pcr.wells[well]].top(-3).move(Point(1,0,0)))
+        p20m.dispense(10, pcr.wells()[well].top(-3).move(Point(1,0,0)))
     for well in range(88, 91):
         p20m.aspirate(10, prot)
-        p20m.dispense(10, pcr.wells[well]].top(-3).move(Point(1,0,0)))
+        p20m.dispense(10, pcr.wells()[well].top(-3).move(Point(1,0,0)))
     p20m.drop_tip()
 
 def add_water(protocol):
@@ -180,10 +183,10 @@ def add_water(protocol):
     pickup_tips(1, p20m, protocol)
     for well in range(83, 86):
         p20m.aspirate(10, water)
-        p20m.dispense(10, pcr.wells[well]].top(-3).move(Point(1,0,0)))
+        p20m.dispense(10, pcr.wells()[well].top(-3).move(Point(1,0,0)))
     for well in range(91, 94):
         p20m.aspirate(10, prot)
-        p20m.dispense(10, pcr.wells[well]].top(-3).move(Point(1,0,0)))
+        p20m.dispense(10, pcr.wells()[well].top(-3).move(Point(1,0,0)))
     p20m.drop_tip()
 
 def add_controls(protocol):
@@ -191,13 +194,13 @@ def add_controls(protocol):
     pickup_tips(1, p20m, protocol)
     for well in ["G11","G12"]:
         p20m.aspirate(10, pos)
-        p20m.dispense(10, pcr.wells_by_name[well]].top(-3).move(Point(1,0,0)))
+        p20m.dispense(10, pcr.wells_by_name()[well].top(-3).move(Point(1,0,0)))
     p20m.drop_tip()
     # add 10µL of negative control
     pickup_tips(1, p20m, protocol)
     for well in ["H11","H12"]:
         p20m.aspirate(10, neg)
-        p20m.dispense(10, pcr.wells_by_name[well]].top(-3).move(Point(1,0,0)))
+        p20m.dispense(10, pcr.wells_by_name()[well].top(-3).move(Point(1,0,0)))
     p20m.drop_tip()
 
 def message(protocol):
