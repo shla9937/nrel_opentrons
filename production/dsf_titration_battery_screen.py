@@ -101,13 +101,13 @@ def add_buff(protocol):
     for col in range(0, 5):
         p20m.aspirate(5, buff1)             
         p20m.dispense(5, pcr.rows()[6][col])
-        clean_tips(p20m, protocol)
+        clean_tips(p20m, 5, protocol)
     p20m.drop_tip()
     pickup_tips(1, p20m, protocol)
     for well in ["A11", "A12", "D11", "D12"]:
         p20m.aspirate(5, buff1)             
         p20m.dispense(5, pcr.wells_by_name()[well])
-        clean_tips(p20m, protocol)
+        clean_tips(p20m, 5, protocol)
     p20m.drop_tip()
 
     # add pH 5.3
@@ -115,13 +115,13 @@ def add_buff(protocol):
     for col in range(5, 10):
         p20m.aspirate(5, buff2)             
         p20m.dispense(5, pcr.rows()[3][col])
-        clean_tips(p20m, protocol)
+        clean_tips(p20m, 5, protocol)
     p20m.drop_tip()
     pickup_tips(1, p20m, protocol)
     for well in ["H1","H2","H3","H4","H5","B11","B12","E11","E12"]:
         p20m.aspirate(5, buff2)             
         p20m.dispense(5, pcr.wells_by_name()[well])
-        clean_tips(p20m, protocol)
+        clean_tips(p20m, 5, protocol)
     p20m.drop_tip()
 
     # add pH 6.6
@@ -129,13 +129,13 @@ def add_buff(protocol):
     for col in range(5, 10):
         p20m.aspirate(5, buff3)             
         p20m.dispense(5, pcr.rows()[7][col])
-        clean_tips(p20m, protocol)
+        clean_tips(p20m, 5, protocol)
     p20m.drop_tip()
     pickup_tips(1, p20m, protocol)
     for well in ["C11","C12","F11","F12"]:
         p20m.aspirate(5, buff3)             
         p20m.dispense(5, pcr.wells_by_name()[well])
-        clean_tips(p20m, protocol)
+        clean_tips(p20m, 5, protocol)
     p20m.drop_tip()
 
 def add_metal(protocol):
@@ -154,7 +154,7 @@ def add_metal(protocol):
         for well in metals_dict[metal]:
             p20m.aspirate(1, metals_loc[count])            
             p20m.dispense(1, pcr.wells_by_name()[well])
-            clean_tips(p20m, protocol)
+            clean_tips(p20m, 5, protocol)
         p20m.drop_tip()
         count += 1
 
@@ -207,24 +207,24 @@ def message(protocol):
     protocol.pause(msg="Protcol complete, please spin plate and equillibrate for 30mins \
                         before thermocycling.")
 
-def clean_tips(pipette, protocol):
+def clean_tips(pipette, clean_vol, protocol):
     if pipette == p20m:
-        p20m.aspirate(20, water1)
-        p20m.dispense(20, waste1.top().move(Point(2,0,-10)))
+        p20m.aspirate(clean_vol, water1)
+        p20m.dispense(clean_vol, waste1.top().move(Point(2,0,-10)))
         p20m.move_to(waste1.top().move(Point(2,0,0)))
-        p20m.aspirate(20, water2)
-        p20m.dispense(20, waste2.top().move(Point(2,0,-10)))
+        p20m.aspirate(clean_vol, water2)
+        p20m.dispense(clean_vol, waste2.top().move(Point(2,0,-10)))
         p20m.move_to(waste2.top().move(Point(2,0,0)))
-        p20m.aspirate(20, water3)
-        p20m.dispense(20, waste3.top().move(Point(2,0,-10)))
+        p20m.aspirate(clean_vol, water3)
+        p20m.dispense(clean_vol, waste3.top().move(Point(2,0,-10)))
         p20m.move_to(waste3.top().move(Point(2,0,0)))
     elif pipette == p300m:
-        p300m.aspirate(300, water1)
-        p300m.dispense(300, waste1.top().move(Point(2,0,-10)))
+        p300m.aspirate(clean_vol, water1)
+        p300m.dispense(clean_vol, waste1.top().move(Point(2,0,-10)))
         p300m.move_to(waste1.top().move(Point(2,0,0)))
-        p300m.aspirate(300, water2)
-        p300m.dispense(300, waste2.top().move(Point(2,0,-10)))
+        p300m.aspirate(clean_vol, water2)
+        p300m.dispense(clean_vol, waste2.top().move(Point(2,0,-10)))
         p300m.move_to(waste2.top().move(Point(2,0,0)))
-        p300m.aspirate(300, water3)
-        p300m.dispense(300, waste3.top().move(Point(2,0,-10)))
+        p300m.aspirate(clean_vol, water3)
+        p300m.dispense(clean_vol, waste3.top().move(Point(2,0,-10)))
         p300m.move_to(waste3.top().move(Point(2,0,0)))
