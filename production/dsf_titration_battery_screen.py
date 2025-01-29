@@ -42,7 +42,7 @@ def setup(protocol):
     p20m = protocol.load_instrument('p20_multi_gen2', 'right', tip_racks=[tips20])    
     
     # reagents
-    global sypro4, prot, water, pos, neg, metals, metals_loc, buff1, buff2, buff3
+    global sypro4, prot, water, pos, neg, metals_loc, buff1, buff2, buff3
     sypro4 = tubes.wells()[8]
     prot = tubes.wells()[12]
     water = tubes.wells()[16]
@@ -147,9 +147,9 @@ def add_metal(protocol):
                    "Cu": ["E1", "D6"],
                    "Al": ["F1"],
                    "Fe": ["G1"]}
-
+    
+    count = 0
     for metal in metals_dict:
-        count = 0
         pickup_tips(1, p20m, protocol)
         for well in metals_dict[metal]:
             p20m.aspirate(1, metals_loc[count])            
