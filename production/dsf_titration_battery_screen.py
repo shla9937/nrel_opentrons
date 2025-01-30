@@ -45,10 +45,10 @@ def setup(protocol):
     global sypro4, prot, water, pos, neg, metals_loc, buff1, buff2, buff3
     sypro4 = tubes.wells()[8]
     prot = tubes.wells()[12]
-    water = tubes.wells()[16]
-    pos = tubes.wells()[20]
-    neg = tubes.wells()[21]
-    metals_loc = [tubes.wells()[i] for i in range(0, 7)]
+    water = tubes.wells()[16].bottom(3)
+    pos = tubes.wells()[20].bottom(3)
+    neg = tubes.wells()[21].bottom(3)
+    metals_loc = [tubes.wells()[i].bottom(3) for i in range(0, 7)]
     buff1 = trough.wells()[0]
     buff2 = trough.wells()[1]
     buff3 = trough.wells()[2]
@@ -170,14 +170,20 @@ def titrate(protocol):
 
 def add_protein(protocol): 
     # add 10µL of protein
-    pickup_tips(1, p20m, protocol)
-    for well in range(0, 83):
-        p20m.aspirate(10, prot)
-        p20m.dispense(10, pcr.wells()[well].top(-3).move(Point(1,0,0)))
+    pickup_tips(1, p300m, protocol)
+    i = 0
+    for j in [28, 56, 83]:
+        p300m.aspirate(300, prot)
+        for well in range(i, j):
+            p300m.dispense(10, pcr.wells()[well].top(-3).move(Point(1,0,0)))
+        p300m.move_to(prot.top())
+        p300m.blow_out()
+        i = j
+
+    p300m.aspirate(30, prot)
     for well in range(88, 91):
-        p20m.aspirate(10, prot)
-        p20m.dispense(10, pcr.wells()[well].top(-3).move(Point(1,0,0)))
-    p20m.drop_tip()
+        p300m.dispense(10, pcr.wells()[well].top(-3).move(Point(1,0,0)))
+    p300m.drop_tip()
 
 def add_water(protocol):
     # add 10µL of water
