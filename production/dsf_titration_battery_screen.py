@@ -180,7 +180,7 @@ def add_protein(protocol):
         p300m.blow_out()
         i = j
 
-    p300m.aspirate(30, prot)
+    p300m.aspirate(35, prot)
     for well in range(88, 91):
         p300m.dispense(10, pcr.wells()[well].top(-3).move(Point(1,0,0)))
     p300m.drop_tip()
