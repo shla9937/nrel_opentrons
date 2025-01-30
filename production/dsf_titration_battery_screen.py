@@ -34,10 +34,10 @@ def setup(protocol):
     # equiptment
     global tips20, tips300, pcr, trough, tubes, p300m, p20m
     tips20 = protocol.load_labware('opentrons_96_tiprack_20ul', 1)
-    pcr = protocol.load_labware('biorad_96_wellplate_200ul_pcr', 2)
+    pcr = protocol.load_labware('biorad_96_wellplate_200ul_pcr', 5)
     tips300 = protocol.load_labware('opentrons_96_tiprack_300ul', 3)
-    trough = protocol.load_labware('nest_12_reservoir_15ml', 7)
-    tubes = protocol.load_labware('opentrons_24_tuberack_eppendorf_1.5ml_safelock_snapcap', 8)
+    trough = protocol.load_labware('nest_12_reservoir_15ml', 6)
+    tubes = protocol.load_labware('opentrons_24_tuberack_eppendorf_1.5ml_safelock_snapcap', 2)
     p300m = protocol.load_instrument('p300_multi_gen2', 'left', tip_racks=[tips300])
     p20m = protocol.load_instrument('p20_multi_gen2', 'right', tip_racks=[tips20])    
     
