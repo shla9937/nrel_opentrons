@@ -162,6 +162,7 @@ def titrate(protocol):
     # titrate 1µL into 10µL
     for i in [0, 5]:
         pickup_tips(8, p20m, protocol)
+        p20m.mix(3, 5 ,pcr.rows()[0][0+i])
         p20m.transfer(1,pcr.rows()[0][0+i:4+i],pcr.rows()[0][1+i:5+i],
                     mix_after=(3, 5),new_tip='never')
         p20m.aspirate(1, pcr.rows()[0][4+i])
