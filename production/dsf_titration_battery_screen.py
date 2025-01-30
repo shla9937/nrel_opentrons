@@ -45,10 +45,10 @@ def setup(protocol):
     global sypro4, prot, water, pos, neg, metals_loc, buff1, buff2, buff3
     sypro4 = tubes.wells()[8]
     prot = tubes.wells()[12]
-    water = tubes.wells()[16].bottom(5)
-    pos = tubes.wells()[20].bottom(5)
-    neg = tubes.wells()[21].bottom(5)
-    metals_loc = [tubes.wells()[i].bottom(5) for i in range(0, 7)]
+    water = tubes.wells()[16].bottom(8)
+    pos = tubes.wells()[20].bottom(8)
+    neg = tubes.wells()[21].bottom(8)
+    metals_loc = [tubes.wells()[i].bottom(8) for i in range(0, 7)]
     buff1 = trough.wells()[0]
     buff2 = trough.wells()[1]
     buff3 = trough.wells()[2]
