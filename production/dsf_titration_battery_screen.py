@@ -173,11 +173,11 @@ def add_protein(protocol):
     pickup_tips(1, p20m, protocol)
     for well in range(0, 83):
         p20m.aspirate(10, prot)
-        p20m.dispense(10, pcr.wells()[well].top())
+        p20m.dispense(10, pcr.wells()[well].top(-3).move(Point(1,0,0)))
         p20m.touch_tip()
     for well in range(88, 91):
         p20m.aspirate(10, prot)
-        p20m.dispense(10, pcr.wells()[well].top())
+        p20m.dispense(10, pcr.wells()[well].top(-3).move(Point(1,0,0)))
         p20m.touch_tip()
     p20m.drop_tip()
 
@@ -186,11 +186,19 @@ def add_water(protocol):
     pickup_tips(1, p20m, protocol)
     for well in range(83, 86):
         p20m.aspirate(10, water)
-        p20m.dispense(10, pcr.wells()[well].top())
+        p20m.dispense(10, pcr.wells()[well].top(-3).move(Point(1,0,0)))
+        p20m.touch_tip()
+    for well in range(86, 88):
+        p20m.aspirate(5, water)
+        p20m.dispense(5, pcr.wells()[well].top(-3).move(Point(1,0,0)))
         p20m.touch_tip()
     for well in range(91, 94):
         p20m.aspirate(10, prot)
-        p20m.dispense(10, pcr.wells()[well].top())
+        p20m.dispense(10, pcr.wells()[well].top(-3).move(Point(1,0,0)))
+        p20m.touch_tip()
+    for well in range(94, 96):
+        p20m.aspirate(5, prot)
+        p20m.dispense(5, pcr.wells()[well].top(-3).move(Point(1,0,0)))
         p20m.touch_tip()
     p20m.drop_tip()
 
@@ -199,14 +207,14 @@ def add_controls(protocol):
     pickup_tips(1, p20m, protocol)
     for well in ["G11","G12"]:
         p20m.aspirate(10, pos)
-        p20m.dispense(10, pcr.wells_by_name()[well].top())
+        p20m.dispense(10, pcr.wells_by_name()[well].top(-3).move(Point(1,0,0)))
         p20m.touch_tip()
     p20m.drop_tip()
     # add 10µL of negative control
     pickup_tips(1, p20m, protocol)
     for well in ["H11","H12"]:
         p20m.aspirate(10, neg)
-        p20m.dispense(10, pcr.wells_by_name()[well].top())
+        p20m.dispense(10, pcr.wells_by_name()[well].top(-3).move(Point(1,0,0)))
         p20m.touch_tip()
     p20m.drop_tip()
 
