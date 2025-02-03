@@ -170,30 +170,28 @@ def titrate(protocol):
 
 def add_protein(protocol): 
     # add 10µL of protein
-    pickup_tips(1, p300m, protocol)
-    i = 0
-    for j in [28, 56, 83]:
-        p300m.aspirate(300, prot)
-        for well in range(i, j):
-            p300m.dispense(10, pcr.wells()[well].top(-3).move(Point(1,0,0)))
-        p300m.move_to(prot.top())
-        p300m.blow_out()
-        i = j
-
-    p300m.aspirate(35, prot)
+    pickup_tips(1, p20m, protocol)
+    for well in range(0, 83):
+        p20m.aspirate(10, prot)
+        p20m.dispense(10, pcr.wells()[well].top())
+        p20m.touch_tip()
     for well in range(88, 91):
-        p300m.dispense(10, pcr.wells()[well].top(-3).move(Point(1,0,0)))
-    p300m.drop_tip()
+        p20m.aspirate(10, prot)
+        p20m.dispense(10, pcr.wells()[well].top())
+        p20m.touch_tip()
+    p20m.drop_tip()
 
 def add_water(protocol):
     # add 10µL of water
     pickup_tips(1, p20m, protocol)
     for well in range(83, 86):
         p20m.aspirate(10, water)
-        p20m.dispense(10, pcr.wells()[well].top(-3).move(Point(1,0,0)))
+        p20m.dispense(10, pcr.wells()[well].top())
+        p20m.touch_tip()
     for well in range(91, 94):
         p20m.aspirate(10, prot)
-        p20m.dispense(10, pcr.wells()[well].top(-3).move(Point(1,0,0)))
+        p20m.dispense(10, pcr.wells()[well].top())
+        p20m.touch_tip()
     p20m.drop_tip()
 
 def add_controls(protocol):
@@ -201,13 +199,15 @@ def add_controls(protocol):
     pickup_tips(1, p20m, protocol)
     for well in ["G11","G12"]:
         p20m.aspirate(10, pos)
-        p20m.dispense(10, pcr.wells_by_name()[well].top(-3).move(Point(1,0,0)))
+        p20m.dispense(10, pcr.wells_by_name()[well].top())
+        p20m.touch_tip()
     p20m.drop_tip()
     # add 10µL of negative control
     pickup_tips(1, p20m, protocol)
     for well in ["H11","H12"]:
         p20m.aspirate(10, neg)
-        p20m.dispense(10, pcr.wells_by_name()[well].top(-3).move(Point(1,0,0)))
+        p20m.dispense(10, pcr.wells_by_name()[well].top())
+        p20m.touch_tip()
     p20m.drop_tip()
 
 def message(protocol):
