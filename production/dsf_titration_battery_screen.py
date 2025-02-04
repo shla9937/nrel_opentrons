@@ -43,8 +43,8 @@ def setup(protocol):
     
     # reagents
     global sypro4, prot, water, pos, neg, metals_loc, buff1, buff2, buff3
-    sypro4 = tubes.wells()[8]
-    prot = tubes.wells()[12]
+    sypro4 = tubes.wells()[8].bottom(8)
+    prot = tubes.wells()[12].bottom(8)
     water = tubes.wells()[16].bottom(8)
     pos = tubes.wells()[20].bottom(8)
     neg = tubes.wells()[21].bottom(8)
@@ -84,15 +84,10 @@ def pickup_tips(number, pipette, protocol):
 
 def add_sypro(protocol):
     # add 4x spyro to first well of plate
-    pickup_tips(1, p300m, protocol)
-    for well in range(0, 8):
-        p300m.aspirate(60, sypro4)             
-        p300m.dispense(60, pcr.wells()[well])
-    p300m.drop_tip()
-
-    # distribute spyro into other wells
-    pickup_tips(8, p20m, protocol)
-    p20m.transfer(5, pcr.rows()[0][0], pcr.rows()[0][1:12], new_tip='never')
+    pickup_tips(1, p20m, protocol)
+    for well in range(0, 96):
+        p20m.aspirate(5, sypro4)             
+        p20m.dispense(5, pcr.wells()[well])
     p20m.drop_tip()
 
 def add_buff(protocol):
@@ -173,12 +168,14 @@ def add_protein(protocol):
     pickup_tips(1, p20m, protocol)
     for well in range(0, 83):
         p20m.aspirate(10, prot)
-        p20m.dispense(10, pcr.wells()[well].top(-3).move(Point(1,0,0)))
-        p20m.touch_tip()
+        p20m.dispense(10, pcr.wells()[well])
+        p20m.mix(3,10)
+        clean_tips(p20m, 10, protocol)
     for well in range(88, 91):
         p20m.aspirate(10, prot)
-        p20m.dispense(10, pcr.wells()[well].top(-3).move(Point(1,0,0)))
-        p20m.touch_tip()
+        p20m.dispense(10, pcr.wells()[well])
+        p20m.mix(3,10)
+        clean_tips(p20m, 10, protocol)
     p20m.drop_tip()
 
 def add_water(protocol):
@@ -186,20 +183,24 @@ def add_water(protocol):
     pickup_tips(1, p20m, protocol)
     for well in range(83, 86):
         p20m.aspirate(10, water)
-        p20m.dispense(10, pcr.wells()[well].top(-3).move(Point(1,0,0)))
-        p20m.touch_tip()
+        p20m.dispense(10, pcr.wells()[well])
+        p20m.mix(3,10)
+        clean_tips(p20m, 10, protocol)
     for well in range(86, 88):
         p20m.aspirate(5, water)
-        p20m.dispense(5, pcr.wells()[well].top(-3).move(Point(1,0,0)))
-        p20m.touch_tip()
+        p20m.dispense(5, pcr.wells()[well])
+        p20m.mix(3,10)
+        clean_tips(p20m, 10, protocol)
     for well in range(91, 94):
         p20m.aspirate(10, prot)
-        p20m.dispense(10, pcr.wells()[well].top(-3).move(Point(1,0,0)))
-        p20m.touch_tip()
+        p20m.dispense(10, pcr.wells()[well])
+        p20m.mix(3,10)
+        clean_tips(p20m, 10, protocol)
     for well in range(94, 96):
         p20m.aspirate(5, prot)
-        p20m.dispense(5, pcr.wells()[well].top(-3).move(Point(1,0,0)))
-        p20m.touch_tip()
+        p20m.dispense(5, pcr.wells()[well])
+        p20m.mix(3,10)
+        clean_tips(p20m, 10, protocol)
     p20m.drop_tip()
 
 def add_controls(protocol):
@@ -207,15 +208,17 @@ def add_controls(protocol):
     pickup_tips(1, p20m, protocol)
     for well in ["G11","G12"]:
         p20m.aspirate(10, pos)
-        p20m.dispense(10, pcr.wells_by_name()[well].top(-3).move(Point(1,0,0)))
-        p20m.touch_tip()
+        p20m.dispense(10, pcr.wells_by_name()[well])
+        p20m.mix(3,10)
+        clean_tips(p20m, 10, protocol)
     p20m.drop_tip()
     # add 10µL of negative control
     pickup_tips(1, p20m, protocol)
     for well in ["H11","H12"]:
         p20m.aspirate(10, neg)
-        p20m.dispense(10, pcr.wells_by_name()[well].top(-3).move(Point(1,0,0)))
-        p20m.touch_tip()
+        p20m.dispense(10, pcr.wells_by_name()[well])
+        p20m.mix(3,10)
+        clean_tips(p20m, 10, protocol)
     p20m.drop_tip()
 
 def message(protocol):
