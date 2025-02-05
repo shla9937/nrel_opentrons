@@ -43,10 +43,10 @@ def setup(protocol):
     
     # reagents
     global sypro4, prot, water, pos, neg, metals_loc, buff1, buff2, buff3
-    sypro4 = tubes.wells()[8].bottom(8)
-    prot = tubes.wells()[12].bottom(8)
-    water = tubes.wells()[16].bottom(8)
-    pos = tubes.wells()[20].bottom(8)
+    sypro4 = tubes.wells()[8]
+    prot = tubes.wells()[12]
+    water = tubes.wells()[16]
+    pos = tubes.wells()[20]
     neg = tubes.wells()[21].bottom(8)
     metals_loc = [tubes.wells()[i].bottom(8) for i in range(0, 7)]
     buff1 = trough.wells()[0]
@@ -192,12 +192,12 @@ def add_water(protocol):
         p20m.mix(3,10)
         clean_tips(p20m, 10, protocol)
     for well in range(91, 94):
-        p20m.aspirate(10, prot)
+        p20m.aspirate(10, water)
         p20m.dispense(10, pcr.wells()[well])
         p20m.mix(3,10)
         clean_tips(p20m, 10, protocol)
     for well in range(94, 96):
-        p20m.aspirate(5, prot)
+        p20m.aspirate(5, water)
         p20m.dispense(5, pcr.wells()[well])
         p20m.mix(3,10)
         clean_tips(p20m, 10, protocol)
