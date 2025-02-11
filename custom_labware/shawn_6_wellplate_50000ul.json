@@ -18,7 +18,7 @@
         "brandId": []
     },
     "metadata": {
-        "displayName": "Shawn 6 Well Block 50ml",
+        "displayName": "Shawn 6 Well Plate 50000 µL",
         "displayCategory": "wellPlate",
         "displayVolumeUnits": "µL",
         "tags": []
@@ -30,64 +30,64 @@
     },
     "wells": {
         "A1": {
-            "depth": 50,
+            "depth": 52.5,
             "totalLiquidVolume": 50000,
             "shape": "rectangular",
             "xDimension": 35.2,
             "yDimension": 35.2,
-            "x": 28.28,
+            "x": 27,
             "y": 60.34,
-            "z": 5
+            "z": 2.5
         },
         "B1": {
-            "depth": 50,
+            "depth": 52.5,
             "totalLiquidVolume": 50000,
             "shape": "rectangular",
             "xDimension": 35.2,
             "yDimension": 35.2,
-            "x": 28.28,
+            "x": 27,
             "y": 24.34,
-            "z": 5
+            "z": 2.5
         },
         "A2": {
-            "depth": 50,
+            "depth": 52.5,
             "totalLiquidVolume": 50000,
             "shape": "rectangular",
             "xDimension": 35.2,
             "yDimension": 35.2,
-            "x": 64.28,
+            "x": 63,
             "y": 60.34,
-            "z": 5
+            "z": 2.5
         },
         "B2": {
-            "depth": 50,
+            "depth": 52.5,
             "totalLiquidVolume": 50000,
             "shape": "rectangular",
             "xDimension": 35.2,
             "yDimension": 35.2,
-            "x": 64.28,
+            "x": 63,
             "y": 24.34,
-            "z": 5
+            "z": 2.5
         },
         "A3": {
-            "depth": 50,
+            "depth": 52.5,
             "totalLiquidVolume": 50000,
             "shape": "rectangular",
             "xDimension": 35.2,
             "yDimension": 35.2,
-            "x": 100.28,
+            "x": 99,
             "y": 60.34,
-            "z": 5
+            "z": 2.5
         },
         "B3": {
-            "depth": 50,
+            "depth": 52.5,
             "totalLiquidVolume": 50000,
             "shape": "rectangular",
             "xDimension": 35.2,
             "yDimension": 35.2,
-            "x": 100.28,
+            "x": 99,
             "y": 24.34,
-            "z": 5
+            "z": 2.5
         }
     },
     "groups": [
@@ -110,7 +110,7 @@
         "quirks": [],
         "isTiprack": false,
         "isMagneticModuleCompatible": false,
-        "loadName": "shawn_6_well_50ml"
+        "loadName": "shawn_6_wellplate_50000ul"
     },
     "namespace": "custom_beta",
     "version": 1,
