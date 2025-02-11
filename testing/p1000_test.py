@@ -20,16 +20,15 @@ def run(protocol):
 def setup(protocol):
     # equiptment
     global tips1000, p1000, mag_mod, plate, reservoir
-    tips1000 = protocol.load_labware('opentrons_96_tiprack_1000ul', 2)
-    p1000 = protocol.load_instrument('p1000_single_gen2', 'left', tip_racks=[tips1000])
+    tips1000 = protocol.load_labware('opentrons_96_tiprack_1000ul', 6)
+    p1000 = protocol.load_instrument('p1000_single_gen2', 'right', tip_racks=[tips1000])
     mag_mod = protocol.load_module('magnetic module gen2', 1)
     plate = mag_mod.load_labware('shawn_6_wellplate_50000ul')
     reservoir = protocol.load_labware('nest_1_reservoir_195ml', 3)
 
 def new_targeting(protocol):
     p1000.pick_up_tip(tips1000)
-    for well in plate.wells_by_name():
-        p1000.transfer(10000, reservoir.wells()[0], plate.wells_by_name()[well], new_tip="never")
-    for well in plate.wells_by_name():
-        p1000.transfer(10000, plate.wells_by_name()[well], reservoir.wells()[0], new_tip="never")
+    for well in range(0,5):
+        p1000.transfer(1000, reservoir.wells()[0], plate.wells()[well], new_tip="never")
+        p1000.transfer(1000, plate.wells()[well], plate.wells()[well+1], new_tip="never")
     p1000.drop_tip()   

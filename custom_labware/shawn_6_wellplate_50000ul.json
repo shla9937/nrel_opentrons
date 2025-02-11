@@ -26,68 +26,68 @@
     "dimensions": {
         "xDimension": 127.76,
         "yDimension": 85.48,
-        "zDimension": 55
+        "zDimension": 50
     },
     "wells": {
         "A1": {
-            "depth": 52.5,
+            "depth": 49,
             "totalLiquidVolume": 50000,
             "shape": "rectangular",
             "xDimension": 35.2,
             "yDimension": 35.2,
             "x": 27,
             "y": 60.34,
-            "z": 2.5
+            "z": 1
         },
         "B1": {
-            "depth": 52.5,
+            "depth": 49,
             "totalLiquidVolume": 50000,
             "shape": "rectangular",
             "xDimension": 35.2,
             "yDimension": 35.2,
             "x": 27,
             "y": 24.34,
-            "z": 2.5
+            "z": 1
         },
         "A2": {
-            "depth": 52.5,
+            "depth": 49,
             "totalLiquidVolume": 50000,
             "shape": "rectangular",
             "xDimension": 35.2,
             "yDimension": 35.2,
             "x": 63,
             "y": 60.34,
-            "z": 2.5
+            "z": 1
         },
         "B2": {
-            "depth": 52.5,
+            "depth": 49,
             "totalLiquidVolume": 50000,
             "shape": "rectangular",
             "xDimension": 35.2,
             "yDimension": 35.2,
             "x": 63,
             "y": 24.34,
-            "z": 2.5
+            "z": 1
         },
         "A3": {
-            "depth": 52.5,
+            "depth": 49,
             "totalLiquidVolume": 50000,
             "shape": "rectangular",
             "xDimension": 35.2,
             "yDimension": 35.2,
             "x": 99,
             "y": 60.34,
-            "z": 2.5
+            "z": 1
         },
         "B3": {
-            "depth": 52.5,
+            "depth": 49,
             "totalLiquidVolume": 50000,
             "shape": "rectangular",
             "xDimension": 35.2,
             "yDimension": 35.2,
             "x": 99,
             "y": 24.34,
-            "z": 2.5
+            "z": 1
         }
     },
     "groups": [
