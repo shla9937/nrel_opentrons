@@ -97,7 +97,7 @@ def add_metal(protocol):
         metal = metals_loc[row]
         pickup_tips(1, p20m, protocol)
         p20m.aspirate(1, metal)            
-        p20m.dispense(1, pcr.rows()[row-8][6])
+        p20m.dispense(1, pcr.rows()[row-8][5])
         p20m.drop_tip()
 
 def titrate(protocol):
