@@ -32,33 +32,31 @@ def run(protocol):
 
 def setup(protocol):
     # equiptment
-    global tips20, tips300, pcr, trough, tubes, p300m, p20m
+    global tips20, pcr, trough, tubes, p20m
     tips20 = protocol.load_labware('opentrons_96_tiprack_20ul', 1)
     pcr = protocol.load_labware('biorad_96_wellplate_200ul_pcr', 5)
-    tips300 = protocol.load_labware('opentrons_96_tiprack_300ul', 3)
     trough = protocol.load_labware('nest_12_reservoir_15ml', 6)
     tubes = protocol.load_labware('opentrons_24_tuberack_eppendorf_1.5ml_safelock_snapcap', 2)
-    p300m = protocol.load_instrument('p300_multi_gen2', 'left', tip_racks=[tips300])
     p20m = protocol.load_instrument('p20_multi_gen2', 'right', tip_racks=[tips20])    
     
     # reagents
     global sypro4, prot, water, pos, neg, metals_loc, buff1
-    sypro4 = tubes.wells()[8]
-    prot = tubes.wells()[12]
-    water = tubes.wells()[16]
-    pos = tubes.wells()[20]
-    neg = tubes.wells()[21].bottom(8)
+    sypro4 = tubes.wells()[16]
+    prot = tubes.wells()[20]
+    water = tubes.wells()[21].bottom(8)
+    pos = tubes.wells()[22].bottom(8)
+    neg = tubes.wells()[23].bottom(8)
     metals_loc = [tubes.wells()[i].bottom(8) for i in range(0, 16)]
     buff1 = trough.wells()[0]
 
     # cleaning
     global water1, waste1, water2, waste2, water3, waste3
-    water1 = trough.wells()[3]
-    waste1 = trough.wells()[4]
-    water2 = trough.wells()[5]
-    waste2 = trough.wells()[6]
-    water3 = trough.wells()[7]
-    waste3 = trough.wells()[8]
+    water1 = trough.wells()[1]
+    waste1 = trough.wells()[2]
+    water2 = trough.wells()[3]
+    waste2 = trough.wells()[4]
+    water3 = trough.wells()[5]
+    waste3 = trough.wells()[6]
 
 def pickup_tips(number, pipette, protocol):
     nozzle_dict = {2: "G1", 3: "F1", 4: "E1", 5: "D1", 6: "C1", 7: "B1"}
@@ -70,15 +68,6 @@ def pickup_tips(number, pipette, protocol):
         else:
             p20m.configure_nozzle_layout(style=ALL)
         p20m.pick_up_tip(tips20)
-
-    elif pipette == p300m:
-        if number == 1:
-            p300m.configure_nozzle_layout(style=SINGLE,start="H1")
-        elif number > 1 and number < 8:
-            p300m.configure_nozzle_layout(style=PARTIAL_COLUMN,start="H1", end=nozzle_dict[number])
-        else:
-            p300m.configure_nozzle_layout(style=ALL)
-        p300m.pick_up_tip(tips300)
 
 def add_sypro(protocol):
     # add 4x spyro to first well of plate
@@ -174,13 +163,3 @@ def clean_tips(pipette, clean_vol, protocol):
         p20m.aspirate(clean_vol, water3)
         p20m.dispense(clean_vol, waste3.top().move(Point(3,0,-10)))
         p20m.move_to(waste3.top().move(Point(3,0,0)))
-    elif pipette == p300m:
-        p300m.aspirate(clean_vol, water1)
-        p300m.dispense(clean_vol, waste1.top().move(Point(3,0,-10)))
-        p300m.move_to(waste1.top().move(Point(3,0,0)))
-        p300m.aspirate(clean_vol, water2)
-        p300m.dispense(clean_vol, waste2.top().move(Point(3,0,-10)))
-        p300m.move_to(waste2.top().move(Point(3,0,0)))
-        p300m.aspirate(clean_vol, water3)
-        p300m.dispense(clean_vol, waste3.top().move(Point(3,0,-10)))
-        p300m.move_to(waste3.top().move(Point(3,0,0)))
