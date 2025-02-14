@@ -20,8 +20,8 @@ metadata = {
 def run(protocol):
     protocol.set_rail_lights(True)
     setup(protocol)
-    add_sypro(protocol)
     add_buff(protocol)
+    add_sypro(protocol)
     add_metal(protocol)
     titrate(protocol)
     add_protein(protocol)
@@ -81,6 +81,13 @@ def pickup_tips(number, pipette, protocol):
             p300m.configure_nozzle_layout(style=ALL)
         p300m.pick_up_tip(tips300)
 
+def add_buff(protocol):
+    pickup_tips(8, p20m, protocol)
+    for col in range(0, 12):
+        p20m.aspirate(5, buff1)             
+        p20m.dispense(5, pcr.rows()[0][col])
+    p20m.drop_tip()
+
 def add_sypro(protocol):
     # add spyro to first well of plate
     pickup_tips(1, p300m, protocol)
@@ -94,14 +101,6 @@ def add_sypro(protocol):
         p20m.aspirate(5, plate.rows()[0][0])             
         p20m.dispense(5, pcr.rows()[0][col])
         clean_tips(p20m, 20, protocol)
-    p20m.drop_tip()
-
-def add_buff(protocol):
-    pickup_tips(8, p20m, protocol)
-    for col in range(0, 12):
-        p20m.aspirate(5, buff1)             
-        p20m.dispense(5, pcr.rows()[0][col])
-        clean_tips(p20m, 5, protocol)
     p20m.drop_tip()
 
 def add_metal(protocol):
