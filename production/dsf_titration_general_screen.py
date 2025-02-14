@@ -32,16 +32,19 @@ def run(protocol):
 
 def setup(protocol):
     # equiptment
-    global tips20, pcr, trough, tubes, p20m
+    global tips20, pcr, trough, tubes, p20m, plate, p300m, tips300
     tips20 = protocol.load_labware('opentrons_96_tiprack_20ul', 1)
+    tips300 = protocol.load_labware('opentrons_96_tiprack_300ul', 3)
     pcr = protocol.load_labware('biorad_96_wellplate_200ul_pcr', 5)
     trough = protocol.load_labware('nest_12_reservoir_15ml', 6)
     tubes = protocol.load_labware('opentrons_24_tuberack_eppendorf_1.5ml_safelock_snapcap', 2)
-    p20m = protocol.load_instrument('p20_multi_gen2', 'right', tip_racks=[tips20])    
+    p20m = protocol.load_instrument('p20_multi_gen2', 'right', tip_racks=[tips20])
+    p300m = protocol.load_instrument('p300_multi_gen2', 'left', tip_racks=[tips300])
+    plate = protocol.load_labware('greiner_96_wellplate_300ul', 4)  
     
     # reagents
-    global sypro4, prot, water, pos, neg, metals_loc, buff1
-    sypro4 = tubes.wells()[16]
+    global sypro, prot, water, pos, neg, metals_loc, buff1
+    sypro = tubes.wells()[16]
     prot = tubes.wells()[20]
     water = tubes.wells()[21].bottom(8)
     pos = tubes.wells()[22].bottom(8)
@@ -69,12 +72,28 @@ def pickup_tips(number, pipette, protocol):
             p20m.configure_nozzle_layout(style=ALL)
         p20m.pick_up_tip(tips20)
 
+    elif pipette == p300m:
+        if number == 1:
+            p300m.configure_nozzle_layout(style=SINGLE,start="H1")
+        elif number > 1 and number < 8:
+            p300m.configure_nozzle_layout(style=PARTIAL_COLUMN,start="H1", end=nozzle_dict[number])
+        else:
+            p300m.configure_nozzle_layout(style=ALL)
+        p300m.pick_up_tip(tips300)
+
 def add_sypro(protocol):
-    # add 4x spyro to first well of plate
-    pickup_tips(1, p20m, protocol)
-    for well in range(0, 96):
-        p20m.aspirate(5, sypro4)             
-        p20m.dispense(5, pcr.wells()[well])
+    # add spyro to first well of plate
+    pickup_tips(1, p300m, protocol)
+    for row in range(0, 8):
+        p300m.aspirate(70, sypro)            
+        p300m.dispense(70, plate.rows()[row][0])
+    p300m.drop_tip()
+
+    pickup_tips(8, p20m, protocol)
+    for col in range(0, 12):
+        p20m.aspirate(5, plate.rows()[0][0])             
+        p20m.dispense(5, pcr.rows()[0][col])
+        clean_tips(p20m, 20, protocol)
     p20m.drop_tip()
 
 def add_buff(protocol):
@@ -104,7 +123,7 @@ def titrate(protocol):
     # titrate 2µL into 10µL
     for i in [0, 5]:
         pickup_tips(8, p20m, protocol)
-        p20m.mix(3, 5 ,pcr.rows()[0][0+i])
+        p20m.mix(3, 5, pcr.rows()[0][0+i])
         p20m.transfer(2,pcr.rows()[0][0+i:4+i],pcr.rows()[0][1+i:5+i],
                     mix_after=(3, 5),new_tip='never')
         p20m.aspirate(2, pcr.rows()[0][4+i])
@@ -112,12 +131,24 @@ def titrate(protocol):
 
 def add_protein(protocol): 
     # add 10µL of protein
-    pickup_tips(1, p20m, protocol)
-    for well in range(0, 84):
+    pickup_tips(1, p300m, protocol)
+    for row in range(0, 8):
+        p300m.aspirate(150, prot)            
+        p300m.dispense(150, plate.rows()[row][0])
+    p300m.drop_tip()
+
+    pickup_tips(8, p20m, protocol)
+    for col in range(0, 10):
         p20m.aspirate(10, prot)
-        p20m.dispense(10, pcr.wells()[well])
+        p20m.dispense(10, pcr.rows()[0][col])
         p20m.mix(3,10)
         clean_tips(p20m, 20, protocol)
+    p20m.drop_tip()
+
+    pickup_tips(4, p20m, protocol)
+    p20m.aspirate(10, prot)
+    p20m.dispense(10, pcr.rows()[3][10])
+    p20m.mix(3,10)
     p20m.drop_tip()
 
 def add_water(protocol):
@@ -139,6 +170,7 @@ def add_controls(protocol):
         p20m.mix(3,10)
         clean_tips(p20m, 20, protocol)
     p20m.drop_tip()
+
     # add 10µL of negative control
     pickup_tips(1, p20m, protocol)
     for well in range(92, 96):
