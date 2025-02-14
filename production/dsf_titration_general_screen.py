@@ -138,26 +138,24 @@ def add_protein(protocol):
 
     pickup_tips(8, p20m, protocol)
     for col in range(0, 10):
-        p20m.aspirate(10, prot)
+        p20m.aspirate(10, plate.rows()[row][0])
         p20m.dispense(10, pcr.rows()[0][col])
         p20m.mix(3,10)
         clean_tips(p20m, 20, protocol)
     p20m.drop_tip()
 
     pickup_tips(4, p20m, protocol)
-    p20m.aspirate(10, prot)
+    p20m.aspirate(10, plate.rows()[row][0])
     p20m.dispense(10, pcr.rows()[3][10])
     p20m.mix(3,10)
     p20m.drop_tip()
 
 def add_water(protocol):
     # add 10µL of water
-    pickup_tips(1, p20m, protocol)
-    for well in range(84, 88):
-        p20m.aspirate(10, water)
-        p20m.dispense(10, pcr.wells()[well])
-        p20m.mix(3,10)
-        clean_tips(p20m, 20, protocol)
+    pickup_tips(4, p20m, protocol)
+    p20m.aspirate(10, water1)
+    p20m.dispense(10, pcr.rows()[7][10])
+    p20m.mix(3,10)
     p20m.drop_tip()
 
 def add_controls(protocol):
