@@ -12,8 +12,6 @@ metadata = {
     'protocolName': 'DSF - general screen',
     'author': 'Shawn Laursen',
     'description': '''
-    Protocol:
-
     ''',
     'apiLevel': '2.20'}
 
@@ -46,9 +44,8 @@ def setup(protocol):
     global sypro, prot, water, pos, neg, metals_loc, buff1
     sypro = tubes.wells()[16]
     prot = tubes.wells()[20]
-    water = tubes.wells()[21].bottom(8)
-    pos = tubes.wells()[22].bottom(8)
-    neg = tubes.wells()[23].bottom(8)
+    pos = tubes.wells()[21].bottom(8)
+    neg = tubes.wells()[22].bottom(8)
     metals_loc = [tubes.wells()[i].bottom(8) for i in range(0, 16)]
     buff1 = trough.wells()[0]
 
@@ -105,16 +102,29 @@ def add_sypro(protocol):
 
 def add_metal(protocol):
     # add 10x metals
+    pickup_tips(8, p300m, protocol)
+    for col in [1,2]:
+        p300m.aspirate(90, water3)             
+        p300m.dispense(90, plate.rows()[0][col])
+    p300m.drop_tip()
+
     for row in range(0,8):
         metal = metals_loc[row]
         pickup_tips(1, p20m, protocol)
-        p20m.aspirate(1, metal)            
+        p20m.aspirate(10, metal)  
+        p20m.dispense(10, plate.wells()[row+8])
+        p20m.mix(3,20)
+        p20m.aspirate(1, plate.wells()[row+8])            
         p20m.dispense(1, pcr.rows()[row][0])
         p20m.drop_tip()
+
     for row in range(8,16):
         metal = metals_loc[row]
         pickup_tips(1, p20m, protocol)
-        p20m.aspirate(1, metal)            
+        p20m.aspirate(10, metal)  
+        p20m.dispense(10, plate.wells()[row+8])
+        p20m.mix(3,20)
+        p20m.aspirate(1, plate.wells()[row+8])            
         p20m.dispense(1, pcr.rows()[row-8][5])
         p20m.drop_tip()
 
@@ -133,19 +143,19 @@ def add_protein(protocol):
     pickup_tips(1, p300m, protocol)
     for row in range(0, 8):
         p300m.aspirate(150, prot)            
-        p300m.dispense(150, plate.rows()[row][0])
+        p300m.dispense(150, plate.rows()[row][3])
     p300m.drop_tip()
 
     pickup_tips(8, p20m, protocol)
     for col in range(0, 10):
-        p20m.aspirate(10, plate.rows()[row][0])
+        p20m.aspirate(10, plate.rows()[0][3])
         p20m.dispense(10, pcr.rows()[0][col])
         p20m.mix(3,10)
         clean_tips(p20m, 20, protocol)
     p20m.drop_tip()
 
     pickup_tips(4, p20m, protocol)
-    p20m.aspirate(10, plate.rows()[row][0])
+    p20m.aspirate(10, plate.rows()[row][3])
     p20m.dispense(10, pcr.rows()[3][10])
     p20m.mix(3,10)
     p20m.drop_tip()
@@ -153,7 +163,7 @@ def add_protein(protocol):
 def add_water(protocol):
     # add 10µL of water
     pickup_tips(4, p20m, protocol)
-    p20m.aspirate(10, water1)
+    p20m.aspirate(10, water3)
     p20m.dispense(10, pcr.rows()[7][10])
     p20m.mix(3,10)
     p20m.drop_tip()
