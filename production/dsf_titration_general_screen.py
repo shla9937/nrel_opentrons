@@ -22,9 +22,9 @@ def run(protocol):
     add_sypro(protocol)
     add_metal(protocol)
     titrate(protocol)
+    add_edta(protocol)
     add_protein(protocol)
     add_water(protocol)
-    add_controls(protocol)
     message(protocol)
     protocol.set_rail_lights(False)
 
@@ -41,11 +41,10 @@ def setup(protocol):
     plate = protocol.load_labware('greiner_96_wellplate_300ul', 4)  
     
     # reagents
-    global sypro, prot, water, pos, neg, metals_loc, buff1
+    global sypro, prot, edta, metals_loc, buff1
     sypro = tubes.wells()[16]
     prot = tubes.wells()[20]
-    pos = tubes.wells()[21].bottom(8)
-    neg = tubes.wells()[22].bottom(8)
+    edta = tubes.wells()[21].bottom(8)
     metals_loc = [tubes.wells()[i].bottom(8) for i in range(0, 16)]
     buff1 = trough.wells()[0]
 
@@ -101,41 +100,52 @@ def add_sypro(protocol):
     p20m.drop_tip()
 
 def add_metal(protocol):
-    # add 10x metals
     pickup_tips(8, p300m, protocol)
     for col in [1,2]:
-        p300m.aspirate(90, water3)             
-        p300m.dispense(90, plate.rows()[0][col])
+        p300m.aspirate(95, water3)             
+        p300m.dispense(95, plate.rows()[0][col])
     p300m.drop_tip()
 
     for row in range(0,8):
         metal = metals_loc[row]
         pickup_tips(1, p20m, protocol)
-        p20m.aspirate(10, metal)  
-        p20m.dispense(10, plate.wells()[row+8])
+        p20m.aspirate(5, metal)  
+        p20m.dispense(5, plate.wells()[row+8])
         p20m.mix(3,20)
-        p20m.aspirate(1, plate.wells()[row+8])            
-        p20m.dispense(1, pcr.rows()[row][0])
         p20m.drop_tip()
 
     for row in range(8,16):
         metal = metals_loc[row]
         pickup_tips(1, p20m, protocol)
-        p20m.aspirate(10, metal)  
-        p20m.dispense(10, plate.wells()[row+8])
+        p20m.aspirate(5, metal)  
+        p20m.dispense(5, plate.wells()[row+8])
         p20m.mix(3,20)
-        p20m.aspirate(1, plate.wells()[row+8])            
-        p20m.dispense(1, pcr.rows()[row-8][5])
         p20m.drop_tip()
 
 def titrate(protocol):
     # titrate 2µL into 10µL
     for i in [0, 5]:
+        if i == 0:
+            col = 1
+        elif i == 5:
+            col = 2
         pickup_tips(8, p20m, protocol)
+        p20m.aspirate(2, plate.rows()[0][col])            
+        p20m.dispense(2, pcr.rows()[0][0+i])
         p20m.mix(3, 5, pcr.rows()[0][0+i])
         p20m.transfer(2,pcr.rows()[0][0+i:4+i],pcr.rows()[0][1+i:5+i],
                     mix_after=(3, 5),new_tip='never')
         p20m.aspirate(2, pcr.rows()[0][4+i])
+        p20m.drop_tip()
+
+def add_edta(protocol):
+    # add 25mM (final) EDTA
+    for well in range(84, 88):
+        pickup_tips(1, p20m, protocol)
+        p20m.aspirate(1, edta)
+        p20m.dispense(1, pcr.wells()[well])
+        p20m.mix(3,5)
+        p20m.aspirate(1, pcr.wells()[well])
         p20m.drop_tip()
 
 def add_protein(protocol): 
@@ -147,44 +157,19 @@ def add_protein(protocol):
     p300m.drop_tip()
 
     pickup_tips(8, p20m, protocol)
-    for col in range(0, 10):
+    for col in range(0, 11):
         p20m.aspirate(10, plate.rows()[0][3])
         p20m.dispense(10, pcr.rows()[0][col])
         p20m.mix(3,10)
         clean_tips(p20m, 20, protocol)
     p20m.drop_tip()
 
-    pickup_tips(4, p20m, protocol)
-    p20m.aspirate(10, plate.rows()[row][3])
-    p20m.dispense(10, pcr.rows()[3][10])
-    p20m.mix(3,10)
-    p20m.drop_tip()
-
 def add_water(protocol):
     # add 10µL of water
-    pickup_tips(4, p20m, protocol)
+    pickup_tips(8, p20m, protocol)
     p20m.aspirate(10, water3)
-    p20m.dispense(10, pcr.rows()[7][10])
+    p20m.dispense(10, pcr.rows()[0][11])
     p20m.mix(3,10)
-    p20m.drop_tip()
-
-def add_controls(protocol):
-    # add 10µL of positive control
-    pickup_tips(1, p20m, protocol)
-    for well in range(88, 92):
-        p20m.aspirate(10, pos)
-        p20m.dispense(10, pcr.wells()[well])
-        p20m.mix(3,10)
-        clean_tips(p20m, 20, protocol)
-    p20m.drop_tip()
-
-    # add 10µL of negative control
-    pickup_tips(1, p20m, protocol)
-    for well in range(92, 96):
-        p20m.aspirate(10, neg)
-        p20m.dispense(10, pcr.wells()[well])
-        p20m.mix(3,10)
-        clean_tips(p20m, 20, protocol)
     p20m.drop_tip()
 
 def message(protocol):
