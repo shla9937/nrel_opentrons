@@ -20,7 +20,8 @@ def run(protocol):
     setup(protocol)
     # lyse(protocol)
     global sample_well
-    for sample_well in range(0,24):
+    # temp_mod.set_temperature(celsius=4)
+    for sample_well in range(1,24):
         find_offset(protocol)
         wash_beads(protocol)
         add_sample(protocol)
@@ -28,11 +29,12 @@ def run(protocol):
         elute(protocol)
         recharge(protocol)
         collect(protocol)
+    hs_mod.open_labware_latch()
     protocol.set_rail_lights(False)
 
 def setup(protocol):
     # equipment
-    global tips1000, p1000, mag_mod, hs_mod, reservoir1, reservoir2, reservoir3, tips300, p300, tubes, deep_well, well24, conicals
+    global tips1000, p1000, mag_mod, hs_mod, temp_mod, reservoir1, reservoir2, reservoir3, tips300, p300, tubes, deep_well, well24, conicals
     tips300 = protocol.load_labware('opentrons_96_tiprack_300ul', 6)
     p300 = protocol.load_instrument('p300_single_gen2', 'left', tip_racks=[tips300])
     tips1000 = protocol.load_labware('opentrons_96_tiprack_1000ul', 3)
@@ -41,11 +43,12 @@ def setup(protocol):
     mag_mod = protocol.load_module('magnetic module gen2', 1)
     deep_well = mag_mod.load_labware('nest_96_wellplate_2ml_deep')
 
-    hs_mod = protocol.load_module('heaterShakerModuleV1', 7)
+    hs_mod = protocol.load_module('heaterShakerModuleV1', 10)
     well24 = hs_mod.load_labware('thomsoninstrument_24_wellplate_10400ul')
     hs_mod.close_labware_latch()
     
-    tubes = protocol.load_labware('opentrons_24_tuberack_nest_1.5ml_snapcap', 4)
+    temp_mod = protocol.load_module('temperature module gen2', 4)
+    tubes = temp_mod.load_labware('opentrons_24_aluminumblock_nest_1.5ml_snapcap')
     
     conicals = protocol.load_labware('opentrons_6_tuberack_nest_50ml_conical', 2)
     reservoir1 = protocol.load_labware('nest_1_reservoir_195ml', 5)
@@ -62,10 +65,11 @@ def setup(protocol):
     elution = conicals.wells()[1]
     naoh = conicals.wells()[2]
 
-    global mag_time, mag_height, elute_time, naoh_time, z, x_offset, y_offset
+    global mag_time, mag_height, incubation_time, elute_time, naoh_time, z, x_offset, y_offset
     mag_time = 20 # seconds
     mag_height = 4 # mm
-    elute_time = 5 # minutes
+    incubation_time = 10 # minutes
+    elute_time = 2.5 # minutes
     naoh_time = 2 # minutes
     z = 1.5 
     x_offset = 1.5 
@@ -97,7 +101,7 @@ def wash_beads(protocol):
     p1000.pick_up_tip()
     p1000.transfer(360, beads.bottom(5), deep_well.wells()[sample_well], new_tip="never", mix_before=(3,500))
     mag_mod.engage(height_from_base=mag_height)
-    clean_tips(p1000, 500, protocol)
+    clean_tips(p1000, 1000, protocol)
     
     for i in range(0,3):
         p1000.transfer(1000, buff, deep_well.wells()[sample_well].top(), new_tip="never")
@@ -116,7 +120,7 @@ def add_sample(protocol):
     p1000.transfer(1500, well24.wells()[sample_well].bottom(4), deep_well.wells()[sample_well], new_tip="never", mix_after=(3,500))
     p1000.transfer(1500, deep_well.wells()[sample_well], well24.wells()[sample_well].bottom(4), new_tip="never")
     hs_mod.set_and_wait_for_shake_speed(400)
-    protocol.delay(minutes=elute_time/2)
+    protocol.delay(minutes=incubation_time)
     hs_mod.deactivate_shaker()
 
 def wash(protocol):
@@ -134,7 +138,7 @@ def wash(protocol):
         p1000.transfer(1500, buff, deep_well.wells()[sample_well].top(), new_tip="never")
         p1000.transfer(1500, pickup_pos, waste.top(), new_tip="never")
         if i != 2:
-            clean_tips(p1000, 750, protocol)
+            clean_tips(p1000, 1000, protocol)
     p1000.drop_tip()
     mag_mod.disengage()
     
@@ -161,7 +165,7 @@ def recharge(protocol):
     
     # remove NaOH from beads
     p1000.transfer(1500, pickup_pos, waste.top(), new_tip='never')
-    clean_tips(p1000, 750, protocol)
+    clean_tips(p1000, 1000, protocol)
 
     # equilibrate with buff
     for i in range(0,3):
@@ -169,7 +173,7 @@ def recharge(protocol):
         p1000.move_to(deep_well.wells()[sample_well].top(10))
         protocol.delay(mag_time)
         p1000.transfer(1500, pickup_pos, waste.top(), new_tip='never')
-        clean_tips(p1000, 900, protocol)
+        clean_tips(p1000, 1000, protocol)
     mag_mod.disengage()
 
 def collect(protocol):
