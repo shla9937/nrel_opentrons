@@ -19,18 +19,18 @@ def run(protocol):
     protocol.set_rail_lights(True)
     setup(protocol)
     lyse(protocol)
-    # global sample_well
-    # for sample_well in range(0,6):
-    #     wash_beads(protocol)
-    #     dispense_beads(protocol)
-    #     wash(protocol)
-    #     elute(protocol)
-    #     recharge(protocol)
-    #     collect(protocol)
+    global sample_well
+    for sample_well in range(0,6):
+        wash_beads(protocol)
+        add_sample(protocol)
+        wash(protocol)
+        elute(protocol)
+        recharge(protocol)
+        collect(protocol)
     protocol.set_rail_lights(False)
 
 def setup(protocol):
-    # equiptment
+    # equipment
     global tips1000, p1000, mag_mod, hs_mod, reservoir1, reservoir2, reservoir3, tips300, p300, tubes, deep_well, well24, conicals
     tips300 = protocol.load_labware('opentrons_96_tiprack_300ul', 6)
     p300 = protocol.load_instrument('p300_single_gen2', 'left', tip_racks=[tips300])
@@ -51,9 +51,8 @@ def setup(protocol):
     reservoir3 = protocol.load_labware('nest_1_reservoir_195ml', 11)
 
     # reagents
-    global new_beads, used_beads, buff, elution, naoh, water, waste, lysis
-    new_beads = tubes.wells()[22].bottom(2)
-    used_beads = deep_well.wells()[95]
+    global beads, buff, elution, naoh, water, waste, lysis
+    beads = deep_well.wells()[95]
     lysis = conicals.wells()[0]
     buff = reservoir1.wells()[0]
     water = reservoir2.wells()[0]
@@ -61,129 +60,121 @@ def setup(protocol):
     elution = conicals.wells()[1]
     naoh = conicals.wells()[2]
 
-    global mag_time
-    mag_time = 10
+    global mag_time, mag_height, elute_time, z_offset, x_offset
+    mag_time = 20 # seconds
+    mag_height = 5 # mm
+    elute_time = 10 # minutes
+    z_offset = 3 
+    x_offset = 2.1 
 
 def lyse(protocol):
     hs_mod.close_labware_latch()
     p1000.pick_up_tip()
     for well in range(0,24):
-        p1000.transfer(1500, lysis, well24.wells()[well].bottom(20), new_tip="never")
+        p1000.transfer(1500, lysis.bottom(3*(24-well)), well24.wells()[well].top(), new_tip="never")
     p1000.drop_tip()
-    hs_mod.set_and_wait_for_shake_speed(200)
+    hs_mod.set_and_wait_for_shake_speed(400)
+    protocol.delay(minutes=120)
+    hs_mod.deactivate_shaker()
 
-# def wash_beads(protocol):
-#     p1000.pick_up_tip()
-#     p1000.transfer(500, new_beads, used_beads, new_tip="never")
-#     mag_mod2.engage(height_from_base=5)
-#     clean_tips(p1000, 500, protocol)
-#     protocol.delay(seconds=mag_time-30)
-#     for i in range(0,3):
-#         p1000.transfer(2000, buff, used_beads, new_tip="never")
-#         protocol.delay(seconds=mag_time-30)
-#         p1000.transfer(2000, used_beads.bottom(2), waste, new_tip="never")
-#         clean_tips(p1000, 1000, protocol)
-#     mag_mod2.disengage()
-
-# def dispense_beads(protocol):
-#     # put 500µL of beads into well
-#     p1000.transfer(500, buff, used_beads, new_tip="never", mix_after=(3,500))
-#     p1000.transfer(500, used_beads, plate.wells()[sample_well], new_tip="never", mix_after=(3,500))
-#     p1000.drop_tip()
-#     protocol.pause(msg="Take out plate and shake for 10min at RT (100rpm).")
-
-# def wash(protocol):
-#     # remove supernatant 
-#     mag_mod.engage(height_from_base=7)
-#     protocol.delay(seconds=mag_time)
-#     p1000.transfer(50000, plate.wells()[sample_well], waste)
-#     mag_mod.disengage()
-
-#     # wash beads
-#     for i in range(0,3):
-#         p1000.pick_up_tip()
-#         p1000.transfer(5000, buff, plate.wells()[sample_well].bottom(10), new_tip="never")
-#         mag_mod.engage(height_from_base=7)
-#         protocol.delay(seconds=mag_time)
-#         p1000.transfer(5000, plate.wells()[sample_well], waste new_tip="never")
-#         p1000.drop_tip()
-#         mag_mod.disengage()
+def wash_beads(protocol):
+    p1000.pick_up_tip()
+    p1000.transfer(360, beads, deep_well.wells()[sample_well], new_tip="never")
+    mag_mod.engage(height_from_base=mag_height)
+    clean_tips(p1000, 500, protocol)
     
-# def elute(protocol):
-#     p300.transfer(50000, plate.wells()[sample_well], waste)
-#     protocol.pause(msg="Take out plate and shake for 10min at RT (400rpm).")
-#     mag_mod.engage(height_from_base=5)
-#     protocol.delay(seconds=mag_time)
+    for i in range(0,3):
+        p1000.transfer(1500, buff, deep_well.wells()[sample_well], new_tip="never")
+        protocol.delay(seconds=mag_time)
+        if i == 0:
+            vol = 1860
+        else:
+            vol = 1500
+        p1000.transfer(vol, deep_well.wells()[sample_well].bottom(2), waste, new_tip="never")
+        if i != 2:
+            clean_tips(p1000, 750, protocol)
+    mag_mod.disengage()
 
-#     # tranfser elution to end plate
-#     for col in range(0, columns):
-#         col_x = ((col % 2) * 2 - 1) * wash_x
-#         p300m.aspirate(elution_vol, mag_plate.wells()[col*8].bottom().move(Point(col_x,0,wash_z)))           
-#         p300m.dispense(elution_vol, pcrend.wells()[col*8])
-#         clean_tips(protocol)
-#     p300m.drop_tip()
-#     mag_mod.disengage()
+def add_sample(protocol):
+    p1000.transfer(1500, well24.wells()[sample_well], deep_well.wells()[sample_well], new_tip="never", mix_after=(3,500))
+    p1000.transfer(1500, deep_well.wells()[sample_well], well24.wells()[sample_well], new_tip="never")
+    hs_mod.set_and_wait_for_shake_speed(400)
+    protocol.delay(minutes=5)
+    hs_mod.deactivate_shaker()
 
-# def recharge(protocol):
-#     # add NaOH to used beads
-#     pickup_tips(8, p300m, protocol)
-#     for col in range(0, columns):
-#         p300m.aspirate(100, naoh)            
-#         p300m.dispense(100, mag_plate.wells()[col*8])
-#         p300m.mix(3, 50)
-#     protocol.delay(seconds=incubate_time)
+def wash(protocol):
+    # remove supernatant 
+    p1000.transfer(1500, well24.wells()[sample_well], deep_well.wells()[sample_well], new_tip="never")
+    mag_mod.engage(height_from_base=mag_height)
+    protocol.delay(seconds=mag_time)
+    p1000.transfer(1500, deep_well.wells()[sample_well].bottom(2), well24.wells()[sample_well], new_tip="never")
+    p1000.drop_tip()
+
+    # wash beads
+    p1000.pick_up_tip()
+    for i in range(0,3):
+        p1000.transfer(1500, buff, deep_well.wells()[sample_well].bottom(2), new_tip="never")
+        p1000.transfer(1500, deep_well.wells()[sample_well].bottom(2), waste, new_tip="never")
+        if i != 2:
+            clean_tips(p1000, 750, protocol)
+    p1000.drop_tip()
+    mag_mod.disengage()
     
-#     # remove NaOH from beads
-#     mag_mod.engage(height_from_base=5)
-#     protocol.delay(seconds=mag_time)
-#     for col in range(0, columns):
-#         col_x = ((col % 2) * 2 - 1) * wash_x
-#         p300m.aspirate(100, mag_plate.wells()[col*8].bottom().move(Point(col_x,0,wash_z)))           
-#         p300m.dispense(100, waste.wells()[0].top())
-#     mag_mod.disengage()
-
-#     # wash beads with buff
-#     clean_tips(protocol)
-#     for col in range(0, columns):
-#         p300m.aspirate(100, buff)            
-#         p300m.dispense(100, mag_plate.wells()[col*8])
-#     p300m.move_to(mag_plate.wells()[0].top(25))
-#     mag_mod.engage(height_from_base=5)
-#     protocol.delay(seconds=mag_time)
-#     for col in range(0, columns):
-#         col_x = ((col % 2) * 2 - 1) * wash_x
-#         p300m.aspirate(100, mag_plate.wells()[col*8].bottom().move(Point(col_x,0,wash_z)))           
-#         p300m.dispense(100, waste.wells()[0].top())
-
-#     for i in range(0, 2):
-#         for col in range(0, columns):
-#             p300m.aspirate(100, buff)            
-#             p300m.dispense(100, mag_plate.wells()[col*8])
-#         for col in range(0, columns):
-#             col_x = ((col % 2) * 2 - 1) * wash_x
-#             p300m.aspirate(100, mag_plate.wells()[col*8].bottom().move(Point(col_x,0,wash_z)))            
-#             p300m.dispense(100, waste.wells()[0].top())
-
-#     mag_mod.disengage()
-#     clean_tips(protocol)
-
-# def collect(protocol):
-#     # add original volume of buff back to beads
-#     protocol.pause(msg="Move plate from mag module to position 2 (press continue again).")
-#     protocol.move_labware(labware=mag_plate, new_location=2)
-#     for col in range(0, columns):
-#         p300m.aspirate(20, buff)            
-#         p300m.dispense(20, mag_plate.wells()[col*8])
-#         p300m.mix(6, 20)
-#     p300m.drop_tip()
+def elute(protocol):
+    global x
+    if sample_well in [8,9,10,11,12,13,14,15]:
+        x = abs(x_offset) #if odd move to the right    
+    else:
+        x = -abs(x_offset) #if even move to the left     
     
-#     # collect beads back into "used" tube
-#     pickup_tips(1, p300m, protocol)
-#     for sample in range(0, samples):
-#         p300m.mix(3, 20, mag_plate.wells()[sample])
-#         p300m.aspirate(20, mag_plate.wells()[sample])           
-#         p300m.dispense(20, used_beads)
-#     p300m.drop_tip()
+    p300.pick_up_tip()
+    p300.transfer(100, elution, deep_well.wells()[sample_well], mix_after=(3,50), new_tip='never')
+    protocol.delay(minutes=10)
+    mag_mod.engage(height_from_base=mag_height)
+    protocol.delay(seconds=elute_time)
+    p300.transfer(100, deep_well.wells()[sample_well].bottom().move(Point(x,0,z_offset)), 
+                  tubes.wells()[sample_well], new_tip='never')
+    p300.drop_tip()
+    mag_mod.disengage()
+
+    p300.pick_up_tip()
+    p300.transfer(50, elution, deep_well.wells()[sample_well], mix_after=(3,25), new_tip='never')
+    protocol.delay(minutes=2)
+    mag_mod.engage(height_from_base=mag_height)
+    protocol.delay(seconds=elute_time)
+    p300.transfer(50, deep_well.wells()[sample_well].bottom().move(Point(x,0,z_offset)), 
+                  tubes.wells()[sample_well], new_tip='never')
+    p300.drop_tip()
+    mag_mod.disengage()
+
+def recharge(protocol):
+    # add NaOH to used beads
+    p1000.pick_up_tip()
+    p1000.transfer(1800, naoh, deep_well.wells()[sample_well], mix_after=(3,500), new_tip='never')
+    mag_mod.engage(height_from_base=mag_height)
+    protocol.delay(seconds=mag_time)
+    
+    # remove NaOH from beads
+    p1000.transfer(1800, deep_well.wells()[sample_well].bottom(2), waste.top(), new_tip='never')
+    clean_tips(p1000, 900, protocol)
+
+    # equilibrate with buff
+    for i in range(0,3):
+        p1000.transfer(1800, buff, deep_well.wells()[sample_well], new_tip='never')
+        protocol.delay(mag_time)
+        p1000.transfer(1800, deep_well.wells()[sample_well].bottom(2), waste.top(), new_tip='never')
+        if i != 2:
+            clean_tips(p1000, 900, protocol)
+    mag_mod.disengage()
+
+def collect(protocol):
+    p300.pick_up_tip()
+    p1000.transfer(300, buff, deep_well.wells()[sample_well].top(), new_tip='never')
+    p300.transfer(300, deep_well.wells()[sample_well].bottom().move(Point(x,0,z_offset)), beads, new_tip='never', mix_before=(3,150))
+    p1000.transfer(60, buff, deep_well.wells()[sample_well].top(), new_tip='never')
+    p300.transfer(60, deep_well.wells()[sample_well].bottom().move(Point(x,0,z_offset)), beads, new_tip='never', mix_before=(3,30))
+    p300.drop_tip()
+    p1000.drop_tip()
 
 def clean_tips(pipette, clean_vol, protocol):
     if pipette == p1000:
