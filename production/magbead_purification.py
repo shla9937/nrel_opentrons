@@ -18,82 +18,96 @@ metadata = {
 def run(protocol):
     protocol.set_rail_lights(True)
     setup(protocol)
-    global sample_well
-    for sample_well in range(0,6):
-        wash_beads(protocol)
-        dispense_beads(protocol)
-        wash(protocol)
-        elute(protocol)
-        recharge(protocol)
-        collect(protocol)
+    lyse(protocol)
+    # global sample_well
+    # for sample_well in range(0,6):
+    #     wash_beads(protocol)
+    #     dispense_beads(protocol)
+    #     wash(protocol)
+    #     elute(protocol)
+    #     recharge(protocol)
+    #     collect(protocol)
     protocol.set_rail_lights(False)
 
 def setup(protocol):
     # equiptment
-    global tips1000, p1000, mag_mod, mag_mod2, plate, reservoir1, reservoir2, reservoir3, tips300, p300, trough, waste, tubes, deep_well, water
-    tips300 = protocol.load_labware('opentrons_96_tiprack_300ul', 3)
+    global tips1000, p1000, mag_mod, hs_mod, reservoir1, reservoir2, reservoir3, tips300, p300, tubes, deep_well, well24, conicals
+    tips300 = protocol.load_labware('opentrons_96_tiprack_300ul', 6)
     p300 = protocol.load_instrument('p300_single_gen2', 'left', tip_racks=[tips300])
-    tips1000 = protocol.load_labware('opentrons_96_tiprack_1000ul', 6)
+    tips1000 = protocol.load_labware('opentrons_96_tiprack_1000ul', 3)
     p1000 = protocol.load_instrument('p1000_single_gen2', 'right', tip_racks=[tips1000])
+
     mag_mod = protocol.load_module('magnetic module gen2', 1)
-    plate = mag_mod.load_labware('shawn_6_wellplate_50000ul')
-    mag_mod2 = protocol.load_module('magnetic module gen2', 4)
-    deep_well = mag_mod2.load_labware('nest_96_wellplate_2ml_deep', 3)
-    reservoir1 = protocol.load_labware('nest_1_reservoir_195ml', 3)
-    trough = protocol.load_labware('nest_12_reservoir_15ml', 4)
-    reservoir2 = protocol.load_labware('nest_1_reservoir_195ml', 10)
+    deep_well = mag_mod.load_labware('nest_96_wellplate_2ml_deep')
+
+    hs_mod = protocol.load_module('heaterShakerModuleV1', 7)
+    well24 = hs_mod.load_labware('thomsoninstrument_24_wellplate_10400ul')
+    
+    tubes = protocol.load_labware('opentrons_24_tuberack_nest_2ml_snapcap', 4)
+    
+    conicals = protocol.load_labware('opentrons_6_tuberack_nest_50ml_conical', 2)
+    reservoir1 = protocol.load_labware('nest_1_reservoir_195ml', 5)
+    reservoir2 = protocol.load_labware('nest_1_reservoir_195ml', 8)
     reservoir3 = protocol.load_labware('nest_1_reservoir_195ml', 11)
-    tubes = protocol.load_labware('opentrons_24_tuberack_nest_2ml_snapcap', 7)
 
     # reagents
-    global new_beads, used_beads, buff, elution, naoh
+    global new_beads, used_beads, buff, elution, naoh, water, waste, lysis
     new_beads = tubes.wells()[22].bottom(2)
     used_beads = deep_well.wells()[95]
+    lysis = conicals.wells()[0]
     buff = reservoir1.wells()[0]
     water = reservoir2.wells()[0]
     waste = reservoir3.wells()[0]
-    elution = trough.wells()[0]
-    naoh = trough.wells()[1]
+    elution = conicals.wells()[1]
+    naoh = conicals.wells()[2]
 
     global mag_time
-    mag_time = 60
+    mag_time = 10
 
-def wash_beads(protocol):
+def lyse(protocol):
+    hs_mod.close_labware_latch()
     p1000.pick_up_tip()
-    p1000.transfer(500, new_beads, used_beads, new_tip="never")
-    mag_mod2.engage(height_from_base=5)
-    clean_tips(p1000s, 500, protocol)
-    protocol.delay(seconds=mag_time-30)
-    for i in range(0,3):
-        p1000.transfer(2000, buff, used_beads, new_tip="never")
-        protocol.delay(seconds=mag_time-30)
-        p1000.transfer(2000, used_beads.bottom(2), waste, new_tip="never")
-        clean_tips(p1000, 1000, protocol)
-    mag_mod2.disengage()
-
-def dispense_beads(protocol):
-    # put 500µL of beads into well
-    p1000.transfer(500, buff, used_beads, new_tip="never", mix_after=(3,500))
-    p1000.transfer(500, used_beads, plate.wells()[sample_well], new_tip="never", mix_after=(3,500))
+    for well in range(0,24):
+        p1000.transfer(1500, lysis, well24.wells()[well].bottom(20), new_tip="never")
     p1000.drop_tip()
-    protocol.pause(msg="Take out plate and shake for 10min at RT (100rpm).")
+    hs_mod.set_and_wait_for_shake_speed(200)
 
-def wash(protocol):
-    # remove supernatant 
-    mag_mod.engage(height_from_base=7)
-    protocol.delay(seconds=mag_time)
-    p1000.transfer(50000, plate.wells()[sample_well], waste)
-    mag_mod.disengage()
+# def wash_beads(protocol):
+#     p1000.pick_up_tip()
+#     p1000.transfer(500, new_beads, used_beads, new_tip="never")
+#     mag_mod2.engage(height_from_base=5)
+#     clean_tips(p1000, 500, protocol)
+#     protocol.delay(seconds=mag_time-30)
+#     for i in range(0,3):
+#         p1000.transfer(2000, buff, used_beads, new_tip="never")
+#         protocol.delay(seconds=mag_time-30)
+#         p1000.transfer(2000, used_beads.bottom(2), waste, new_tip="never")
+#         clean_tips(p1000, 1000, protocol)
+#     mag_mod2.disengage()
 
-    # wash beads
-    for i in range(0,3):
-        p1000.pick_up_tip()
-        p1000.transfer(5000, buff, plate.wells()[sample_well].bottom(10), new_tip="never")
-        mag_mod.engage(height_from_base=7)
-        protocol.delay(seconds=mag_time)
-        p1000.transfer(5000, plate.wells()[sample_well], waste new_tip="never")
-        p1000.drop_tip()
-        mag_mod.disengage()
+# def dispense_beads(protocol):
+#     # put 500µL of beads into well
+#     p1000.transfer(500, buff, used_beads, new_tip="never", mix_after=(3,500))
+#     p1000.transfer(500, used_beads, plate.wells()[sample_well], new_tip="never", mix_after=(3,500))
+#     p1000.drop_tip()
+#     protocol.pause(msg="Take out plate and shake for 10min at RT (100rpm).")
+
+# def wash(protocol):
+#     # remove supernatant 
+#     mag_mod.engage(height_from_base=7)
+#     protocol.delay(seconds=mag_time)
+#     p1000.transfer(50000, plate.wells()[sample_well], waste)
+#     mag_mod.disengage()
+
+#     # wash beads
+#     for i in range(0,3):
+#         p1000.pick_up_tip()
+#         p1000.transfer(5000, buff, plate.wells()[sample_well].bottom(10), new_tip="never")
+#         mag_mod.engage(height_from_base=7)
+#         protocol.delay(seconds=mag_time)
+#         p1000.transfer(5000, plate.wells()[sample_well], waste new_tip="never")
+#         p1000.drop_tip()
+#         mag_mod.disengage()
     
 # def elute(protocol):
 #     p300.transfer(50000, plate.wells()[sample_well], waste)
