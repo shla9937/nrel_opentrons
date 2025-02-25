@@ -99,19 +99,18 @@ def lyse(protocol):
 
 def wash_beads(protocol):
     p1000.pick_up_tip()
-    p1000.transfer(360, beads.bottom(5), deep_well.wells()[sample_well], new_tip="never", mix_before=(3,500))
+    p1000.transfer(1000, beads, deep_well.wells()[sample_well], new_tip="never", mix_before=(3,1000))
     mag_mod.engage(height_from_base=mag_height)
+    p1000.move_to(deep_well.wells()[sample_well].top(10))
+    protocol.delay(seconds=mag_time)
+    p1000.transfer(1000, pickup_pos, waste.top(), new_tip="never")
     clean_tips(p1000, 1000, protocol)
     
     for i in range(0,3):
         p1000.transfer(1000, buff, deep_well.wells()[sample_well].top(), new_tip="never")
         p1000.move_to(deep_well.wells()[sample_well].top(10))
         protocol.delay(seconds=mag_time)
-        if i == 0:
-            vol = 1360
-        else:
-            vol = 1000
-        p1000.transfer(vol, pickup_pos, waste.top(), new_tip="never")
+        p1000.transfer(1000, pickup_pos, waste.top(), new_tip="never")
         if i != 2:
             clean_tips(p1000, 1000, protocol)
     mag_mod.disengage()
@@ -179,8 +178,8 @@ def recharge(protocol):
 def collect(protocol):
     p300.pick_up_tip()
     for i in [0,1]:
-        p300.transfer(180, buff, deep_well.wells()[sample_well].top(), new_tip='never')
-        p1000.transfer(190, deep_well.wells()[sample_well], beads, new_tip='never', mix_before=(3,180))
+        p300.transfer(500, buff, deep_well.wells()[sample_well].top(), new_tip='never')
+        p1000.transfer(510, deep_well.wells()[sample_well], beads, new_tip='never', mix_before=(3,500))
     p300.drop_tip()
     p1000.drop_tip()
 
