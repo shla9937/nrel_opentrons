@@ -57,13 +57,13 @@ def setup(protocol):
 
     # reagents
     global beads, buff, elution, naoh, water, waste, lysis
-    beads = deep_well.wells()[95]
     lysis = conicals.wells()[0]
+    beads = conicals.wells()[1]
     buff = reservoir1.wells()[0]
     water = reservoir2.wells()[0]
     waste = reservoir3.wells()[0]
-    elution = conicals.wells()[1]
-    naoh = conicals.wells()[2]
+    elution = conicals.wells()[2]
+    naoh = conicals.wells()[3]
 
     global mag_time, mag_height, incubation_time, elute_time, naoh_time, z, x_offset, y_offset
     mag_time = 20 # seconds
@@ -136,7 +136,7 @@ def wash(protocol):
     p1000.pick_up_tip()
     for i in range(0,3):
         p1000.transfer(1500, buff, deep_well.wells()[sample_well].top(), new_tip="never")
-        p1000.transfer(1500, pickup_pos, waste.top(), new_tip="never")
+        p1000.transfer(1550, pickup_pos, waste.top(), new_tip="never")
         if i != 2:
             clean_tips(p1000, 1000, protocol)
     p1000.drop_tip()
@@ -150,7 +150,7 @@ def elute(protocol):
         protocol.delay(minutes=elute_time)
         mag_mod.engage(height_from_base=mag_height)
         protocol.delay(seconds=mag_time)
-        p300.transfer(100, pickup_pos, tubes.wells()[sample_well], new_tip='never')
+        p300.transfer(110, pickup_pos, tubes.wells()[sample_well], new_tip='never')
         p300.drop_tip()
         mag_mod.disengage()
 
@@ -172,7 +172,7 @@ def recharge(protocol):
         p1000.transfer(1500, buff, deep_well.wells()[sample_well].top(), new_tip='never')
         p1000.move_to(deep_well.wells()[sample_well].top(10))
         protocol.delay(mag_time)
-        p1000.transfer(1500, pickup_pos, waste.top(), new_tip='never')
+        p1000.transfer(1550, pickup_pos, waste.top(), new_tip='never')
         clean_tips(p1000, 1000, protocol)
     mag_mod.disengage()
 
