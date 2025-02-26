@@ -26,7 +26,7 @@ def run(protocol):
 
 def setup(protocol):
     # equipment
-    global tips1000, p1000, mag_mod, hs_mod, temp_mod, reservoir1, reservoir2, reservoir3, tips300, p300, tubes, deep_well, well24, conicals
+    global tips1000, p1000, mag_mod, hs_mod, reservoir1, reservoir2, reservoir3, tips300, p300, tubes, deep_well, well24, conicals
     tips300 = protocol.load_labware('opentrons_96_tiprack_300ul', 6)
     p300 = protocol.load_instrument('p300_single_gen2', 'left', tip_racks=[tips300])
     tips1000 = protocol.load_labware('opentrons_96_tiprack_1000ul', 3)
@@ -39,8 +39,7 @@ def setup(protocol):
     well24 = hs_mod.load_labware('thomsoninstrument_24_wellplate_10400ul')
     hs_mod.close_labware_latch()
     
-    temp_mod = protocol.load_module('temperature module gen2', 4)
-    tubes = temp_mod.load_labware('opentrons_24_aluminumblock_nest_1.5ml_snapcap')
+    tubes = protocol.load_labware('opentrons_24_tuberack_eppendorf_1.5ml_safelock_snapcap', 4)
     
     conicals = protocol.load_labware('opentrons_6_tuberack_nest_50ml_conical', 2)
     reservoir1 = protocol.load_labware('nest_1_reservoir_195ml', 5)
