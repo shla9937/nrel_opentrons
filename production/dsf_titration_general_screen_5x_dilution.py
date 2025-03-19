@@ -133,9 +133,9 @@ def titrate(protocol):
         pickup_tips(8, p20m, protocol)
         p20m.aspirate(4, plate.rows()[0][col])            
         p20m.dispense(4, pcr.rows()[0][0+i])
-        p20m.mix(3, 5, pcr.rows()[0][0+i])
+        p20m.mix(5, 5, pcr.rows()[0][0+i])
         p20m.transfer(4,pcr.rows()[0][0+i:4+i],pcr.rows()[0][1+i:5+i],
-                    mix_after=(3, 5),new_tip='never')
+                    mix_after=(5, 5),new_tip='never')
         p20m.aspirate(4, pcr.rows()[0][4+i])
         p20m.drop_tip()
 
