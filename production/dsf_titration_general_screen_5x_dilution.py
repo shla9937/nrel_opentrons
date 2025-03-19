@@ -145,7 +145,7 @@ def add_edta(protocol):
         pickup_tips(1, p20m, protocol)
         p20m.aspirate(1, edta)
         p20m.dispense(1, pcr.wells()[well])
-        p20m.mix(3,5)
+        p20m.mix(5,5)
         p20m.aspirate(1, pcr.wells()[well])
         p20m.drop_tip()
 
