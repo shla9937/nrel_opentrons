@@ -103,24 +103,24 @@ def add_sypro(protocol):
 def add_metal(protocol):
     pickup_tips(8, p300m, protocol)
     for col in [1,2]:
-        p300m.aspirate(95, water3)             
-        p300m.dispense(95, plate.rows()[0][col])
+        p300m.aspirate(252, water3)             
+        p300m.dispense(252, plate.rows()[0][col])
     p300m.drop_tip()
 
     for row in range(0,8):
         metal = metals_loc[row]
         pickup_tips(1, p20m, protocol)
-        p20m.aspirate(5, metal)  
-        p20m.dispense(5, plate.wells()[row+8])
-        p20m.mix(3,20)
+        p20m.aspirate(4, metal)  
+        p20m.dispense(4, plate.wells()[row+8])
+        p20m.mix(5,20)
         p20m.drop_tip()
 
     for row in range(8,16):
         metal = metals_loc[row]
         pickup_tips(1, p20m, protocol)
-        p20m.aspirate(5, metal)  
-        p20m.dispense(5, plate.wells()[row+8])
-        p20m.mix(3,20)
+        p20m.aspirate(4, metal)  
+        p20m.dispense(4, plate.wells()[row+8])
+        p20m.mix(5,20)
         p20m.drop_tip()
 
 def titrate(protocol):
