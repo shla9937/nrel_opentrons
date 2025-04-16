@@ -9,7 +9,7 @@ import subprocess
 
 
 metadata = {
-    'protocolName': 'DSF screen - 12 point 1:1 dilution, 7 metals',
+    'protocolName': 'DSF screen - 12 point 1:1 dilution, 8 metals',
     'author': 'Shawn Laursen',
     'description': '''
     12 well dilution = 11 well dilution series (1mM -> 1µM) + 0 point
@@ -93,20 +93,20 @@ def add_buff(protocol):
 def add_metal(protocol):
     # dilute metals 1 in 100 in staging plate
     pickup_tips(8, p300m, protocol)
-    p300m.aspirate(198, water3)             
+    p300m.aspirate(198, buff1)             
     p300m.dispense(198, plate.rows()[0][0])
     p300m.drop_tip()
     for row in range(0,8):
         metal = metals_loc[row]
         pickup_tips(1, p20m, protocol)
         p20m.aspirate(2, metal)  
-        p20m.dispense(2, plate.wells()[row+8])
-        p20m.mix(5,20)
+        p20m.dispense(2, plate.wells()[row])
         p20m.drop_tip()
 
 def titrate(protocol):
     # titrate 10µL into 10µL 11 times
     pickup_tips(8, p20m, protocol)
+    p20m.mix(5,20, plate.rows()[0][0])
     p20m.aspirate(20, plate.rows()[0][0])            
     p20m.dispense(20, pcr.rows()[0][0])
     p20m.transfer(10,pcr.rows()[0][0:10],pcr.rows()[0][1:11],
