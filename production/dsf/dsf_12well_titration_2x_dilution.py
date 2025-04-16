@@ -101,6 +101,7 @@ def add_metal(protocol):
         pickup_tips(1, p20m, protocol)
         p20m.aspirate(2, metal)  
         p20m.dispense(2, plate.wells()[row])
+        p20m.mix(3,5)
         p20m.drop_tip()
 
 def titrate(protocol):
