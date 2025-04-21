@@ -92,7 +92,7 @@ def add_sypro(protocol):
     # add spyro to first well of pcr plate
     p300m.aspirate(90, sypro) 
     for row in range(0, 8):        
-        p300m.dispense(10, plate.rows()[row][0])
+        p300m.dispense(10, pcr.rows()[row][0])
     p300m.drop_tip()
 
 def add_buff(protocol):
@@ -127,8 +127,8 @@ def add_metal(protocol):
 def titrate(protocol):
     # mix 4mM with 1:1 sypro to get 2mM metal
     pickup_tips(8, p20m, protocol)
-    p20m.mix(5,20, plate.rows()[0][0])
-    p20m.aspirate(10, plate.rows()[0][0])            
+    p20m.mix(5,20, plate.rows()[0][1])
+    p20m.aspirate(10, plate.rows()[0][1])            
     p20m.dispense(10, pcr.rows()[0][0])
     p20m.mix(5,10)
     
