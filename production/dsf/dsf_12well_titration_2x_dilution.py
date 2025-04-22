@@ -54,13 +54,14 @@ def setup(protocol):
     buff1 = trough.wells()[0]
 
     # cleaning
-    global water1, waste1, water2, waste2, water3, waste3
+    global water1, waste1, water2, waste2, water3, waste3, water
     water1 = trough.wells()[1]
     waste1 = trough.wells()[2]
     water2 = trough.wells()[3]
     waste2 = trough.wells()[4]
     water3 = trough.wells()[5]
     waste3 = trough.wells()[6]
+    water = trough.wells()[7]
 
 def pickup_tips(number, pipette, protocol):
     nozzle_dict = {2: "G1", 3: "F1", 4: "E1", 5: "D1", 6: "C1", 7: "B1"}
@@ -96,31 +97,39 @@ def add_sypro(protocol):
     p300m.drop_tip()
 
 def add_buff(protocol):
-    # add buff to metal dilution wells 
+    # add water to metal dilution wells 
     pickup_tips(8, p300m, protocol)
-    p300m.aspirate(196, buff1)             
-    p300m.dispense(196, plate.rows()[0][1])
+    p300m.aspirate(120, water)             
+    p300m.dispense(120, plate.rows()[0][1])
     
+    # add water to first well of staging plate
+    p300m.aspirate(35, water)            
+    p300m.dispense(35, plate.rows()[0][0])
+
     # add buff to first well of staging plate
-    p300m.aspirate(70, buff1)            
-    p300m.dispense(70, plate.rows()[0][0])
+    p300m.aspirate(35, buff1)            
+    p300m.dispense(35, plate.rows()[0][0])
     p300m.mix(3, 100)
     p300m.drop_tip()
 
-    # add buff to titration wells
+    # add buff to first well of pcr plate
     pickup_tips(8, p20m, protocol)
+    p20m.aspirate(5, buff1)             
+    p20m.dispense(5, pcr.rows()[0][0])
+
+    # add buff to titration wells
     for col in range(1, 12):
         p20m.aspirate(10, plate.rows()[0][0])             
         p20m.dispense(10, pcr.rows()[0][col])
     p20m.drop_tip()
 
 def add_metal(protocol):
-    # dilute metals 50x from 200mM to 4mM
+    # dilute metals 25x from 200mM to 8mM
     for row in range(0,8):
         metal = metals_loc[row]
         pickup_tips(1, p20m, protocol)
-        p20m.aspirate(4, metal)  
-        p20m.dispense(4, plate.rows()[row][1])
+        p20m.aspirate(5, metal)  
+        p20m.dispense(5, plate.rows()[row][1])
         p20m.mix(3,5)
         p20m.drop_tip()
 
@@ -128,8 +137,8 @@ def titrate(protocol):
     # mix 4mM with 1:1 sypro to get 2mM metal
     pickup_tips(8, p20m, protocol)
     p20m.mix(5,20, plate.rows()[0][1])
-    p20m.aspirate(10, plate.rows()[0][1])            
-    p20m.dispense(10, pcr.rows()[0][0])
+    p20m.aspirate(5, plate.rows()[0][1])            
+    p20m.dispense(5, pcr.rows()[0][0])
     p20m.mix(5,10)
     
     # titrate 10µL into 10µL 11 times
@@ -145,13 +154,12 @@ def add_edta(protocol):
         p20m.aspirate(1, edta)
         p20m.dispense(1, pcr.wells()[well])
         p20m.mix(5,5)
-        p20m.aspirate(1, pcr.wells()[well])
         p20m.drop_tip()
 
 def add_water(protocol):
     # add 10µL of water to blanks
     pickup_tips(2, p20m, protocol)
-    p20m.aspirate(10, water3)
+    p20m.aspirate(10, water)
     p20m.dispense(10, pcr.rows()[7][11])
     p20m.drop_tip()
 
