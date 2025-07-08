@@ -33,15 +33,14 @@ def run(protocol):
 
 def setup(protocol):
     # equiptment
-    global tips20, pcr, trough, tubes, p20m, plate, p300m, tips300
+    global tips20, trough, tubes, p20m, plate, p300m, tips300
     tips20 = protocol.load_labware('opentrons_96_tiprack_20ul', 1)
     tips300 = protocol.load_labware('opentrons_96_tiprack_300ul', 3)
-    pcr = protocol.load_labware('biorad_96_wellplate_200ul_pcr', 5)
     trough = protocol.load_labware('nest_12_reservoir_15ml', 6)
     tubes = protocol.load_labware('opentrons_24_tuberack_eppendorf_1.5ml_safelock_snapcap', 2)
     p20m = protocol.load_instrument('p20_multi_gen2', 'right', tip_racks=[tips20])
     p300m = protocol.load_instrument('p300_multi_gen2', 'left', tip_racks=[tips300])
-    plate = protocol.load_labware('corning_384_wellplate_112ul_flat', 4)  
+    plate = protocol.load_labware('corning_384_wellplate_112ul_flat', 5)  
     
     # reagents
     global metals_loc, buff, prot_buff
