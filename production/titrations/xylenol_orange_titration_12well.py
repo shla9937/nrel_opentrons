@@ -86,21 +86,17 @@ def distribute_buffs(protocol):
 def add_metal(protocol):
     for metal in range(0,8):
         pickup_tips(1, p20m, protocol)
-        p20m.aspirate(2, metals_loc[metal])
-        p20m.dispense(2, plate.rows()[metal][0])
+        p20m.transfer(2, metals_loc[metal], plate.rows()[metal*2][0], mix_after=(3,5), new_tip='never')
         p20m.drop_tip()
         pickup_tips(1, p20m, protocol)
-        p20m.aspirate(2, metals_loc[metal])
-        p20m.dispense(2, plate.rows()[metal+1][0])
+        p20m.transfer(2, metals_loc[metal], plate.rows()[metal*2+1][0], mix_after=(3,5), new_tip='never')
         p20m.drop_tip()
     for metal in range(0,8):
         pickup_tips(1, p20m, protocol)
-        p20m.aspirate(2, metals_loc[metal+8])
-        p20m.dispense(2, plate.rows()[metal][12])
+        p20m.transfer(2, metals_loc[metal+8], plate.rows()[metal*2][12], mix_after=(3,5), new_tip='never')
         p20m.drop_tip()
         pickup_tips(1, p20m, protocol)
-        p20m.aspirate(2, metals_loc[metal+8])
-        p20m.dispense(2, plate.rows()[metal+1][12])
+        p20m.transfer(2, metals_loc[metal+8], plate.rows()[metal*2+1][12], mix_after=(3,5), new_tip='never')
         p20m.drop_tip()
 
 def titrate(protocol):
@@ -109,6 +105,6 @@ def titrate(protocol):
     for row, col in zip(rows,cols):
         pickup_tips(8, p20m, protocol)
         p20m.transfer(16.66, plate.rows()[0+row][0+col:10+col], plate.rows()[0+row][1+col:11+col], 
-                    mix_after=(5, 20), new_tip='never')
+                    mix_before=(5, 20), new_tip='never')
         p20m.drop_tip()
 
