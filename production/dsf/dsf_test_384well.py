@@ -34,10 +34,11 @@ def setup(protocol):
     plate = protocol.load_labware('appliedbiosystemsmicroamp_384_wellplate_40ul', 5)  
     
     # reagents
-    global metals_loc, buff, prot_buff
-    metals_loc = [tubes.wells()[i].bottom(8) for i in range(0, 16)]
+    global buff, buff1, buff2, buff3
     buff = trough.wells()[0]
-    prot_buff = trough.wells()[1]
+    buff1 = trough.wells()[1]
+    buff2 = trough.wells()[2]
+    buff3 = trough.wells()[3]
 
     #single tips
     global tip_20, tip_300
@@ -82,12 +83,19 @@ def distribute_buffs(protocol):
     pickup_tips(8, p20m, protocol)
     p20m.transfer(20, buff, plate.rows()[0][0:6], new_tip='never')
     p20m.transfer(20, buff, plate.rows()[1][0:6], new_tip='never')
-    p20m.transfer(15, buff, plate.rows()[0][6:12], new_tip='never')
-    p20m.transfer(15, buff, plate.rows()[1][6:12], new_tip='never')
-    p20m.transfer(10, buff, plate.rows()[0][12:18], new_tip='never')
-    p20m.transfer(10, buff, plate.rows()[1][12:18], new_tip='never')
-    p20m.transfer(5, buff, plate.rows()[0][18:24], new_tip='never')
-    p20m.transfer(5, buff, plate.rows()[1][18:24], new_tip='never')
     return_tips(p20m)
+    pickup_tips(8, p20m, protocol)
+    p20m.transfer(20, buff1, plate.rows()[0][6:12], new_tip='never')
+    p20m.transfer(20, buff1, plate.rows()[1][6:12], new_tip='never')
+    return_tips(p20m)
+    pickup_tips(8, p20m, protocol)
+    p20m.transfer(20, buff2, plate.rows()[0][12:18], new_tip='never')
+    p20m.transfer(20, buff2, plate.rows()[1][12:18], new_tip='never')
+    return_tips(p20m)
+    pickup_tips(8, p20m, protocol)
+    p20m.transfer(20, buff3, plate.rows()[0][18:24], new_tip='never')
+    p20m.transfer(20, buff3, plate.rows()[1][18:24], new_tip='never')
+    return_tips(p20m)
+
 
 
