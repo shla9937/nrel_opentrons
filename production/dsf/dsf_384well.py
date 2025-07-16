@@ -40,27 +40,26 @@ def setup(protocol):
     # equiptment
     global tips20, trough, tubes, p20m, plate, p300m, tips300, dirty_tips20, dirty_tips300, metals
     tips20 = protocol.load_labware('opentrons_96_tiprack_20ul', 1)
-    dirty_tips20 = protocol.load_labware('opentrons_96_tiprack_20ul', 7)
     tips300 = protocol.load_labware('opentrons_96_tiprack_300ul', 3)
-    dirty_tips300 = protocol.load_labware('opentrons_96_tiprack_300ul', 9)
+    metals = protocol.load_labware('nest_96_wellplate_2ml_deep', 4)
+    plate = protocol.load_labware('corning_384_wellplate_112ul_flat', 5) 
     trough = protocol.load_labware('nest_12_reservoir_15ml', 6)
+    dirty_tips20 = protocol.load_labware('opentrons_96_tiprack_20ul', 7)
+    dirty_tips300 = protocol.load_labware('opentrons_96_tiprack_300ul', 9)
     p20m = protocol.load_instrument('p20_multi_gen2', 'right', tip_racks=[tips20])
     p300m = protocol.load_instrument('p300_multi_gen2', 'left', tip_racks=[tips300])
-    plate = protocol.load_labware('corning_384_wellplate_112ul_flat', 5)  
-    metals = protocol.load_labware('nest_96_wellplate_2ml_deep')
-    
-    # reagents
+     
     global buff, sample_vol
     buff = trough.wells()[0]
     sample_vol = protocol.params.sample_vol
 
-    #single tips
     global tip_20, tip_300
     tip_20 = 0
     tip_300 = 0
 
 def pickup_tips(number, pipette, protocol):
     global last_tip20, last_tip300, tip_20, tip_300
+   
     nozzle_dict = {2: "G1", 3: "F1", 4: "E1", 5: "D1", 6: "C1", 7: "B1"}
    
     if pipette == p20m: 
@@ -128,7 +127,7 @@ def titrate(protocol):
     metal_col = 0
     for row, col in zip(rows,cols):
         pickup_tips(8, p20m, protocol)
-        p20m.transfer(sample_vol/10, metals[metal_col], plate.rows()[0+row][0+col], mix_after=(3,5), new_tip='never')
+        p20m.transfer(sample_vol/10, metals.rows()[0][metal_col], plate.rows()[0+row][0+col], mix_after=(3,5), new_tip='never')
         p20m.transfer(sample_vol/3, plate.rows()[0+row][0+col:10+col], plate.rows()[0+row][1+col:11+col], 
                     mix_before=(5, sample_vol/2), new_tip='never')
         return_tips(p20m)
