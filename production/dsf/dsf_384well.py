@@ -34,6 +34,7 @@ def run(protocol):
     setup(protocol)
     distribute_buff(protocol)
     titrate(protocol)
+    blanks(protocol)
     protocol.set_rail_lights(False)
 
 def setup(protocol):
@@ -44,13 +45,15 @@ def setup(protocol):
     metals = protocol.load_labware('nest_96_wellplate_2ml_deep', 4)
     plate = protocol.load_labware('corning_384_wellplate_112ul_flat', 5) 
     trough = protocol.load_labware('nest_12_reservoir_15ml', 6)
-    dirty_tips20 = protocol.load_labware('opentrons_96_tiprack_20ul', 7)
-    dirty_tips300 = protocol.load_labware('opentrons_96_tiprack_300ul', 9)
+    dirty_tips20 = protocol.load_labware('opentrons_96_tiprack_20ul', 10)
+    dirty_tips300 = protocol.load_labware('opentrons_96_tiprack_300ul', 11)
     p20m = protocol.load_instrument('p20_multi_gen2', 'right', tip_racks=[tips20])
     p300m = protocol.load_instrument('p300_multi_gen2', 'left', tip_racks=[tips300])
      
-    global buff, sample_vol
+    global buff, neg, edta, sample_vol
     buff = trough.wells()[0]
+    neg = trough.wells()[1]
+    edta = metals.wells()[31]
     sample_vol = protocol.params.sample_vol
 
     global tip_20, tip_300
@@ -109,7 +112,6 @@ def distribute_buff(protocol):
     pip1.transfer(sample_vol*1.33, buff, plate.rows()[0][0], new_tip='never')
     pip1.transfer(sample_vol*1.33, buff, plate.rows()[1][0], new_tip='never')
     pip1.transfer(sample_vol*1.33, buff, plate.rows()[0][12], new_tip='never')
-    pip1.transfer(sample_vol*1.33, buff, plate.rows()[1][12], new_tip='never')
 
     if pip1 != pip2:
         return_tips(pip1)
@@ -118,18 +120,49 @@ def distribute_buff(protocol):
     pip2.transfer(sample_vol, buff, plate.rows()[0][1:12], new_tip='never')
     pip2.transfer(sample_vol, buff, plate.rows()[0][13:24], new_tip='never')
     pip2.transfer(sample_vol, buff, plate.rows()[1][1:12], new_tip='never')
-    pip2.transfer(sample_vol, buff, plate.rows()[1][13:24], new_tip='never')
     return_tips(pip2)
+
+    # different because of blanks
+    pickup_tips(7, pip1, protocol)
+    pip1.transfer(sample_vol*1.33, buff, plate.rows()[1][12], new_tip='never')
+    if pip1 != pip2:
+        pip1.drop_tip()
+        pickup_tips(7, pip2, protocol)
+    pip2.transfer(sample_vol, buff, plate.rows()[1][13:24], new_tip='never')
+    pip2.drop_tip()
+
 
 def titrate(protocol):
     rows = [0,0,1,1]
     cols = [0,12,0,12]
     metal_col = 0
     for row, col in zip(rows,cols):
-        pickup_tips(8, p20m, protocol)
+        if metal_col == 3:
+            pickup_tips(7, p20m, protocol)
+        else:
+            pickup_tips(8, p20m, protocol)
         p20m.transfer(sample_vol/10, metals.rows()[0][metal_col], plate.rows()[0+row][0+col], mix_after=(3,5), new_tip='never')
         p20m.transfer(sample_vol/3, plate.rows()[0+row][0+col:10+col], plate.rows()[0+row][1+col:11+col], 
                     mix_before=(5, sample_vol/2), new_tip='never')
-        return_tips(p20m)
+        if metal_col == 3:
+            p20m.drop_tip()
+        else:
+            return_tips(p20m)
         metal_col += 1
 
+def blanks(protocol):
+    # add protein
+    pickup_tips(1, p20m, protocol)
+    p20m.transfer(sample_vol, buff, plate.rows()[1][12:20], new_tip='never')
+    p20m.drop_tip()
+
+    # add edta
+    for i in range(4):
+        pickup_tips(1, p20m, protocol)
+        p20m.transfer(sample_vol/10, edta, plate.rows()[1][12+i], new_tip='never')
+        p20m.drop_tip()
+
+    # add negative control (sypro only)
+    pickup_tips(1, p20m, protocol)
+    p20m.transfer(sample_vol, neg, plate.rows()[1][20:24], new_tip='never')
+    p20m.drop_tip()
