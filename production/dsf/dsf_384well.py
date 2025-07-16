@@ -139,16 +139,16 @@ def titrate(protocol):
 def blanks(protocol):
     # add protein
     pickup_tips(1, p20m, protocol)
-    p20m.transfer(sample_vol, buff, plate.rows()[1][12:20], new_tip='never')
+    p20m.transfer(sample_vol, buff, plate.rows()[15][12:20], new_tip='never')
     p20m.drop_tip()
 
     # add edta
     for i in range(4):
         pickup_tips(1, p20m, protocol)
-        p20m.transfer(sample_vol/10, edta, plate.rows()[1][12+i], new_tip='never')
+        p20m.transfer(sample_vol/10, edta, plate.rows()[15][12+i], new_tip='never')
         p20m.drop_tip()
 
     # add negative control (sypro only)
     pickup_tips(1, p20m, protocol)
-    p20m.transfer(sample_vol, neg, plate.rows()[1][20:24], new_tip='never')
+    p20m.transfer(sample_vol, neg, plate.rows()[15][20:24], new_tip='never')
     p20m.drop_tip()
