@@ -120,12 +120,14 @@ def titrate(protocol):
     rows = [0,0,1,13]
     cols = [0,12,0,12]
     metal_col = 0
+    metal_row = 0
     for row, col in zip(rows,cols):
         if metal_col == 3:
             pickup_tips(7, p20m, protocol)
+            metal_row = 6
         else:
             pickup_tips(8, p20m, protocol)
-        p20m.transfer(sample_vol/10, metals.rows()[0][metal_col], plate.rows()[0+row][0+col], new_tip='never')
+        p20m.transfer(sample_vol/10, metals.rows()[metal_row][metal_col], plate.rows()[0+row][0+col], new_tip='never')
         p20m.transfer(sample_vol/3, plate.rows()[0+row][0+col:10+col], plate.rows()[0+row][1+col:11+col], 
                     mix_before=(5, sample_vol/2), new_tip='never')
         if metal_col == 3:
