@@ -128,7 +128,7 @@ def titrate(protocol):
         else:
             pickup_tips(8, p20m, protocol)
         p20m.transfer(sample_vol/10, metals.rows()[metal_row][metal_col], plate.rows()[0+row][0+col], new_tip='never')
-        p20m.transfer(sample_vol/3, plate.rows()[0+row][0+col:10+col], plate.rows()[0+row][1+col:11+col], 
+        p20m.transfer(sample_vol/3, plate.rows()[0+row][0+col:11+col], plate.rows()[0+row][1+col:12+col], 
                     mix_before=(5, sample_vol/2), new_tip='never')
         if metal_col == 3:
             p20m.drop_tip()
