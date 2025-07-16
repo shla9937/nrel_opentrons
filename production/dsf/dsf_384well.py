@@ -102,8 +102,8 @@ def return_tips(pipette):
 def distribute_buff(protocol):
     pickup_tips(8, p20m, protocol)
     p20m.transfer(sample_vol*1.33, buff, plate.rows()[0][0], new_tip='never')
-    p20m.transfer(sample_vol*1.33, buff, plate.rows()[1][0], new_tip='never')
     p20m.transfer(sample_vol*1.33, buff, plate.rows()[0][12], new_tip='never')
+    p20m.transfer(sample_vol*1.33, buff, plate.rows()[1][0], new_tip='never')
     
     p20m.transfer(sample_vol, buff, plate.rows()[0][1:12], new_tip='never')
     p20m.transfer(sample_vol, buff, plate.rows()[0][13:24], new_tip='never')
@@ -116,7 +116,6 @@ def distribute_buff(protocol):
     p20m.transfer(sample_vol, buff, plate.rows()[13][13:24], new_tip='never')
     p20m.drop_tip()
 
-
 def titrate(protocol):
     rows = [0,0,1,13]
     cols = [0,12,0,12]
@@ -126,7 +125,7 @@ def titrate(protocol):
             pickup_tips(7, p20m, protocol)
         else:
             pickup_tips(8, p20m, protocol)
-        p20m.transfer(sample_vol/10, metals.rows()[0][metal_col], plate.rows()[0+row][0+col], mix_after=(3,5), new_tip='never')
+        p20m.transfer(sample_vol/10, metals.rows()[0][metal_col], plate.rows()[0+row][0+col], new_tip='never')
         p20m.transfer(sample_vol/3, plate.rows()[0+row][0+col:10+col], plate.rows()[0+row][1+col:11+col], 
                     mix_before=(5, sample_vol/2), new_tip='never')
         if metal_col == 3:
