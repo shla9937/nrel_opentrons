@@ -112,13 +112,13 @@ def distribute_buff(protocol):
 
     # different because of blanks
     pickup_tips(7, p20m, protocol)
-    p20m.transfer(sample_vol*1.33, buff, plate.rows()[1][12], new_tip='never')
-    p20m.transfer(sample_vol, buff, plate.rows()[1][13:24], new_tip='never')
+    p20m.transfer(sample_vol*1.33, buff, plate.rows()[13][12], new_tip='never')
+    p20m.transfer(sample_vol, buff, plate.rows()[13][13:24], new_tip='never')
     p20m.drop_tip()
 
 
 def titrate(protocol):
-    rows = [0,0,1,1]
+    rows = [0,0,1,13]
     cols = [0,12,0,12]
     metal_col = 0
     for row, col in zip(rows,cols):
