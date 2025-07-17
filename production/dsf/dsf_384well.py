@@ -12,7 +12,7 @@ metadata = {
     'protocolName': 'DSF - 384 well',
     'author': 'Shawn Laursen',
     'description': '''
-    Titrates 30 metals in 12 point 1:2 (1 in 3) dilution series.
+    Titrates 30 metals in 12 point 1:3 (1 in 4) dilution series.
     1mM highest metal concentration (metal stocks are at 13.3mM).
     5µM final protein concentration.
     4x sypro concentration.
