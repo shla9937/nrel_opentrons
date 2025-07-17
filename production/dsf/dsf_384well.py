@@ -54,8 +54,8 @@ def setup(protocol):
      
     global buff, neg, edta, sample_vol
     buff = trough.wells()[0]
-    neg = trough.wells()[1]
-    edta = metals.wells()[31]
+    neg = metals.wells()[47]
+    edta = metals.wells()[39]
     sample_vol = protocol.params.sample_vol
 
     global tip_20, tip_300
@@ -124,7 +124,7 @@ def titrate(protocol):
     for row, col in zip(rows,cols):
         if metal_col == 3:
             pickup_tips(7, p20m, protocol)
-            metal_row = 6
+            metal_row = 7
         else:
             pickup_tips(8, p20m, protocol)
         p20m.transfer(sample_vol/10, metals.rows()[metal_row][metal_col], plate.rows()[0+row][0+col], new_tip='never')
@@ -146,7 +146,7 @@ def blanks(protocol):
     # add edta
     for i in range(4):
         pickup_tips(1, p20m, protocol)
-        p20m.transfer(sample_vol/10, edta, plate.rows()[15][12+i], new_tip='never')
+        p20m.transfer(sample_vol/10, edta, plate.rows()[15][12+i], new_tip='never', mix_after=(3, sample_vol/2))
         p20m.drop_tip()
 
     # add negative control (sypro only)
