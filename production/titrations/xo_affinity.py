@@ -48,7 +48,7 @@ def setup(protocol):
     plate = protocol.load_labware('corning_384_wellplate_112ul_flat', 5)  
     trough = protocol.load_labware('nest_12_reservoir_15ml', 6)
     dirty_tips20 = protocol.load_labware('opentrons_96_tiprack_20ul', 7)
-    dilution_plate = protocol.load_labware('thermoscientificnunc_96_wellplate_2000ul', 8)
+    dilution_plate = protocol.load_labware('greiner_96_wellplate_300ul', 8)
     dirty_tips300 = protocol.load_labware('opentrons_96_tiprack_300ul', 9)
     p20m = protocol.load_instrument('p20_multi_gen2', 'right', tip_racks=[tips20])
     p300m = protocol.load_instrument('p300_multi_gen2', 'left', tip_racks=[tips300])
