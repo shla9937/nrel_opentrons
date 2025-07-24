@@ -106,8 +106,8 @@ def make_high(protocol):
     
     for i in [0,1]:
         pickup_tips(8, p20m, protocol)
-        p20m.transfer(4.8, metals.rows()[0][i], dilution_plate.rows()[0][i*2], mix_after=(5,20), new_tip='never')
-        p20m.transfer(4.8, dilution_plate.rows()[0][i*2], dilution_plate.rows()[0][1+(2*i)], mix_after=(5,20), new_tip='never')
+        p20m.transfer(4.8, metals.rows()[0][i], dilution_plate.rows()[0][i*2], mix_after=(10,20), new_tip='never')
+        p20m.transfer(4.8, dilution_plate.rows()[0][i*2], dilution_plate.rows()[0][1+(2*i)], mix_after=(10,20), new_tip='never')
         p20m.transfer(25, dilution_plate.rows()[0][1+(2*i)], plate.rows()[i][0+side], new_tip='never')
         return_tips(p20m)
 
