@@ -13,10 +13,10 @@ metadata = {
     'author': 'Shawn Laursen',
     'description': '''
     Titrates 16 metals in 12 point 1:1 dilution series.
-    5µM metal concentration.
-    10µM xylenol orange concentration.
-    Titrate protein concentration from 62.5µM.
-    20mM MES.''',
+    5µM metal concentration (13.3mM stock).
+    10µM xylenol orange concentration (20µM stock).
+    50mM MES (100mM stock).
+    Titrate protein concentration from 62.5µM.''',
     'apiLevel': '2.23'}
 
 def add_parameters(parameters: protocol_api.Parameters):
@@ -25,9 +25,9 @@ def add_parameters(parameters: protocol_api.Parameters):
         display_name="Side of plate",
         description="Left or right side of plate",
         choices=[
-            {"display_name": "Left", "value": 0},
-            {"display_name": "Right", "value": 12}],
-         default="flex_1channel_50")
+            {"display_name": "Left", "value": "0"},
+            {"display_name": "Right", "value": "12"}],
+         default="0")
 
 def run(protocol):
     protocol.set_rail_lights(True)
@@ -58,7 +58,7 @@ def setup(protocol):
     protein = tubes.wells()[0]
     buff = trough.wells()[0]
     water = trough.wells()[1]
-    side = protocol.params.side
+    side = int(protocol.params.side)
 
     #single tips
     global tip_20, tip_300
@@ -101,21 +101,21 @@ def return_tips(pipette):
 
 def make_high(protocol):
     pickup_tips(8, p300m, protocol)
-    p300m.distribute(166.5, buff, dilution_plate.rows()[0][0:4], new_tip='never')
+    p300m.distribute(170.2, buff, dilution_plate.rows()[0][0:4], new_tip='never')
     return_tips(p300m)
     
     for i in [0,1]:
         pickup_tips(8, p20m, protocol)
-        p20m.transfer(6.7, metals.rows()[0][i], dilution_plate.rows()[0][i*2], mix_after=(5,20), new_tip='never')
-        p20m.transfer(6.7, dilution_plate.rows()[0][i*2], dilution_plate.rows()[0][1+(2*i)], mix_after=(5,20), new_tip='never')
+        p20m.transfer(4.8, metals.rows()[0][i], dilution_plate.rows()[0][i*2], mix_after=(5,20), new_tip='never')
+        p20m.transfer(4.8, dilution_plate.rows()[0][i*2], dilution_plate.rows()[0][1+(2*i)], mix_after=(5,20), new_tip='never')
         p20m.transfer(25, dilution_plate.rows()[0][1+(2*i)], plate.rows()[i][0+side], new_tip='never')
         return_tips(p20m)
 
 def make_low(protocol):
     for i in [0,1]:
         pickup_tips(8, p300m, protocol)
-        p300m.transfer(148.2, water, dilution_plate.rows()[0][(i*2)+1], mix_after=(3,250) new_tip='never')
-        p300m.distribute(25, dilution_plate.rows()[0][(i*2)+1], plate.rows[i][1+side:12+side], new_tip='never')
+        p300m.transfer(150, water, dilution_plate.rows()[0][(i*2)+1], mix_after=(3,150), new_tip='never')
+        p300m.distribute(25, dilution_plate.rows()[0][(i*2)+1], plate.rows()[i][1+side:12+side], new_tip='never')
         return_tips(p300m)
 
 def add_protein(protocol):
@@ -127,10 +127,6 @@ def add_protein(protocol):
 def titrate(protocol):
     for i in [0,1]:
         pickup_tips(8, p300m, protocol)
-        p300m.transfer(25, plate.rows()[i][0+side:10+side], plate.rows()[i][1+side:11+side], 
-                    mix_after=(5, 25), new_tip='never')
+        p300m.transfer(25, plate.rows()[i][0+side:10+side], plate.rows()[i][1+side:11+side], mix_after=(5, 25), new_tip='never')
         p300m.aspirate(25, plate.rows()[i][10+side])
         return_tips(p300m)
-
-
-
