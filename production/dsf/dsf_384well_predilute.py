@@ -43,10 +43,11 @@ def setup(protocol):
     p300m = protocol.load_instrument('p300_multi_gen2', 'left', tip_racks=[tips300])
     dilution_plate = protocol.load_labware('greiner_96_wellplate_300ul', 8)  
          
-    global buff, protein, sypro, edta, rxn_vol, dilutant_vol, protein_vol, dilutant_stock_vol, dilution_factor, start_vol
+    global buff, protein, sypro, water, edta, rxn_vol, dilutant_vol, protein_vol, dilutant_stock_vol, dilution_factor, start_vol
     buff = trough.wells()[0]
     protein = trough.wells()[1]
     sypro = trough.wells()[2]
+    water = trough.wells()[3]
     edta = metals.wells()[-1]
     rxn_vol = 20
     dilutant_vol = rxn_vol/2
@@ -56,14 +57,13 @@ def setup(protocol):
     start_vol = (dilutant_vol/dilution_factor) + dilutant_vol
 
     # cleaning
-    global water1, waste1, water2, waste2, water3, waste3, water
-    water1 = trough.wells()[1]
-    waste1 = trough.wells()[2]
-    water2 = trough.wells()[3]
-    waste2 = trough.wells()[4]
-    water3 = trough.wells()[5]
-    waste3 = trough.wells()[6]
-    water = trough.wells()[7]
+    global water1, waste1, water2, waste2, water3, waste3
+    water1 = trough.wells()[4]
+    waste1 = trough.wells()[5]
+    water2 = trough.wells()[6]
+    waste2 = trough.wells()[7]
+    water3 = trough.wells()[8]
+    waste3 = trough.wells()[9]
 
     global tip_20, tip_300
     tip_20 = 0
@@ -138,15 +138,17 @@ def add_buff(protocol):
     cols = [0,0,12,12]
     for row, col in zip(rows, cols):
         p20m.transfer(start_vol/3, buff, plate.rows()[row][col], new_tip='never')
+    return_tips(p20m)
 
     # add buff to titration wells
     rows = [0,1,0,1]
     cols = [1,1,13,13]
     i = 0
+    pickup_tips(8, p300m, protocol)
     for row, col in zip(rows, cols):
-        p20m.distribute(dilutant_vol, dilution_plate.rows()[0][i], plate.rows()[row][col:col+11], new_tip='never')
+        p300m.distribute(dilutant_vol, dilution_plate.rows()[0][i], plate.rows()[row][col:col+11], new_tip='never')
         i += 1
-    return_tips(p20m)
+    return_tips(p300m)
 
 def add_metal_and_titrate(protocol):
     rows = [0,1,0,1]
@@ -155,7 +157,7 @@ def add_metal_and_titrate(protocol):
     for row, col in zip(rows, cols):
         pickup_tips(8, p20m, protocol)
         p20m.transfer(5, metals.rows()[0][i], dilution_plate.rows()[0][i], mix_after=(5, 20), new_tip='never') # dilute 200mM to 6mM
-        p20m.transfer(start_vol/3, dilution_plate.rows()[0][i], plate.rows()[0+row][0+col], mix_after=(5, start_vol/2), new_tip='never') # dliute 6mM to 2mM
+        p20m.transfer(start_vol/dilution_factor, dilution_plate.rows()[0][i], plate.rows()[0+row][0+col], mix_after=(5, start_vol/2), new_tip='never') # dliute 6mM to 2mM
         p20m.transfer(dilutant_vol/dilution_factor, plate.rows()[0+row][0+col:11+col], plate.rows()[0+row][1+col:12+col], mix_after=(5, dilutant_vol), new_tip='never') # titrate 1:1
         p20m.aspirate(dilutant_vol/dilution_factor, plate.rows()[0+row][11+col]) # remove excess
         i += 1 
