@@ -12,53 +12,48 @@ metadata = {
     'protocolName': 'DSF - 384 well, predilute',
     'author': 'Shawn Laursen',
     'description': '''
-    Titrates 30 metals in 12 point 1:3 (1 in 4) dilution series.
-    1mM highest metal concentration (metal stocks are at 13.3mM).
-    5µM final protein concentration.
-    4x sypro concentration.
-    100mM HEPES.''',
+    Titrates 30-32 metals in 12 point 1:3 (1 in 4) dilution series.
+    1mM highest metal concentration (metal stocks are at 200mM).
+    5µM final protein concentration (2x stock).
+    1x final sypro concentration (6x stock).
+    50mM buffer (6x stock).''',
     'apiLevel': '2.23'}
-
-def add_parameters(parameters: protocol_api.Parameters):
-    parameters.add_int(
-        variable_name="rxn_vol",
-        display_name="Reaction volume",
-        description="Volume of reaction in 384well.",
-        default=20,
-        minimum=5,
-        maximum=20,
-        unit="µL")
 
 def run(protocol):
     protocol.set_rail_lights(True)
     setup(protocol)
-    distribute_buff(protocol)
-    titrate(protocol)
+    add_sypro(protocol)
+    add_buff(protocol)
+    add_metal_and_titrate(protocol)
+    add_edta(protocol)
     add_protein(protocol)
-    blanks(protocol)
     protocol.set_rail_lights(False)
 
 def setup(protocol):
     # equiptment
-    global tips20, trough, p20m, plate, p300m, tips300, dirty_tips20, dirty_tips300, metals
+    global tips20, trough, p20m, plate, p300m, tips300, dirty_tips20, dirty_tips300, metals, dilution_plate
     tips20 = protocol.load_labware('opentrons_96_tiprack_20ul', 1)
-    dirty_tips20 = protocol.load_labware('opentrons_96_tiprack_20ul', 3)
-    metals = protocol.load_labware('nest_96_wellplate_2ml_deep', 4)
+    dirty_tips20 = protocol.load_labware('opentrons_96_tiprack_20ul', 7)
+    tips300 = protocol.load_labware('opentrons_96_tiprack_300ul', 3)
+    dirty_tips300 = protocol.load_labware('opentrons_96_tiprack_300ul', 9)
+    metals = protocol.load_labware('greiner_96_wellplate_300ul', 4)
     plate = protocol.load_labware('corning_384_wellplate_112ul_flat', 5) 
     trough = protocol.load_labware('nest_12_reservoir_15ml', 6)
     p20m = protocol.load_instrument('p20_multi_gen2', 'right', tip_racks=[tips20])
-    
-    # unused
-    tips300 = protocol.load_labware('opentrons_96_tiprack_300ul', 10)
-    dirty_tips300 = protocol.load_labware('opentrons_96_tiprack_300ul', 11)
     p300m = protocol.load_instrument('p300_multi_gen2', 'left', tip_racks=[tips300])
-     
-    global buff, protein, neg, edta, rxn_vol
+    dilution_plate = protocol.load_labware('greiner_96_wellplate_300ul', 8)  
+         
+    global buff, protein, sypro, edta, rxn_vol, dilutant_vol, protein_vol, dilutant_stock_vol, dilution_factor, start_vol
     buff = trough.wells()[0]
     protein = trough.wells()[1]
-    neg = metals.wells()[47]
-    edta = metals.wells()[39]
-    rxn_vol = protocol.params.rxn_vol
+    sypro = trough.wells()[2]
+    edta = metals.wells()[-1]
+    rxn_vol = 20
+    dilutant_vol = rxn_vol/2
+    protein_vol = dilutant_vol
+    dilutant_stock_vol = (dilutant_vol * 11) + 30
+    dilution_factor = 3 # 1:3 aka 1 in X+1
+    start_vol = (dilutant_vol/dilution_factor) + dilutant_vol
 
     # cleaning
     global water1, waste1, water2, waste2, water3, waste3, water
@@ -111,74 +106,74 @@ def return_tips(pipette):
         # p300m.configure_nozzle_layout(style=ALL)
         p300m.drop_tip(dirty_tips300.wells()[last_tip300])
 
-def distribute_buff(protocol):
+def add_sypro(protocol):
+    # add spyro to first well of staging plate
+    pickup_tips(8, p300m, protocol)
+    p300m.distribute(dilutant_stock_vol/3, sypro, dilution_plate.rows()[0][0:4], new_tip='never')
+    return_tips(p300m)
+
+    # add spyro to first well of pcr plate
     pickup_tips(8, p20m, protocol)
-    p20m.transfer(((rxn_vol*1.33)/2)-(rxn_vol/10), buff, plate.rows()[0][0], new_tip='never')
-    p20m.transfer(((rxn_vol*1.33)/2)-(rxn_vol/10), buff, plate.rows()[0][12], new_tip='never')
-    p20m.transfer(((rxn_vol*1.33)/2)-(rxn_vol/10), buff, plate.rows()[1][0], new_tip='never')
-    
-    p20m.distribute(rxn_vol/2, buff, plate.rows()[0][1:12], new_tip='never')
-    p20m.distribute(rxn_vol/2, buff, plate.rows()[0][13:24], new_tip='never')
-    p20m.distribute(rxn_vol/2, buff, plate.rows()[1][1:12], new_tip='never')
+    rows = [0,1,0,1]
+    cols = [0,0,12,12]
+    for row, col in zip(rows, cols):        
+        p20m.transfer(start_vol/3, sypro, plate.rows()[row][col], new_tip='never')
     return_tips(p20m)
 
-    # different because of blanks
-    pickup_tips(7, p20m, protocol)
-    p20m.transfer(((rxn_vol*1.33)/2)-(rxn_vol/10), buff, plate.rows()[13][12], new_tip='never')
-    p20m.distribute(rxn_vol/2, buff, plate.rows()[13][13:24], new_tip='never')
-    p20m.drop_tip()
+def add_buff(protocol):
+    # add water to metal dilution wells 
+    pickup_tips(8, p300m, protocol)
+    p300m.distribute(((200/6)*5)-5, water, dilution_plate.rows()[0][4:8], new_tip='never')
+    
+    # add water to first wells of staging plate
+    p300m.distribute(dilutant_stock_vol/3, water, dilution_plate.rows()[0][0:4], new_tip='never')
 
-def titrate(protocol):
-    rows = [0,0,1,13]
-    cols = [0,12,0,12]
-    metal_col = 0
-    metal_row = 0
-    for row, col in zip(rows,cols):
-        if metal_col == 3:
-            pickup_tips(7, p20m, protocol)
-            metal_row = 7
-        else:
-            pickup_tips(8, p20m, protocol)
-        p20m.transfer(rxn_vol/10, metals.rows()[metal_row][metal_col], plate.rows()[0+row][0+col], new_tip='never')
-        p20m.transfer(rxn_vol/6, plate.rows()[0+row][0+col:11+col], plate.rows()[0+row][1+col:12+col], 
-                    mix_before=(5, rxn_vol/4), new_tip='never')
-        p20m.mix(5, rxn_vol/4)
-        p20m.aspirate(rxn_vol/6, plate.rows()[0+row][11+col])
-        if metal_col == 3:
-            p20m.drop_tip()
-        else:
-            return_tips(p20m)
-        metal_col += 1
+    # add buff to first well of staging plate
+    p300m.distribute(dilutant_stock_vol/3, buff, dilution_plate.rows()[0][0:4], mix_after=(3,dilutant_stock_vol-30), new_tip='never')
+    return_tips(p300m)
+
+    # add buff to first well of pcr plate
+    pickup_tips(8, p20m, protocol)
+    rows = [0,1,0,1]
+    cols = [0,0,12,12]
+    for row, col in zip(rows, cols):
+        p20m.transfer(start_vol/3, buff, plate.rows()[row][col], new_tip='never')
+
+    # add buff to titration wells
+    rows = [0,1,0,1]
+    cols = [1,1,13,13]
+    i = 0
+    for row, col in zip(rows, cols):
+        p20m.distribute(dilutant_vol, dilution_plate.rows()[0][i], plate.rows()[row][col:col+11], new_tip='never')
+        i += 1
+    return_tips(p20m)
+
+def add_metal_and_titrate(protocol):
+    rows = [0,1,0,1]
+    cols = [0,0,12,12]
+    i = 4
+    for row, col in zip(rows, cols):
+        pickup_tips(8, p20m, protocol)
+        p20m.transfer(5, metals.rows()[0][i], dilution_plate.rows()[0][i], mix_after=(5, 20), new_tip='never') # dilute 200mM to 6mM
+        p20m.transfer(start_vol/3, dilution_plate.rows()[0][i], plate.rows()[0+row][0+col], mix_after=(5, start_vol/2), new_tip='never') # dliute 6mM to 2mM
+        p20m.transfer(dilutant_vol/dilution_factor, plate.rows()[0+row][0+col:11+col], plate.rows()[0+row][1+col:12+col], mix_after=(5, dilutant_vol), new_tip='never') # titrate 1:1
+        p20m.aspirate(dilutant_vol/dilution_factor, plate.rows()[0+row][11+col]) # remove excess
+        i += 1 
+        return_tips(p20m)
+
+def add_edta(protocol):
+    for i in range(6):
+        pickup_tips(1, p20m, protocol)
+        p20m.transfer(rxn_vol/10, edta, plate.rows()[15][12+i], new_tip='never')
+        p20m.drop_tip()    
 
 def add_protein(protocol):
     pickup_tips(8, p20m, protocol)
-    for col in range(0, 24):
-        p20m.transfer(rxn_vol/2, protein, plate.rows()[0][col], new_tip='never')
-        clean_tips(p20m, rxn_vol, protocol)
-    for col in range(0, 20):
-        p20m.transfer(rxn_vol/2, protein, plate.rows()[1][col], new_tip='never')
-        clean_tips(p20m, rxn_vol, protocol)
+    for row in range(0, 2):
+        for col in range(0, 24):
+            p20m.transfer(protein_vol, protein, plate.rows()[row][col], new_tip='never')
+            clean_tips(p20m, 20, protocol)
     return_tips(p20m)
-
-    # different because of blanks
-    pickup_tips(7, p20m, protocol)
-    for col in range(20, 24):
-        p20m.transfer(rxn_vol/2, protein, plate.rows()[13][col], new_tip='never')
-        clean_tips(p20m, rxn_vol, protocol)
-    p20m.drop_tip()
-    
-def blanks(protocol):
-    # add buff
-    pickup_tips(1, p20m, protocol)
-    p20m.distribute(rxn_vol, buff, plate.rows()[15][20:24], new_tip='never')
-    p20m.distribute(rxn_vol/2, buff, plate.rows()[15][12:20], new_tip='never')
-    p20m.drop_tip()
-
-    # add edta
-    for i in range(4):
-        pickup_tips(1, p20m, protocol)
-        p20m.transfer(rxn_vol/10, edta, plate.rows()[15][12+i], new_tip='never', mix_after=(3, rxn_vol/2))
-        p20m.drop_tip()
 
 def clean_tips(pipette, clean_vol, protocol):
     if pipette == p20m:
