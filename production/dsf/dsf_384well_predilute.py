@@ -140,7 +140,7 @@ def add_buff(protocol):
         p20m.transfer(start_vol/3, buff, plate.rows()[row][col], new_tip='never')
     return_tips(p20m)
 
-    # add buff to titration wells
+    # add dilutant to titration wells
     rows = [0,1,0,1]
     cols = [1,1,13,13]
     i = 0
@@ -153,20 +153,20 @@ def add_buff(protocol):
 def add_metal_and_titrate(protocol):
     rows = [0,1,0,1]
     cols = [0,0,12,12]
-    i = 4
+    i = 0
     for row, col in zip(rows, cols):
         pickup_tips(8, p20m, protocol)
-        p20m.transfer(5, metals.rows()[0][i], dilution_plate.rows()[0][i], mix_after=(5, 20), new_tip='never') # dilute 200mM to 6mM
-        p20m.transfer(start_vol/dilution_factor, dilution_plate.rows()[0][i], plate.rows()[0+row][0+col], mix_after=(5, start_vol/2), new_tip='never') # dliute 6mM to 2mM
-        p20m.transfer(dilutant_vol/dilution_factor, plate.rows()[0+row][0+col:11+col], plate.rows()[0+row][1+col:12+col], mix_after=(5, dilutant_vol), new_tip='never') # titrate 1:1
+        p20m.transfer(5, metals.rows()[0][i], dilution_plate.rows()[0][i+4], mix_after=(5, 20), new_tip='never') # dilute 200mM to 6mM
+        p20m.transfer(start_vol/dilution_factor, dilution_plate.rows()[0][i+4], plate.rows()[0+row][0+col], mix_after=(5, start_vol/2), new_tip='never') # dliute 6mM to 2mM
+        p20m.transfer(dilutant_vol/dilution_factor, plate.rows()[0+row][0+col:11+col], plate.rows()[0+row][1+col:12+col], mix_after=(3, dilutant_vol), new_tip='never') # titrate 1:1
         p20m.aspirate(dilutant_vol/dilution_factor, plate.rows()[0+row][11+col]) # remove excess
         i += 1 
         return_tips(p20m)
 
 def add_edta(protocol):
-    for i in range(6):
+    for col in range(12,18):
         pickup_tips(1, p20m, protocol)
-        p20m.transfer(rxn_vol/10, edta, plate.rows()[15][12+i], new_tip='never')
+        p20m.transfer(rxn_vol/10, edta, plate.rows()[15][col], new_tip='never')
         p20m.drop_tip()    
 
 def add_protein(protocol):
