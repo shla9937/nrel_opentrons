@@ -126,7 +126,7 @@ def add_buff(protocol):
     p300m.distribute(((200/6)*5)-5, water, dilution_plate.rows()[0][4:8], new_tip='never')
     
     # add water to first wells of staging plate
-    p300m.distribute(dilutant_stock_vol/3, water, dilution_plate.rows()[0][0:4], new_tip='never')
+    p300m.distribute(dilutant_stock_vol/3, water, dilution_plate.rows()[0][0:4], new_tip='never', mix_after=(3, dilutant_stock_vol/2))
 
     # add buff to first well of staging plate
     p300m.distribute(dilutant_stock_vol/3, buff, dilution_plate.rows()[0][0:4], mix_after=(3,dilutant_stock_vol-30), new_tip='never')
