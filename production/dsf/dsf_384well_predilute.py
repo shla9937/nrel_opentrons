@@ -126,10 +126,10 @@ def add_buff(protocol):
     p300m.distribute(((200/6)*5)-5, water, dilution_plate.rows()[0][4:8], new_tip='never')
     
     # add water to first wells of staging plate
-    p300m.distribute(dilutant_stock_vol/3, water, dilution_plate.rows()[0][0:4], new_tip='never', mix_after=(3, dilutant_stock_vol/2))
+    p300m.distribute(dilutant_stock_vol/3, water, dilution_plate.rows()[0][0:4], new_tip='never')
 
     # add buff to first well of staging plate
-    p300m.distribute(dilutant_stock_vol/3, buff, dilution_plate.rows()[0][0:4], mix_after=(3,dilutant_stock_vol-30), new_tip='never')
+    p300m.distribute(dilutant_stock_vol/3, buff, dilution_plate.rows()[0][0:4], new_tip='never')
     return_tips(p300m)
 
     # add buff to first well of pcr plate
@@ -146,6 +146,7 @@ def add_buff(protocol):
     i = 0
     pickup_tips(8, p300m, protocol)
     for row, col in zip(rows, cols):
+        p300m.mix(3, dilutant_vol/2, dilution_plate.rows()[0][i])
         p300m.distribute(dilutant_vol, dilution_plate.rows()[0][i], plate.rows()[row][col:col+11], new_tip='never')
         i += 1
     return_tips(p300m)
