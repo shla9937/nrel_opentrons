@@ -16,7 +16,7 @@ metadata = {
     1mM highest metal concentration (metal stocks are at 200mM).
     5µM final protein concentration (2x stock).
     1x final sypro concentration (6x stock).
-    50mM buffer (6x stock).''',
+    100mM buffer (6x stock).''',
     'apiLevel': '2.23'}
 
 def run(protocol):
@@ -138,7 +138,7 @@ def add_buff(protocol):
     i = 0
     pickup_tips(8, p300m, protocol)
     for row, col in zip(rows, cols):
-        p300m.mix(3, dilutant_vol/2, dilution_plate.rows()[0][i])
+        p300m.mix(3, dilutant_stock_vol/2, dilution_plate.rows()[0][i])
         p300m.distribute(dilutant_vol, dilution_plate.rows()[0][i], plate.rows()[row][col:col+11], new_tip='never')# add dilutant to titration wells
         i += 1
     return_tips(p300m)
