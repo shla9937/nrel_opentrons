@@ -166,7 +166,7 @@ def add_protein(protocol):
     pickup_tips(8, p20m, protocol)
     for row in range(0, 2):
         for col in range(0, 24):
-            p20m.transfer(protein_vol, protein, plate.rows()[row][col], new_tip='never')
+            p20m.transfer(protein_vol, protein, plate.rows()[row][col], new_tip='never', mix_after=(3, protein_vol)) # add protein to first two rows of pcr plate
             clean_tips(p20m, 20, protocol)
     return_tips(p20m)
 
