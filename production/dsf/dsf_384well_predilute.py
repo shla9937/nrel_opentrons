@@ -43,6 +43,7 @@ def setup(protocol):
     p300m = protocol.load_instrument('p300_multi_gen2', 'left', tip_racks=[tips300])
     dilution_plate = protocol.load_labware('greiner_96_wellplate_300ul', 8)  
          
+    # reagents     
     global buff, protein, sypro, water, edta, rxn_vol, dilutant_vol, protein_vol, dilutant_stock_vol, dilution_factor, start_vol
     buff = trough.wells()[0]
     protein = trough.wells()[1]
@@ -65,13 +66,13 @@ def setup(protocol):
     water3 = trough.wells()[8]
     waste3 = trough.wells()[9]
 
+    # tips
     global tip_20, tip_300
     tip_20 = 0
     tip_300 = 0
 
 def pickup_tips(number, pipette, protocol):
     global last_tip20, last_tip300, tip_20, tip_300
-   
     nozzle_dict = {2: "G1", 3: "F1", 4: "E1", 5: "D1", 6: "C1", 7: "B1"}
    
     if pipette == p20m: 
@@ -107,47 +108,38 @@ def return_tips(pipette):
         p300m.drop_tip(dirty_tips300.wells()[last_tip300])
 
 def add_sypro(protocol):
-    # add spyro to first well of staging plate
     pickup_tips(8, p300m, protocol)
-    p300m.distribute(dilutant_stock_vol/3, sypro, dilution_plate.rows()[0][0:4], new_tip='never')
+    p300m.distribute(dilutant_stock_vol/3, sypro, dilution_plate.rows()[0][0:4], new_tip='never') # add spyro to first well of staging plate
     return_tips(p300m)
 
-    # add spyro to first well of pcr plate
     pickup_tips(8, p20m, protocol)
     rows = [0,1,0,1]
     cols = [0,0,12,12]
     for row, col in zip(rows, cols):        
-        p20m.transfer(start_vol/3, sypro, plate.rows()[row][col], new_tip='never')
+        p20m.transfer(start_vol/3, sypro, plate.rows()[row][col], new_tip='never') # add spyro to first well of pcr plate
     return_tips(p20m)
 
 def add_buff(protocol):
-    # add water to metal dilution wells 
     pickup_tips(8, p300m, protocol)
-    p300m.distribute(((200/6)*5)-5, water, dilution_plate.rows()[0][4:8], new_tip='never')
-    
-    # add water to first wells of staging plate
-    p300m.distribute(dilutant_stock_vol/3, water, dilution_plate.rows()[0][0:4], new_tip='never')
-
-    # add buff to first well of staging plate
-    p300m.distribute(dilutant_stock_vol/3, buff, dilution_plate.rows()[0][0:4], new_tip='never')
+    p300m.distribute(((200/6)*5)-5, water, dilution_plate.rows()[0][4:8], new_tip='never') # add water to metal dilution wells
+    p300m.distribute(dilutant_stock_vol/3, water, dilution_plate.rows()[0][0:4], new_tip='never')# add water to first wells of staging plate
+    p300m.distribute(dilutant_stock_vol/3, buff, dilution_plate.rows()[0][0:4], new_tip='never')# add buff to first well of staging plate
     return_tips(p300m)
 
-    # add buff to first well of pcr plate
     pickup_tips(8, p20m, protocol)
     rows = [0,1,0,1]
     cols = [0,0,12,12]
     for row, col in zip(rows, cols):
-        p20m.transfer(start_vol/3, buff, plate.rows()[row][col], new_tip='never')
+        p20m.transfer(start_vol/3, buff, plate.rows()[row][col], new_tip='never')# add buff to first well of pcr plate
     return_tips(p20m)
-
-    # add dilutant to titration wells
+    
     rows = [0,1,0,1]
     cols = [1,1,13,13]
     i = 0
     pickup_tips(8, p300m, protocol)
     for row, col in zip(rows, cols):
         p300m.mix(3, dilutant_vol/2, dilution_plate.rows()[0][i])
-        p300m.distribute(dilutant_vol, dilution_plate.rows()[0][i], plate.rows()[row][col:col+11], new_tip='never')
+        p300m.distribute(dilutant_vol, dilution_plate.rows()[0][i], plate.rows()[row][col:col+11], new_tip='never')# add dilutant to titration wells
         i += 1
     return_tips(p300m)
 
