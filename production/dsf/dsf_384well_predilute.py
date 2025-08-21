@@ -16,7 +16,7 @@ metadata = {
     1mM highest metal concentration (metal stocks are at 200mM).
     5µM final protein concentration (2x stock).
     1x final sypro concentration (6x stock).
-    100mM buffer (6x stock).''',
+    10mM buffer (6x stock).''',
     'apiLevel': '2.23'}
 
 def run(protocol):
