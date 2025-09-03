@@ -17,8 +17,8 @@ metadata = {
     5µM final protein concentration.
     1x final sypro concentration.
     20mM buff, 150mM NaCl.
-    Protein stock should be at 1.14x final concentration (5.7µM protein, 20mM buff, 150mM NaCl).
-    Sypro stock should be at 8x (in 20mM buff, 150mM NaCl).
+    Protein stock should be at 1.14x final concentration (5.7µM protein, 20mM buff, 150mM NaCl) - 15ml.
+    Sypro stock should be at 8x (in 20mM buff, 150mM NaCl) - 2ml.
     EDTA stock at 500mM (in 20mM buff, 150mM NaCl).''',
     'apiLevel': '2.23'}
 
@@ -48,18 +48,18 @@ def setup(protocol):
     # reagents     
     global protein, sypro, water, edta, rxn_vol, dilutant_vol, protein_vol, dilutant_stock_vol, dilution_factor, start_vol
     protein = trough.wells()[0]
-    sypro = trough.wells()[2]
-    water = trough.wells()[3]
+    sypro = trough.wells()[1]
+    water = trough.wells()[2]
     edta = metals.wells()[-1]
 
     # cleaning
     global water1, waste1, water2, waste2, water3, waste3
-    water1 = trough.wells()[4]
-    waste1 = trough.wells()[5]
-    water2 = trough.wells()[6]
-    waste2 = trough.wells()[7]
-    water3 = trough.wells()[8]
-    waste3 = trough.wells()[9]
+    water1 = trough.wells()[3]
+    waste1 = trough.wells()[4]
+    water2 = trough.wells()[5]
+    waste2 = trough.wells()[6]
+    water3 = trough.wells()[7]
+    waste3 = trough.wells()[8]
 
     # tips
     global tip_20, tip_300
