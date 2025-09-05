@@ -23,7 +23,7 @@ metadata = {
     'apiLevel': '2.23'}
 
 def run(protocol):
-    protocol.set_rail_lights(True)
+    protocol.set_rail_lights(False)
     setup(protocol)
     add_protein(protocol) # fill plate with protein in buff at 1.14x protein, 1x buff, 17.5µl
     add_metal_and_titrate(protocol) # titrate into protein/buff wells, diluted in protein/buff
