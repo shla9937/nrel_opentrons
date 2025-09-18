@@ -33,17 +33,17 @@ def run(protocol):
 def setup(protocol):
     # equiptment
     global tips1000, p1000, plate96, well24_1, well24_2, well24_3, well24_4, wells24
-    tips1000 = protocol.load_labware('opentrons_96_tiprack_300ul', 3)
+    tips1000 = protocol.load_labware('opentrons_96_tiprack_300ul', 8)
     p1000 = protocol.load_instrument('p1000_single_gen2', 'right', tip_racks=[tips1000])
     plate96 = protocol.load_labware('nest_96_wellplate_2ml_deep', 5)  
-    well24_1 = protocol.load_labware('thomsoninstrument_24_wellplate_10400ul')
-    well24_2 = protocol.load_labware('thomsoninstrument_24_wellplate_10400ul', 8)
-    well24_3 = protocol.load_labware('thomsoninstrument_24_wellplate_10400ul', 2)
-    well24_4 = protocol.load_labware('thomsoninstrument_24_wellplate_10400ul', 11)
+    well24_1 = protocol.load_labware('thomsoninstrument_24_wellplate_10400ul', 10)
+    well24_2 = protocol.load_labware('thomsoninstrument_24_wellplate_10400ul', 7)
+    well24_3 = protocol.load_labware('thomsoninstrument_24_wellplate_10400ul', 4)
+    well24_4 = protocol.load_labware('thomsoninstrument_24_wellplate_10400ul', 1)
     wells24 = [well24_1, well24_2, well24_3, well24_4]
 
 def reformat(protocol):
-    volume = protocol.parameters.volume
+    volume = protocol.params.volume
     for i in range(24):
         for j in range(4):
-            p1000.transfer(volume, wells24(j).wells()[i], plate96.wells()[i*4 + j], new_tip='always')
+            p1000.transfer(volume, wells24[j].wells()[i], plate96.wells()[i*4 + j], new_tip='always')
