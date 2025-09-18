@@ -25,7 +25,7 @@ def add_parameters(parameters: protocol_api.Parameters):
         maximum=2000,)
 
 def run(protocol):
-    protocol.set_rail_lights(False)
+    protocol.set_rail_lights(True)
     setup(protocol)
     reformat(protocol)
     protocol.set_rail_lights(False)
@@ -33,8 +33,8 @@ def run(protocol):
 def setup(protocol):
     # equiptment
     global tips1000, p1000, plate96, well24_1, well24_2, well24_3, well24_4, wells24
-    tips1000 = protocol.load_labware('opentrons_96_tiprack_300ul', 8)
-    p1000 = protocol.load_instrument('p1000_single_gen2', 'right', tip_racks=[tips1000])
+    tips1000 = protocol.load_labware('opentrons_96_tiprack_1000ul', 8)
+    p1000 = protocol.load_instrument('p1000_single_gen2', 'left', tip_racks=[tips1000])
     plate96 = protocol.load_labware('nest_96_wellplate_2ml_deep', 5)  
     well24_1 = protocol.load_labware('thomsoninstrument_24_wellplate_10400ul', 10)
     well24_2 = protocol.load_labware('thomsoninstrument_24_wellplate_10400ul', 7)
@@ -46,4 +46,4 @@ def reformat(protocol):
     volume = protocol.params.volume
     for i in range(24):
         for j in range(4):
-            p1000.transfer(volume, wells24[j].wells()[i], plate96.wells()[i*4 + j], new_tip='always')
+            p1000.transfer(volume, wells24[j].wells()[i], plate96.wells()[i*4 + j], new_tip='once')
