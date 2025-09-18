@@ -66,7 +66,7 @@ def return_tips(pipette):
 
 def pull_sup(protocol):
     volume = protocol.params.volume
-    pickup_tips(8, p300m, protocol)
     for col in range(12):
-        p300m.transfer(volume, old_plate96.wells()[col*8].bottom(10).move(Point(-2,0,0)), new_plate96.columns()[col], new_tip='never')
-    return_tips(p300m)
+        pickup_tips(8, p300m, protocol)
+        p300m.transfer(volume, old_plate96.wells()[col*8].bottom(5).move(Point(0,-2,0)), new_plate96.columns()[col], new_tip='never')
+        return_tips(p300m)
