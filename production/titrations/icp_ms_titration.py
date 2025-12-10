@@ -71,7 +71,7 @@ def pickup_tips(number, pipette, protocol):
 def add_protein(protocol):
     pickup_tips(8, p300m, protocol)
     p300m.transfer(112.5, buff, rxn_plate.rows()[0][0], new_tip='never')
-    p300m.transfer(75, buff, rxn_plate.rows()[0][0:12], new_tip='never')
+    p300m.transfer(75, buff, rxn_plate.rows()[0][1:12], new_tip='never')
     p300m.transfer(37.5, protein, rxn_plate.rows()[0][0], new_tip='never')
     p300m.transfer(25, protein, rxn_plate.rows()[0][1:12], new_tip='never')
     p300m.return_tip()
