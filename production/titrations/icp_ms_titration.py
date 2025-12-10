@@ -71,22 +71,22 @@ def pickup_tips(number, pipette, protocol):
 
 def add_protein(protocol):
     pickup_tips(8, p300m, protocol)
-    p300m.transfer(150, buff, rxn_plate.rows()[0][0], new_tip='never')
+    p300m.transfer(112.5, buff, rxn_plate.rows()[0][0], new_tip='never')
     p300m.transfer(75, buff, rxn_plate.rows()[0][0:12], new_tip='never')
-    p300m.transfer(50, protein, rxn_plate.rows()[0][0], new_tip='never')
+    p300m.transfer(37.5, protein, rxn_plate.rows()[0][0], new_tip='never')
     p300m.transfer(25, protein, rxn_plate.rows()[0][1:12], new_tip='never')
     p300m.return_tip()
 
 def titrate_metal(protocol):
     for metal in range(8): 
         pickup_tips(1, p300m, protocol)
-        p300m.transfer(50, metals.wells()[metal], rxn_plate.rows()[metal][0], new_tip='never', mix_after=(3, 50))
+        p300m.transfer(37.5, metals.wells()[metal], rxn_plate.rows()[metal][0], new_tip='never', mix_after=(3, 50))
         p300m.drop_tip()
 
     pickup_tips(8, p300m, protocol)
-    p300m.transfer(125, rxn_plate.rows()[0][0:10], rxn_plate.rows()[0][1:11], 
-                mix_before=(5, 125), new_tip='never')    
-    p300m.mix(5, 125, rxn_plate.rows()[0][11])
+    p300m.transfer(62.5, rxn_plate.rows()[0][0:10], rxn_plate.rows()[0][1:11], 
+                mix_before=(5, 62.5), new_tip='never')    
+    p300m.mix(5, 62.5, rxn_plate.rows()[0][11])
     p300m.return_tip()
 
 def incubate(protocol):
