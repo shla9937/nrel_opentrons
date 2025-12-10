@@ -112,8 +112,9 @@ def add_acid(protocol):
     p300m.return_tip()
 
 def desalt(protocol):
-    while time.time() - start_time < 900:
-        protocol.delay(1)
+    if not protocol.is_simulating():
+        while time.time() - start_time < 900:
+            protocol.delay(1)
     p300m.transfer(100, rxn_plate.rows()[0][0:12], desalt_plate.rows()[0][0:12], new_tip='always', trash=False)
     protocol.pause("Centrifuge desalt plate 2 min at 1000rcf and return elution plate to slot 4.")
 
