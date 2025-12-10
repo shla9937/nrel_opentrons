@@ -36,7 +36,6 @@ def run(protocol):
     prep_desalt(protocol)
     add_acid(protocol)
     desalt(protocol)
-    add_desalted(protocol)
     protocol.set_rail_lights(False)
 
 def setup(protocol):
@@ -104,7 +103,7 @@ def prep_desalt(protocol):
     for wash in range(4):
         p300m.transfer(250, buff, destinations, new_tip='never')
         p300m.move_to(buff.top())
-        protocol.pause("Centrifuge desalt plate 2 min at 1000rcf, swap wash plate for elution plate, and return to slot 1.")
+        protocol.pause("Centrifuge desalt plate 2 min at 1000rcf, set on wash plate again, and return to slot 1.")
     p300m.return_tip()
     protocol.pause("Ready to resume protocol.")
 
@@ -117,9 +116,6 @@ def desalt(protocol):
     if not protocol.is_simulating():
         while time.time() - start_time < 900:
             protocol.delay(1)
-    p300m.transfer(100, rxn_plate.rows()[0][0:12], desalt_plate.rows()[0][0:12], new_tip='always', trash=False)
-    protocol.pause("Centrifuge desalt plate 2 min at 1000rcf and return elution plate to slot 4.")
-
-def add_desalted(protocol):
-    protocol.pause("Ensure desalt elution plate is in slot 4.")
-    p300m.transfer(100, desalt_elution.rows()[0][0:12], icp_plate.rows()[0][0:12], new_tip='always', trash=False)
+    destinations = [well.top() for well in desalt_plate.rows()[0]]
+    p300m.transfer(100, rxn_plate.rows()[0][0:12], destinations, new_tip='always', trash=False)
+    protocol.pause("Put desalt plate on acid 96 well, centrifuge desalt plate 2 min at 1000rcf.")
