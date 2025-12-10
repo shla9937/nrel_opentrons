@@ -97,11 +97,13 @@ def incubate(protocol):
 def prep_desalt(protocol):
     protocol.pause("Start prepping desalt plate by removing bottom foil, \
         placing on wash plate, removing top seal. Centrifuge 2 min at 1000rcf.")
-    protocol.pause("Place desalt plate in slot 1.")
+    protocol.pause("Place desalt plate back in slot 1.")
 
     pickup_tips(8, p300m, protocol)
+    destinations = [well.top() for well in desalt_plate.rows()[0]]
     for wash in range(4):
-        p300m.transfer(250, buff, desalt_plate.rows()[0][0:12], new_tip='never')
+        p300m.transfer(250, buff, destinations, new_tip='never')
+        p300m.move_to(buff.top())
         protocol.pause("Centrifuge desalt plate 2 min at 1000rcf, swap wash plate for elution plate, and return to slot 1.")
     p300m.return_tip()
     protocol.pause("Ready to resume protocol.")
