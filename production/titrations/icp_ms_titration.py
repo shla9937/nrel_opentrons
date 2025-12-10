@@ -84,7 +84,7 @@ def titrate_metal(protocol):
         p300m.drop_tip()
 
     pickup_tips(8, p300m, protocol)
-    p300m.transfer(62.5, rxn_plate.rows()[0][0:10], rxn_plate.rows()[0][1:11], 
+    p300m.transfer(62.5, rxn_plate.rows()[0][0:11], rxn_plate.rows()[0][1:12], 
                 mix_before=(5, 62.5), new_tip='never')    
     p300m.mix(5, 62.5, rxn_plate.rows()[0][11])
     p300m.return_tip()
