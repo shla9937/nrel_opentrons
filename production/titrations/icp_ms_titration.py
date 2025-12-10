@@ -79,7 +79,8 @@ def add_protein(protocol):
 def titrate_metal(protocol):
     for metal in range(8): 
         pickup_tips(1, p300m, protocol)
-        p300m.transfer(37.5, metals.wells()[metal], rxn_plate.rows()[metal][0], new_tip='never', mix_after=(3, 50))
+        p300m.transfer(37.5, metals.wells()[metal], rxn_plate.rows()[metal][0], new_tip='never', 
+                       mix_before=(3,200), mix_after=(3, 50))
         p300m.drop_tip()
 
     pickup_tips(8, p300m, protocol)
