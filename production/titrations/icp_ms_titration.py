@@ -14,9 +14,11 @@ metadata = {
     'description': '''
     Titrates 8 metals (7 single, 1 mix) in 12 point 1:2 dilution series.
     Starts at 1mM metal concentration goes to 5nM. (1mM, 333µM, 111µM, 37µM, 12.3µM, 4.1µM, 1.37µM, 457nM, 152nM, 51nM, 17nM, 6nM)
-    Uses 1µM protein concentration.
-    Stock metals should be at 5mM in proper pH buffer.
-    Protein should be at 5µM in proper pH buffer.
+    1µM final protein concentration.
+    Stock metals should be at 5mM in proper pH buffer (>400µL).
+    Protein should be at 5µM in proper pH buffer (5mL).
+    3.89% ppt nitric acid (125mL).
+    Buff (200mL).
     Rxn vol is 125µL.
     Steps:
     -   Add protein
