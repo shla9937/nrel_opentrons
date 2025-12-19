@@ -25,7 +25,7 @@ metadata = {
     'apiLevel': '2.26'}
 
 def run(protocol):
-    protocol.set_rail_lights(False)
+    protocol.set_rail_lights(True)
     setup(protocol)
     add_protein_and_sypro(protocol) 
     add_metal_and_titrate(protocol) # titrate into protein/buff wells, diluted in protein/buff
@@ -42,9 +42,9 @@ def setup(protocol):
     p20m = protocol.load_instrument('p20_multi_gen2', 'right', tip_racks=[tips20])
          
     # reagents     
-    global protein_and_sypro, buff, water
-    protein_and_sypro = trough.wells()[0]
-    buff = trough.wells()[1]
+    global buff, protein_and_sypro, water
+    buff = trough.wells()[0]
+    protein_and_sypro = trough.wells()[1]
     water = trough.wells()[2]
 
     # rows
@@ -68,13 +68,14 @@ def add_protein_and_sypro(protocol):
     rows = [0,1,0,1]
     cols = [0,0,12,12]
     
+    pickup_tips(8, p20m, protocol)
     for row, col in zip(rows, cols):
-        pickup_tips(8, p20m, protocol)
         p20m.transfer(start_vol*(3/5), buff, plate.rows()[row][col], new_tip='never')
         p20m.transfer(rxn_vol*(4/5), buff, plate.rows()[row][col+1:col+12], new_tip='never')
+    for row, col in zip(rows, cols):
         p20m.transfer(start_vol*(1/5), protein_and_sypro, plate.rows()[row][col], new_tip='never')
         p20m.transfer(rxn_vol*(1/5), protein_and_sypro, plate.rows()[row][col+1:col+12], new_tip='never')
-        p20m.return_tip()
+    p20m.return_tip()
 
 def add_metal_and_titrate(protocol):
     rows = [0,1,0]
