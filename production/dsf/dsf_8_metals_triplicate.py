@@ -42,10 +42,9 @@ def setup(protocol):
     p20m = protocol.load_instrument('p20_multi_gen2', 'right', tip_racks=[tips20])
          
     # reagents     
-    global buff, protein_and_sypro, water
+    global buff, protein_and_sypro
     buff = trough.wells()[0]
-    protein_and_sypro = trough.wells()[1]
-    water = trough.wells()[2]
+    protein_and_sypro = metals.rows()[0][11]
 
     # rows
     global rxn_vol, start_vol, dilution_factor
