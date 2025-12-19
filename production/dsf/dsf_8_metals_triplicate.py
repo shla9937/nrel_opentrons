@@ -83,7 +83,7 @@ def add_metal_and_titrate(protocol):
     for row, col in zip(rows, cols):
         pickup_tips(8, p20m, protocol)
         p20m.transfer(start_vol*(1/5), metals.rows()[0][0], plate.rows()[row][col], new_tip='never', 
-                mix_before=(3,rxn_vol), mix_after=(3,rxn_vol))
+                mix_before=(3,rxn_vol))
         p20m.transfer(rxn_vol/dilution_factor, plate.rows()[row][col+0:col+11], plate.rows()[row][col+1:col+12], 
                     mix_before=(3,rxn_vol), new_tip='never')    
         p20m.mix(3,rxn_vol, plate.rows()[row][col+11])
