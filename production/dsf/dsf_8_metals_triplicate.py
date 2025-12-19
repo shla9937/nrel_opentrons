@@ -48,9 +48,10 @@ def setup(protocol):
     water = trough.wells()[2]
 
     # rows
-    global rxn_vol, dilution_factor
-    rxn_vol = 20 
-    dilution_factor = 1.5
+    global rxn_vol, start_vol, dilution_factor
+    rxn_vol = 20   
+    dilution_factor = 2 # i.e. 1:2, not 1 in 2
+    start_vol = rxn_vol + (rxn_vol/dilution_factor)
 
 def pickup_tips(number, pipette, protocol):
     nozzle_dict = {2: "G1", 3: "F1", 4: "E1", 5: "D1", 6: "C1", 7: "B1"}
@@ -69,9 +70,9 @@ def add_protein_and_sypro(protocol):
     
     for row, col in zip(rows, cols):
         pickup_tips(8, p20m, protocol)
-        p20m.transfer(rxn_vol*dilution_factor*(3/5), buff, plate.rows()[row][col], new_tip='never')
+        p20m.transfer(start_vol*(3/5), buff, plate.rows()[row][col], new_tip='never')
         p20m.transfer(rxn_vol*(4/5), buff, plate.rows()[row][col+1:col+12], new_tip='never')
-        p20m.transfer(rxn_vol*dilution_factor*(1/5), protein_and_sypro, plate.rows()[row][col], new_tip='never')
+        p20m.transfer(start_vol*(1/5), protein_and_sypro, plate.rows()[row][col], new_tip='never')
         p20m.transfer(rxn_vol*(1/5), protein_and_sypro, plate.rows()[row][col+1:col+12], new_tip='never')
         p20m.return_tip()
 
@@ -81,11 +82,12 @@ def add_metal_and_titrate(protocol):
 
     for row, col in zip(rows, cols):
         pickup_tips(8, p20m, protocol)
-        p20m.transfer(rxn_vol*(dilution_factor-1), metals.rows()[0][0], plate.rows()[row][col], new_tip='never', 
-                mix_before=(3,rxn_vol*(dilution_factor-1)), mix_after=(3,rxn_vol*(dilution_factor-1)))
-        p20m.transfer(rxn_vol*(dilution_factor-1), plate.rows()[row][col+0:col+11], plate.rows()[row][col+1:col+12], 
-                    mix_before=(3,rxn_vol*(dilution_factor-1)), new_tip='never')    
-        p20m.mix(3,rxn_vol*(dilution_factor-1), plate.rows()[row][col+11])
+        p20m.transfer(start_vol*(1/5), metals.rows()[0][0], plate.rows()[row][col], new_tip='never', 
+                mix_before=(3,rxn_vol), mix_after=(3,rxn_vol))
+        p20m.transfer(rxn_vol/dilution_factor, plate.rows()[row][col+0:col+11], plate.rows()[row][col+1:col+12], 
+                    mix_before=(3,rxn_vol), new_tip='never')    
+        p20m.mix(3,rxn_vol, plate.rows()[row][col+11])
+        p20m.aspirate(rxn_vol/dilution_factor, plate.rows()[row][col+11])
         p20m.return_tip()
 
 def add_edta(protocol):
@@ -93,9 +95,10 @@ def add_edta(protocol):
     col = 12
 
     pickup_tips(8, p20m, protocol)
-    p20m.transfer(rxn_vol*(dilution_factor-1), metals.rows()[0][1], plate.rows()[row][col], new_tip='never', 
-            mix_before=(3,rxn_vol*(dilution_factor-1)), mix_after=(3,rxn_vol*(dilution_factor-1)))
-    p20m.transfer(rxn_vol*(dilution_factor-1), plate.rows()[row][col+0:col+11], plate.rows()[row][col+1:col+12], 
-                mix_before=(3,rxn_vol*(dilution_factor-1)), new_tip='never')    
-    p20m.mix(3,rxn_vol*(dilution_factor-1), plate.rows()[row][col+11])
+    p20m.transfer(start_vol*(1/5), metals.rows()[0][1], plate.rows()[row][col], new_tip='never', 
+            mix_before=(3,rxn_vol), mix_after=(3,rxn_vol))
+    p20m.transfer(rxn_vol/dilution_factor, plate.rows()[row][col+0:col+11], plate.rows()[row][col+1:col+12],
+            mix_before=(3,rxn_vol), new_tip='never')
+    p20m.mix(3,rxn_vol, plate.rows()[row][col+11])
+    p20m.aspirate(rxn_vol/dilution_factor, plate.rows()[row][col+11])
     p20m.return_tip()
