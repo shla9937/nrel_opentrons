@@ -17,11 +17,11 @@ metadata = {
     Titrates EDTA in 11 point dilution series. (1mM, 333µM, 111µM, 37µM, 12.3µM, 4.1µM, 1.37µM, 457nM, 152nM, 51nM, 17nM, 0)
 
     Stocks:
-    -   metal: 5x (5mM) -> 1mM final 
-    -   EDTA: 5x (500mM) -> 100mM final
-    -   protein + sypro: 5x (25µM, 5x) -> 5µM, 1x final
+    -   metal: 5x (5mM) -> 1mM final (250µL into wells)
+    -   EDTA: 5x (500mM) -> 100mM final (250µL into wells)
+    -   protein + sypro + rox: 5x (25µM, 20x, 250nM) -> 5µM, 4x, 50nM final (2mL total -> 250µL into wells)
 
-    Buff should be ~100mM buff, 150mM NaCl''',
+    Buff should be ~100mM buff, 150mM NaC (10mL in trough)''',
     'apiLevel': '2.26'}
 
 def run(protocol):
