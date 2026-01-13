@@ -19,7 +19,7 @@ metadata = {
     Stocks:
     -   metal: 5x (5mM) -> 1mM final (50µL into wells)
     -   EDTA: 5x (500mM) -> 100mM final (50µL into wells)
-    -   protein + sypro + rox: 5x (25µM, 20x, 250nM) -> 5µM, 4x, 50nM final (2mL total -> 250µL into wells)
+    -   protein + sypro + rox: 5x (25µM, 50x, 250nM) -> 5µM, 10x, 50nM final (2mL total -> 250µL into wells)
 
     Buff should be ~100mM buff, 150mM NaC (10mL in trough)''',
     'apiLevel': '2.26'}
