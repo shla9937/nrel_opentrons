@@ -108,31 +108,24 @@ def add_metal(protocol):
 def add_buff(protocol):
     # add buff to top 6 rows
     pickup_tips(6, p300m, protocol)
-    p300m.transfer(135, buff, rxn_plate.rows()[5][0], new_tip='never')
-    p300m.transfer(120, buff, rxn_plate.rows()[5][1:12], new_tip='never')
+    p300m.transfer(135, buff, rxn_plate.rows()[5][0].bottom(10), new_tip='never')
+    for col in range(1,12):
+        p300m.transfer(120, buff, rxn_plate.rows()[5][col].bottom(10), new_tip='never')
     p300m.drop_tip()
    
     # add buff to controls
+    pickup_tips(1, p300m, protocol)
     for col in range(12): 
-        pickup_tips(1, p300m, protocol)
-        p300m.transfer(120, buff, rxn_plate.rows()[6][col], new_tip='never')
-        p300m.drop_tip()
+        p300m.transfer(120, buff, rxn_plate.rows()[6][col].bottom(10), new_tip='never')
     
     # add buff to bottom row
     for col in range(3): 
-        pickup_tips(1, p300m, protocol)
-        p300m.transfer(120, buff, rxn_plate.rows()[7][col], new_tip='never')
-        p300m.drop_tip()
-
-    for col in range(3,9): 
-        pickup_tips(1, p300m, protocol)
-        p300m.transfer(116.25, buff, rxn_plate.rows()[7][col], new_tip='never')
-        p300m.drop_tip()
-
+        p300m.transfer(120, buff, rxn_plate.rows()[7][col].bottom(10), new_tip='never')
+    for col in range(3,9):     
+        p300m.transfer(116.25, buff, rxn_plate.rows()[7][col].bottom(10), new_tip='never')
     for col in range(9,12): 
-        pickup_tips(1, p300m, protocol)
-        p300m.transfer(146.25, buff, rxn_plate.rows()[7][col], new_tip='never')
-        p300m.drop_tip()
+        p300m.transfer(146.25, buff, rxn_plate.rows()[7][col].bottom(10), new_tip='never')
+    p300m.drop_tip()
 
 def titrate_protein(protocol):
     # put protein in top 6 rows
