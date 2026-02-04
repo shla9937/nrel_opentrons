@@ -131,8 +131,7 @@ def titrate_protein(protocol):
     # put protein in top 6 rows
     for metal in range(6): 
         pickup_tips(1, p300m, protocol)
-        p300m.transfer(225, protein, rxn_plate.rows()[metal][0], new_tip='never', 
-                       mix_before=(3,100), mix_after=(3,100))
+        p300m.transfer(225, protein, rxn_plate.rows()[metal][0], new_tip='never', mix_after=(3,100))
         p300m.drop_tip()
 
     # titrate protein
