@@ -46,7 +46,7 @@ def run(protocol):
 def setup(protocol):
     # equiptment
     global p20m, p300m, tips20, tips300, tips300_1, desalt_plate, res1, rxn_plate, icp_plate, metals, res2
-    tips20 = protocol.load_labware('opentrons_96_tiprack_300ul', 6)
+    tips20 = protocol.load_labware('opentrons_96_tiprack_20ul', 6)
     tips300 = protocol.load_labware('opentrons_96_tiprack_300ul', 3)
     tips300_1 = protocol.load_labware('opentrons_96_tiprack_300ul', 9)
     p20m = protocol.load_instrument('p20_multi_gen2', 'right', tip_racks=[tips20])
