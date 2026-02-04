@@ -46,7 +46,7 @@ def run(protocol):
 def setup(protocol):
     # equiptment
     global p20m, p300m, tips20, tips300, tips300_1, desalt_plate, res1, rxn_plate, icp_plate, metals, res2
-    tips20 = protocol.load_labware('opentrons_96_tiprack_20ul', 6)
+    tips20 = protocol.load_labware('opentrons_96_tiprack_20ul', 7)
     tips300 = protocol.load_labware('opentrons_96_tiprack_300ul', 3)
     tips300_1 = protocol.load_labware('opentrons_96_tiprack_300ul', 9)
     p20m = protocol.load_instrument('p20_multi_gen2', 'right', tip_racks=[tips20])
@@ -54,7 +54,7 @@ def setup(protocol):
     desalt_plate = protocol.load_labware('nest_96_wellplate_2ml_deep', 1)
     res1 = protocol.load_labware('nest_1_reservoir_195ml', 2)
     rxn_plate = protocol.load_labware('greiner_96_wellplate_300ul', 5)
-    icp_plate = protocol.load_labware('nest_96_wellplate_2ml_deep', 7)
+    icp_plate = protocol.load_labware('nest_96_wellplate_2ml_deep', 11)
     metals = protocol.load_labware('opentrons_24_tuberack_nest_1.5ml_screwcap', 4)
     res2 = protocol.load_labware('nest_1_reservoir_195ml', 8)
 
