@@ -9,7 +9,7 @@ import subprocess
 
 
 metadata = {
-    'protocolName': 'ICP-MS - 6 x 12 point 1:2 dilution, 96 well plate',
+    'protocolName': 'ICP-MS - 6 x 12 point 1:1.5 protein dilution, 96 well plate',
     'author': 'Shawn Laursen',
     'description': '''
     Titrates 6 metals (6 single titrations, with 3 controls for each, 6 WT controls) in 12 point 1:2 dilution series.
