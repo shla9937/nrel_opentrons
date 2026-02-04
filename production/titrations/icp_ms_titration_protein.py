@@ -53,7 +53,7 @@ def setup(protocol):
     p300m = protocol.load_instrument('p300_multi_gen2', 'left', tip_racks=[tips300, tips300_1])
     desalt_plate = protocol.load_labware('nest_96_wellplate_2ml_deep', 1)
     res1 = protocol.load_labware('nest_1_reservoir_195ml', 2)
-    rxn_plate = protocol.load_labware('greiner_96_wellplate_300ul', 5)
+    rxn_plate = protocol.load_labware('nest_96_wellplate_2ml_deep', 5)
     icp_plate = protocol.load_labware('nest_96_wellplate_2ml_deep', 11)
     metals = protocol.load_labware('opentrons_24_tuberack_nest_1.5ml_screwcap', 4)
     res2 = protocol.load_labware('nest_1_reservoir_195ml', 8)
