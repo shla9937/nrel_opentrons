@@ -95,13 +95,13 @@ def add_metal(protocol):
     
     # add mix to control wells
     pickup_tips(1, p300m, protocol)
-    p300m.transfer(30, metals.wells()[6], rxn_plate.rows()[6][0:6], new_tip='never', 
+    p300m.transfer(30, metals.wells()[6], rxn_plate.rows()[7][0:6], new_tip='never', 
                     mix_before=(3,100))
     p300m.drop_tip()
 
     # add EDTA to control wells
     pickup_tips(1, p300m, protocol)
-    p300m.transfer(30, metals.wells()[7], rxn_plate.rows()[6][6:9], new_tip='never', 
+    p300m.transfer(30, metals.wells()[7], rxn_plate.rows()[7][6:9], new_tip='never', 
                     mix_before=(3,100))
     p300m.drop_tip()
 
