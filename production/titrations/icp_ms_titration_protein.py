@@ -45,11 +45,11 @@ def run(protocol):
 
 def setup(protocol):
     # equiptment
-    global p20m, p300m, tips20, tips300, tips300_1, desalt_plate, res1, rxn_plate, icp_plate, metals, res2
+    global p20, p300m, tips20, tips300, tips300_1, desalt_plate, res1, rxn_plate, icp_plate, metals, res2
     tips20 = protocol.load_labware('opentrons_96_tiprack_20ul', 7)
     tips300 = protocol.load_labware('opentrons_96_tiprack_300ul', 3)
     tips300_1 = protocol.load_labware('opentrons_96_tiprack_300ul', 9)
-    p20m = protocol.load_instrument('p20_multi_gen2', 'right', tip_racks=[tips20])
+    p20 = protocol.load_instrument('p20_single_gen2', 'right', tip_racks=[tips20])
     p300m = protocol.load_instrument('p300_multi_gen2', 'left', tip_racks=[tips300, tips300_1])
     desalt_plate = protocol.load_labware('nest_96_wellplate_2ml_deep', 1)
     res1 = protocol.load_labware('nest_1_reservoir_195ml', 2)
@@ -65,23 +65,13 @@ def setup(protocol):
 
 def pickup_tips(number, pipette, protocol):
     nozzle_dict = {2: "G1", 3: "F1", 4: "E1", 5: "D1", 6: "C1", 7: "B1"}
-    if pipette == p20m: 
-        if number == 1:
-            p20m.configure_nozzle_layout(style=SINGLE,start="H1")
-        elif number > 1 and number < 8:
-            p20m.configure_nozzle_layout(style=PARTIAL_COLUMN, start="H1", end=nozzle_dict[number])
-        else:
-            p20m.configure_nozzle_layout(style=ALL)
-        p20m.pick_up_tip(tips20)
-        
-    elif pipette == p300m:
-        if number == 1:
-            p300m.configure_nozzle_layout(style=SINGLE,start="H1", tip_racks=[tips300, tips300_1])
-        elif number > 1 and number < 8:
-            p300m.configure_nozzle_layout(style=PARTIAL_COLUMN,start="H1", end=nozzle_dict[number], tip_racks=[tips300, tips300_1])
-        else:
-            p300m.configure_nozzle_layout(style=ALL, tip_racks=[tips300, tips300_1])
-        p300m.pick_up_tip()
+    if number == 1:
+        p300m.configure_nozzle_layout(style=SINGLE,start="H1", tip_racks=[tips300, tips300_1])
+    elif number > 1 and number < 8:
+        p300m.configure_nozzle_layout(style=PARTIAL_COLUMN,start="H1", end=nozzle_dict[number], tip_racks=[tips300, tips300_1])
+    else:
+        p300m.configure_nozzle_layout(style=ALL, tip_racks=[tips300, tips300_1])
+    p300m.pick_up_tip()
 
 def add_metal(protocol):
     # add 5µM metal to top 6 rows
@@ -142,11 +132,7 @@ def titrate_protein(protocol):
     p300m.drop_tip()
 
     # add protein to bottom row
-    for well in range(3,12): 
-        pickup_tips(1, p20m, protocol)
-        p20m.transfer(3.75, protein, rxn_plate.rows()[metal][0], new_tip='never', 
-                        mix_before=(3,20), mix_after=(3,20))
-        p20m.drop_tip()
+    p20.transfer(3.75, protein, rxn_plate.rows()[3:12][0], new_tip='always', mix_after=(3,20))
 
 def incubate(protocol):
     global start_time
