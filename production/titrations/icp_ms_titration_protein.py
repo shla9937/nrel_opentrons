@@ -132,7 +132,7 @@ def titrate_protein(protocol):
     p300m.drop_tip()
 
     # add protein to bottom row
-    p20.transfer(3.75, protein, rxn_plate.rows()[3:12][0], new_tip='always', mix_after=(3,20))
+    p20.transfer(3.75, protein, rxn_plate.rows()[7][3:12], new_tip='always', mix_after=(3,20))
 
 def incubate(protocol):
     global start_time
