@@ -138,7 +138,7 @@ def titrate_protein(protocol):
     pickup_tips(6, p300m, protocol)
     p300m.transfer(300, rxn_plate.rows()[5][0:11], rxn_plate.rows()[5][1:12], 
                 mix_before=(5,225), new_tip='never')    
-    p300m.mix(5,255, rxn_plate.rows()[0][11])
+    p300m.mix(5,225, rxn_plate.rows()[5][11])
     p300m.drop_tip()
 
     # add protein to bottom row
