@@ -15,8 +15,8 @@ metadata = {
     Titrates 6 metals (6 single titrations, with 3 controls for each, 6 WT controls) in 12 point 1:2 dilution series.
     Starts at 100µM protein concentration goes to 1µM. (100µM, 66.6µM, 44.4µM, 29.6µM, 19.7µM, 13.1µM, 8.8µM, 5.9µM, 3.9µM, 2.6µM, 1.7µM, 1.2µM)
     5µM final metal concentration.
-    Stock metals should be at 25µM in proper pH buffer (>400µL).
-    Protein should be at 200µM in proper pH buffer ().
+    Stock metals should be at 25µM in proper pH buffer (600µL).
+    Protein should be at 200µM in proper pH buffer (1500µL).
     3.89% ppt nitric acid (125mL).
     Buff (200mL).
     Rxn vol is 125µL.
