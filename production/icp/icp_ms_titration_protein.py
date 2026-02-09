@@ -19,7 +19,7 @@ metadata = {
     Protein should be at 200µM in proper pH buffer (1500µL).
     3.89% ppt nitric acid (125mL).
     Buff (200mL).
-    Rxn vol is 125µL.
+    Rxn vol is 150µL.
     Steps:
     -   Add metal
     -   Titration protein

@@ -9,20 +9,20 @@ import subprocess
 
 
 metadata = {
-    'protocolName': 'ICP-MS - 12 point 1:2 dilution, 96 well plate',
+    'protocolName': 'ICP-MS mixture',
     'author': 'Shawn Laursen',
     'description': '''
-    Titrates 8 metals (7 single, 1 mix) in 12 point 1:2 dilution series.
-    Starts at 1mM metal concentration goes to 5nM. (1mM, 333µM, 111µM, 37µM, 12.3µM, 4.1µM, 1.37µM, 457nM, 152nM, 51nM, 17nM, 6nM)
-    1µM final protein concentration.
-    Stock metals should be at 5mM in proper pH buffer (>400µL).
-    Protein should be at 5µM in proper pH buffer (5mL).
+    Plates 24 proteins in triplicate with 3 controls per row, adds mixture of metals, desalts.
+    5µM final protein and metal concentration.
+    Stock metals should be at 25µM in proper pH buffer (5mL).
+    Protein should be at 25µM in proper pH buffer (100µL).
     3.89% ppt nitric acid (125mL).
-    Buff (200mL).
+    Buff (300mL).
     Rxn vol is 150µL.
     Steps:
+    -   Add buff
+    -   Add metal
     -   Add protein
-    -   Titration metal
     -   Incubate (15 min)
     -   Prep desalt plate
     -   Add acid
@@ -33,8 +33,9 @@ metadata = {
 def run(protocol):
     protocol.set_rail_lights(True)
     setup(protocol)
-    add_protein(protocol)    
-    titrate_metal(protocol)
+    add_buff(protocol)
+    add_metal(protocol)    
+    add_protein(protocol)
     incubate(protocol) 
     prep_desalt(protocol)
     add_acid(protocol)
@@ -43,22 +44,23 @@ def run(protocol):
 
 def setup(protocol):
     # equiptment
-    global p300m, tips300, tips300_1, desalt_plate, res1, desalt_elution, rxn_plate, trough, icp_plate, metals, res2
+    global p300m, tips300, tips300_1, desalt_plate, res1, rxn_plate, icp_plate, proteins, res2, trough
     tips300 = protocol.load_labware('opentrons_96_tiprack_300ul', 3)
     tips300_1 = protocol.load_labware('opentrons_96_tiprack_300ul', 9)
     p300m = protocol.load_instrument('p300_multi_gen2', 'left', tip_racks=[tips300, tips300_1])
     desalt_plate = protocol.load_labware('nest_96_wellplate_2ml_deep', 1)
     res1 = protocol.load_labware('nest_1_reservoir_195ml', 2)
-    rxn_plate = protocol.load_labware('greiner_96_wellplate_300ul', 5)
+    rxn_plate = protocol.load_labware('nest_96_wellplate_2ml_deep', 5)
+    icp_plate = protocol.load_labware('nest_96_wellplate_2ml_deep', 11)
+    proteins = protocol.load_labware('greiner_96_wellplate_300ul', 4)
     trough = protocol.load_labware('nest_12_reservoir_15ml', 6)
-    icp_plate = protocol.load_labware('nest_96_wellplate_2ml_deep', 7)
-    metals = protocol.load_labware('opentrons_24_tuberack_nest_1.5ml_screwcap', 4)
     res2 = protocol.load_labware('nest_1_reservoir_195ml', 8)
 
-    global protein, buff, acid
-    protein = trough.wells()[0]
+    global buff, acid, metal_mix, rxn_vol
     buff = res1.wells()[0]
     acid = res2.wells()[0]
+    metal_mix = trough.wells()[0]
+    rxn_vol = 150 # needs to be 100 for desalting plus extra to pick up effectively
 
 def pickup_tips(number, pipette, protocol):
     nozzle_dict = {2: "G1", 3: "F1", 4: "E1", 5: "D1", 6: "C1", 7: "B1"}
@@ -70,26 +72,27 @@ def pickup_tips(number, pipette, protocol):
         p300m.configure_nozzle_layout(style=ALL, tip_racks=[tips300, tips300_1])
     p300m.pick_up_tip()
 
+def add_buff(protocol):
+    # add buff to wells 1-9
+    pickup_tips(8, p300m, protocol)
+    p300m.transfer(rxn_vol*(3/5), buff, rxn_plate.rows()[0][0:9], new_tip='never')
+
+    # add buff to control wells 10-12
+    p300m.transfer(rxn_vol*(4/5), buff, rxn_plate.rows()[0][9:12], new_tip='never')
+    p300m.return_tip()
+
+def add_metal(protocol):
+    # add buff to wells 1-9
+    pickup_tips(8, p300m, protocol)
+    p300m.transfer(rxn_vol*(1/5), metal_mix, rxn_plate.rows()[0][0:12], new_tip='never')
+    p300m.return_tip()
+
 def add_protein(protocol):
-    pickup_tips(8, p300m, protocol)
-    p300m.transfer(135, buff, rxn_plate.rows()[0][0], new_tip='never')
-    p300m.transfer(120, buff, rxn_plate.rows()[0][1:12], new_tip='never')
-    p300m.transfer(45, protein, rxn_plate.rows()[0][0], new_tip='never')
-    p300m.transfer(30, protein, rxn_plate.rows()[0][1:12], new_tip='never')
-    p300m.return_tip()
-
-def titrate_metal(protocol):
-    for metal in range(8): 
-        pickup_tips(1, p300m, protocol)
-        p300m.transfer(45, metals.wells()[metal], rxn_plate.rows()[metal][0], new_tip='never', 
-                       mix_before=(3,200), mix_after=(3,100))
-        p300m.drop_tip()
-
-    pickup_tips(8, p300m, protocol)
-    p300m.transfer(75, rxn_plate.rows()[0][0:11], rxn_plate.rows()[0][1:12], 
-                mix_before=(5,75), new_tip='never')    
-    p300m.mix(5,75, rxn_plate.rows()[0][11])
-    p300m.return_tip()
+    # add protein to wells 1-9
+    for col in range(3):
+        pickup_tips(8, p300m, protocol)
+        p300m.transfer(rxn_vol*(1/5), proteins.rows()[0][col], rxn_plate.rows()[0][col*3:(col*3)+3], new_tip='never')
+        p300m.return_tip()
 
 def incubate(protocol):
     global start_time
