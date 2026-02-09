@@ -82,17 +82,14 @@ def add_buff(protocol):
     p300m.return_tip()
 
 def add_metal(protocol):
-    # add buff to wells 1-9
-    pickup_tips(8, p300m, protocol)
-    p300m.transfer(rxn_vol*(1/5), metal_mix, rxn_plate.rows()[0][0:12], new_tip='never')
-    p300m.return_tip()
+    # add metal to all wells
+    p300m.transfer(rxn_vol*(1/5), metal_mix, rxn_plate.rows()[0][0:12], new_tip='once', trash=False)
 
 def add_protein(protocol):
     # add protein to wells 1-9
     for col in range(3):
-        pickup_tips(8, p300m, protocol)
-        p300m.transfer(rxn_vol*(1/5), proteins.rows()[0][col], rxn_plate.rows()[0][col*3:(col*3)+3], new_tip='never')
-        p300m.return_tip()
+        p300m.transfer(rxn_vol*(1/5), proteins.rows()[0][col], rxn_plate.rows()[0][col*3:(col*3)+3], 
+                       new_tip='once', trash=False, mix_after=(3,100))
 
 def incubate(protocol):
     global start_time
