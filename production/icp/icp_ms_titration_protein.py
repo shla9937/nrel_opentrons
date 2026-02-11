@@ -9,13 +9,14 @@ import subprocess
 
 
 metadata = {
-    'protocolName': 'ICP-MS - 6 x 12 point 1:1.5 protein dilution, 96 well plate',
+    'protocolName': 'ICP-MS - 6 x 12 point 1:1 protein dilution, 96 well plate',
     'author': 'Shawn Laursen',
     'description': '''
     Titrates 6 metals (6 single titrations, with 3 controls for each, 6 WT controls) in 12 point 1:2 dilution series.
-    Starts at 100µM protein concentration goes to 1µM. (100µM, 66.6µM, 44.4µM, 29.6µM, 19.7µM, 13.1µM, 8.8µM, 5.9µM, 3.9µM, 2.6µM, 1.7µM, 1.2µM)
+    Starts at 100µM protein concentration goes to 50nM. (100µM, 50.0µM, 25.0µM, 12.5µM, 6.25µM, 3.13µM, 1.56µM, 781nM, 391nM, 195nM, 97.7µM, 48.8nM)
     5µM final metal concentration.
     Stock metals should be at 25µM in proper pH buffer (600µL).
+    EDTA should be at 500µM to avoid Fe and Zn contamination.
     Protein should be at 200µM in proper pH buffer (1500µL).
     3.89% ppt nitric acid (125mL).
     Buff (200mL).
@@ -63,6 +64,12 @@ def setup(protocol):
     buff = res1.wells()[0]
     acid = res2.wells()[0]
 
+    global rxn_vol, dilution_factor, start_vol
+    rxn_vol = 150
+    dilution_factor = 1 # i.e. 1:2, not 1 in 2
+    start_vol = rxn_vol + (rxn_vol/dilution_factor)
+    
+
 def pickup_tips(number, pipette, protocol):
     nozzle_dict = {2: "G1", 3: "F1", 4: "E1", 5: "D1", 6: "C1", 7: "B1"}
     if number == 1:
@@ -77,62 +84,65 @@ def add_metal(protocol):
     # add 5µM metal to top 6 rows
     for metal in range(6): 
         pickup_tips(1, p300m, protocol)
-        p300m.transfer(90, metals.wells()[metal], rxn_plate.rows()[metal][0], new_tip='never', 
+        p300m.transfer(start_vol*(1/5), metals.wells()[metal], rxn_plate.rows()[metal][0], new_tip='never', 
                         mix_before=(3,100))
-        p300m.transfer(30, metals.wells()[metal], rxn_plate.rows()[metal][1:12], new_tip='never')
-        p300m.transfer(30, metals.wells()[metal], rxn_plate.rows()[6][metal*2:(metal*2)+2], new_tip='never')
+        p300m.transfer(rxn_vol*(1/5), metals.wells()[metal], rxn_plate.rows()[metal][1:12], new_tip='never')
+        p300m.transfer(rxn_vol*(1/5), metals.wells()[metal], rxn_plate.rows()[6][metal*2:(metal*2)+2], new_tip='never')
         p300m.drop_tip()
     
     # add mix to control wells
     pickup_tips(1, p300m, protocol)
     p300m.mix(3, 100, metals.wells()[6])
-    p300m.transfer(30, metals.wells()[6], rxn_plate.rows()[7][0:6], new_tip='never')
+    p300m.transfer(rxn_vol*(1/5), metals.wells()[6], rxn_plate.rows()[7][0:6], new_tip='never')
     p300m.drop_tip()
 
     # add EDTA to control wells
     pickup_tips(1, p300m, protocol)
     p300m.mix(3, 100, metals.wells()[7])
-    p300m.transfer(30, metals.wells()[7], rxn_plate.rows()[7][6:9], new_tip='never')
+    p300m.transfer(rxn_vol*(1/5), metals.wells()[7], rxn_plate.rows()[7][6:10], new_tip='never')
     p300m.drop_tip()
 
 def add_buff(protocol):
     # add buff to top 6 rows
     pickup_tips(6, p300m, protocol)
-    p300m.transfer(135, buff, rxn_plate.rows()[5][0].bottom(10), new_tip='never')
+    p300m.transfer(start_vol*(3/10), buff, rxn_plate.rows()[5][0].bottom(10), new_tip='never') # protien stock is 2x, not 5x
     for col in range(1,12):
-        p300m.transfer(120, buff, rxn_plate.rows()[5][col].bottom(10), new_tip='never')
+        p300m.transfer(rxn_vol*(4/5), buff, rxn_plate.rows()[5][col].bottom(10), new_tip='never')
     p300m.drop_tip()
    
     # add buff to controls
     pickup_tips(1, p300m, protocol)
     for col in range(12): 
-        p300m.transfer(120, buff, rxn_plate.rows()[6][col].bottom(10), new_tip='never')
+        p300m.transfer(rxn_vol*(4/5), buff, rxn_plate.rows()[6][col].bottom(10), new_tip='never')
     
     # add buff to bottom row
     for col in range(3): 
-        p300m.transfer(120, buff, rxn_plate.rows()[7][col].bottom(10), new_tip='never')
-    for col in range(3,9):     
-        p300m.transfer(116.25, buff, rxn_plate.rows()[7][col].bottom(10), new_tip='never')
-    for col in range(9,12): 
-        p300m.transfer(146.25, buff, rxn_plate.rows()[7][col].bottom(10), new_tip='never')
+        p300m.transfer(rxn_vol*(4/5), buff, rxn_plate.rows()[7][col].bottom(10), new_tip='never')
+    for col in range(3,8):     
+        p300m.transfer((rxn_vol*(4/5))-(rxn_vol/40), buff, rxn_plate.rows()[7][col].bottom(10), new_tip='never')
+    for col in range(8,10): 
+        p300m.transfer(rxn_vol*(4/5), buff, rxn_plate.rows()[7][col].bottom(10), new_tip='never')
+    for col in range(10,12): 
+        p300m.transfer(rxn_vol-(rxn_vol/40), buff, rxn_plate.rows()[7][col].bottom(10), new_tip='never')
     p300m.drop_tip()
 
 def titrate_protein(protocol):
     # put protein in top 6 rows
     for metal in range(6): 
         pickup_tips(1, p300m, protocol)
-        p300m.transfer(225, protein, rxn_plate.rows()[metal][0], new_tip='never', mix_after=(3,100))
+        p300m.transfer(start_vol*(1/2), protein, rxn_plate.rows()[metal][0], new_tip='never', mix_after=(3,100)) # protein stock is 2x, not 5x
         p300m.drop_tip()
 
     # titrate protein
     pickup_tips(6, p300m, protocol)
-    p300m.transfer(300, rxn_plate.rows()[5][0:11], rxn_plate.rows()[5][1:12], 
-                mix_before=(5,225), new_tip='never')    
-    p300m.mix(5,225, rxn_plate.rows()[5][11])
+    p300m.transfer(rxn_vol/dilution_factor, rxn_plate.rows()[5][0:11], rxn_plate.rows()[5][1:12], 
+                mix_before=(5,rxn_vol/dilution_factor), new_tip='never')    
+    p300m.mix(5,rxn_vol/dilution_factor, rxn_plate.rows()[5][11])
     p300m.drop_tip()
 
     # add protein to bottom row
-    p20.transfer(3.75, protein, rxn_plate.rows()[7][3:12], new_tip='always', mix_after=(3,20))
+    p20.transfer(rxn_vol/40, protein, rxn_plate.rows()[7][3:8], new_tip='always', mix_after=(3,20))
+    p20.transfer(rxn_vol/40, protein, rxn_plate.rows()[7][10:12], new_tip='always', mix_after=(3,20))
 
 def incubate(protocol):
     global start_time
