@@ -9,11 +9,11 @@ import subprocess
 
 
 metadata = {
-    'protocolName': 'ICP-MS - 6 x 12 point 1:1 protein dilution, 96 well plate',
+    'protocolName': 'ICP-MS - 6 x 12 point 1:0.5 protein dilution, 96 well plate',
     'author': 'Shawn Laursen',
     'description': '''
     Titrates 6 metals (6 single titrations, with 3 controls for each, 6 WT controls) in 12 point 1:2 dilution series.
-    Starts at 100µM protein concentration goes to 50nM. (100µM, 50.0µM, 25.0µM, 12.5µM, 6.25µM, 3.13µM, 1.56µM, 781nM, 391nM, 195nM, 97.7nM, 48.8nM)
+    Starts at 100µM protein concentration goes to 50nM. (100µM, 66.6µM, 44.4µM, 29.6µM, 19.7µM, 13.1µM, 8.8µM, 5.9µM, 3.9µM, 2.6µM, 1.7µM, 1.2µM)
     5µM final metal concentration.
     Stock metals should be at 25µM in proper pH buffer (600µL).
     EDTA should be at 500µM to avoid Fe and Zn contamination.
@@ -66,7 +66,7 @@ def setup(protocol):
 
     global rxn_vol, dilution_factor, start_vol
     rxn_vol = 150
-    dilution_factor = 1 # i.e. 1:2, not 1 in 2
+    dilution_factor = 0.5 # i.e. 1:2, not 1 in 2
     start_vol = rxn_vol + (rxn_vol/dilution_factor)
     
 
