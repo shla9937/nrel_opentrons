@@ -9,16 +9,17 @@ import subprocess
 
 
 metadata = {
-    'protocolName': 'DSF - 384 well, 8 row triplicate',
+    'protocolName': 'DSF - 384 well, 30 metals',
     'author': 'Shawn Laursen',
     'description': '''
     Adds buff + spyro + protein
-    Titrates 8 metals in 12 point dilution series. (1mM, 333µM, 111µM, 37µM, 12.3µM, 4.1µM, 1.37µM, 457nM, 152nM, 51nM, 17nM, 6nM)
+    Titrates 30 metals in 12 point dilution series. (1mM, 333µM, 111µM, 37µM, 12.3µM, 4.1µM, 1.37µM, 457nM, 152nM, 51nM, 17nM, 6nM)
     Titrates EDTA in 11 point dilution series. (1mM, 333µM, 111µM, 37µM, 12.3µM, 4.1µM, 1.37µM, 457nM, 152nM, 51nM, 17nM, 0)
 
     Stocks:
-    -   metal: 5x (5mM) -> 1mM final (50µL into wells)
-    -   EDTA: 5x (500mM) -> 100mM final (50µL into wells)
+    -   metal: 5x (5mM) -> 1mM final (50µL into wells A1-H1, A2-H2, A3-H3, A4-F4)
+    -   EDTA: 5x (500mM) -> 100mM final (50µL into well G4)
+    -   Apo: buff (50µL into well H4)
     -   protein + sypro + rox: 5x (25µM, 50x, 250nM) -> 5µM, 10x, 50nM final (2mL total -> 250µL into wells)
 
     Buff should be ~100mM buff, 150mM NaCl (10mL in trough)''',
@@ -29,7 +30,6 @@ def run(protocol):
     setup(protocol)
     add_protein_and_sypro(protocol) 
     add_metal_and_titrate(protocol) # titrate into protein/buff wells, diluted in protein/buff
-    add_edta(protocol) # add edta to control wells, 2µl
     protocol.set_rail_lights(False)
 
 def setup(protocol):
@@ -77,28 +77,16 @@ def add_protein_and_sypro(protocol):
     p20m.return_tip()
 
 def add_metal_and_titrate(protocol):
-    rows = [0,1,0]
-    cols = [0,0,12]
+    rows = [0,1,0,1]
+    cols = [0,0,12,12]
+    metal_col = [0,1,2,3]
 
-    for row, col in zip(rows, cols):
+    for row, col, metal in zip(rows, cols, metal_col):
         pickup_tips(8, p20m, protocol)
-        p20m.transfer(start_vol*(1/5), metals.rows()[0][0], plate.rows()[row][col], new_tip='never', 
+        p20m.transfer(start_vol*(1/5), metals.rows()[0][metal], plate.rows()[row][col], new_tip='never', 
                 mix_before=(3,rxn_vol))
         p20m.transfer(rxn_vol/dilution_factor, plate.rows()[row][col+0:col+11], plate.rows()[row][col+1:col+12], 
                     mix_before=(3,rxn_vol), new_tip='never')    
         p20m.mix(3,rxn_vol, plate.rows()[row][col+11])
         p20m.aspirate(rxn_vol/dilution_factor, plate.rows()[row][col+11])
         p20m.return_tip()
-
-def add_edta(protocol):
-    row = 1
-    col = 12
-
-    pickup_tips(8, p20m, protocol)
-    p20m.transfer(start_vol*(1/5), metals.rows()[0][1], plate.rows()[row][col], new_tip='never', 
-            mix_before=(3,rxn_vol), mix_after=(3,rxn_vol))
-    p20m.transfer(rxn_vol/dilution_factor, plate.rows()[row][col+0:col+11], plate.rows()[row][col+1:col+12],
-            mix_before=(3,rxn_vol), new_tip='never')
-    p20m.mix(3,rxn_vol, plate.rows()[row][col+11])
-    p20m.aspirate(rxn_vol/dilution_factor, plate.rows()[row][col+11])
-    p20m.return_tip()
