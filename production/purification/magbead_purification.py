@@ -11,8 +11,8 @@ import subprocess
 metadata = {
     'protocolName': 'Magnetic purification',
     'author': 'Shawn Laursen',
-    'description': '''Purify protein from 6well plate using StrepXT mag beads.''',
-    'apiLevel': '2.20'}
+    'description': '''Purify protein from 24 well plate using StrepXT mag beads.''',
+    'apiLevel': '2.26'}
 
 
 def run(protocol):
