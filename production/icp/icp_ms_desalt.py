@@ -33,11 +33,9 @@ def run(protocol):
 
 def setup(protocol):
     # equiptment
-    global p20, p300m, tips20, tips300, tips300_1, desalt_plate, buff, rxn_plate, icp_plate, metals, res2
-    tips20 = protocol.load_labware('opentrons_96_tiprack_20ul', 7)
+    global p300m, tips300, tips300_1, desalt_plate, buff, rxn_plate, icp_plate, res2
     tips300 = protocol.load_labware('opentrons_96_tiprack_300ul', 3)
-    tips300_1 = protocol.load_labware('opentrons_96_tiprack_300ul', 9)
-    p20 = protocol.load_instrument('p20_single_gen2', 'right', tip_racks=[tips20])
+    tips300_1 = protocol.load_labware('opentrons_96_tiprack_300ul', 4)
     p300m = protocol.load_instrument('p300_multi_gen2', 'left', tip_racks=[tips300, tips300_1])
     desalt_plate = protocol.load_labware('nest_96_wellplate_2ml_deep', 1)
     buff = protocol.load_labware('nest_96_wellplate_2ml_deep', 2)
