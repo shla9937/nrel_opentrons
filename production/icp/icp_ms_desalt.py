@@ -33,20 +33,19 @@ def run(protocol):
 
 def setup(protocol):
     # equiptment
-    global p20, p300m, tips20, tips300, tips300_1, desalt_plate, res1, rxn_plate, icp_plate, metals, res2
+    global p20, p300m, tips20, tips300, tips300_1, desalt_plate, buff, rxn_plate, icp_plate, metals, res2
     tips20 = protocol.load_labware('opentrons_96_tiprack_20ul', 7)
     tips300 = protocol.load_labware('opentrons_96_tiprack_300ul', 3)
     tips300_1 = protocol.load_labware('opentrons_96_tiprack_300ul', 9)
     p20 = protocol.load_instrument('p20_single_gen2', 'right', tip_racks=[tips20])
     p300m = protocol.load_instrument('p300_multi_gen2', 'left', tip_racks=[tips300, tips300_1])
     desalt_plate = protocol.load_labware('nest_96_wellplate_2ml_deep', 1)
-    res1 = protocol.load_labware('nest_1_reservoir_195ml', 2)
+    buff = protocol.load_labware('nest_96_wellplate_2ml_deep', 2)
     rxn_plate = protocol.load_labware('nest_96_wellplate_2ml_deep', 5)
     icp_plate = protocol.load_labware('nest_96_wellplate_2ml_deep', 11)
     res2 = protocol.load_labware('nest_1_reservoir_195ml', 8)
 
-    global buff, acid
-    buff = res1.wells()[0]
+    global acid
     acid = res2.wells()[0]
 
 def pickup_tips(number, pipette, protocol):
@@ -64,13 +63,17 @@ def prep_desalt(protocol):
         placing on wash plate, removing top seal. Centrifuge 2 min at 1000rcf.")
     protocol.pause("Place desalt plate back in slot 1.")
 
-    pickup_tips(8, p300m, protocol)
-    destinations = [well.top() for well in desalt_plate.rows()[0]]
     for wash in range(4):
-        p300m.transfer(250, buff, destinations, new_tip='never')
-        p300m.move_to(buff.top())
+        pickup_tips(8, p300m, protocol)
+        for col in range(6):
+            p300m.transfer(250, buff.rows()[0][col], desalt_plate.rows()[0][col].top(), new_tip='never')
+        p300m.drop_tip()
+        pickup_tips(8, p300m, protocol)
+        for col in range(6,12):
+            p300m.transfer(250, buff.rows()[0][col], desalt_plate.rows()[0][col].top(), new_tip='never')
+        p300m.drop_tip()
+        p300m.move_to(buff.rows()[0][0].top())
         protocol.pause("Centrifuge desalt plate 2 min at 1000rcf, set on wash plate again, and return to slot 1.")
-    p300m.drop_tip()
     protocol.pause("Ready to resume protocol.")
 
 def add_acid(protocol):
@@ -84,6 +87,6 @@ def desalt(protocol):
         p300m.transfer(100, rxn_plate.rows()[6][col], desalt_plate.rows()[6][col].top(), new_tip='never', trash=False)
         p300m.drop_tip()
         pickup_tips(1, p300m, protocol)
-        p300m.transfer(100, rxn_plate.rows()[7][col], icp_plate.rows()[7][col], new_tip='never', trash=False)
+        p300m.transfer(100, rxn_plate.rows()[7][col], icp_plate.rows()[7][col].top(), new_tip='never', trash=False)
         p300m.drop_tip()
     protocol.pause("Put desalt plate on acid 96 well, centrifuge desalt plate 2 min at 1000rcf.")
