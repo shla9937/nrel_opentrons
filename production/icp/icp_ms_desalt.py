@@ -67,11 +67,11 @@ def prep_desalt(protocol):
         pickup_tips(8, p300m, protocol)
         for col in range(6):
             p300m.transfer(250, buff.rows()[0][col], desalt_plate.rows()[0][col].top(), new_tip='never')
-        p300m.drop_tip()
+        p300m.return_tip()
         pickup_tips(8, p300m, protocol)
         for col in range(6,12):
             p300m.transfer(250, buff.rows()[0][col], desalt_plate.rows()[0][col].top(), new_tip='never')
-        p300m.drop_tip()
+        p300m.return_tip()
         p300m.move_to(buff.rows()[0][0].top())
         protocol.pause("Centrifuge desalt plate 2 min at 1000rcf, set on wash plate again, and return to slot 1.")
     protocol.pause("Ready to resume protocol.")
