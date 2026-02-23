@@ -59,7 +59,7 @@ def setup(protocol):
     res2 = protocol.load_labware('nest_1_reservoir_195ml', 8)
 
     global protein, buff, acid
-    protein = metals.wells()[8]
+    protein = metals.wells()[-1]
     buff = res1.wells()[0]
     acid = res2.wells()[0]
 
