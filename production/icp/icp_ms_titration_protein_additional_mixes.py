@@ -97,9 +97,9 @@ def add_metal(protocol):
 
     for mix in range(3):
         pickup_tips(1, p300m, protocol)
-        p300m.mix(3, 100, metals.wells()[mix+6])
-        p300m.transfer(rxn_vol*(1/5), metals.wells()[mix+6], rxn_plate.rows()[7][6+mix], new_tip='never')
-        p300m.transfer(rxn_vol*(1/5), metals.wells()[mix+6], rxn_plate.rows()[7][9+mix], new_tip='never')
+        p300m.mix(3, 100, metals.wells()[mix+7])
+        p300m.transfer(rxn_vol*(1/5), metals.wells()[mix+7], rxn_plate.rows()[7][6+mix], new_tip='never')
+        p300m.transfer(rxn_vol*(1/5), metals.wells()[mix+7], rxn_plate.rows()[7][9+mix], new_tip='never')
         p300m.drop_tip()
 
 def add_buff(protocol):
