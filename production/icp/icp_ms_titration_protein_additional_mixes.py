@@ -173,5 +173,5 @@ def desalt(protocol):
         while time.time() - start_time < 900:
             protocol.delay(1)
     destinations = [well.top() for well in desalt_plate.rows()[0]]
-    p300m.transfer(100, rxn_plate.rows()[0][0:12], destinations, new_tip='always', trash=False)
+    p300m.transfer(100, rxn_plate.rows()[0][0:12], destinations, new_tip='always', trash=False, touch_tip=True)
     protocol.pause("Put desalt plate on acid 96 well, centrifuge desalt plate 2 min at 1000rcf.")

@@ -12,7 +12,7 @@ metadata = {
     'protocolName': 'ICP-MS - desalt',
     'author': 'Shawn Laursen',
     'description': '''
-    Preps desalt plate and transfers all but last row to desalt plate. 
+    Preps desalt plate and transfers all. 
     3.89% ppt nitric acid (125mL).
     Buff (200mL).
     Rxn vol is 150µL.
@@ -80,11 +80,6 @@ def add_acid(protocol):
     p300m.return_tip()
 
 def desalt(protocol):
-    for col in range(12):
-        pickup_tips(7, p300m, protocol)
-        p300m.transfer(100, rxn_plate.rows()[6][col], desalt_plate.rows()[6][col].top(), new_tip='never', trash=False)
-        p300m.drop_tip()
-        pickup_tips(1, p300m, protocol)
-        p300m.transfer(100, rxn_plate.rows()[7][col], icp_plate.rows()[7][col].top(), new_tip='never', trash=False)
-        p300m.drop_tip()
+    destinations = [well.top() for well in desalt_plate.rows()[0]]
+    p300m.transfer(100, rxn_plate.rows()[0][0:12], destinations, new_tip='always', trash=False, touch_tip=True)
     protocol.pause("Put desalt plate on acid 96 well, centrifuge desalt plate 2 min at 1000rcf.")
