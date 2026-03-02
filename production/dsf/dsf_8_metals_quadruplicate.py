@@ -13,11 +13,13 @@ metadata = {
     'author': 'Shawn Laursen',
     'description': '''
     Adds buff + spyro + protein
-    Titrates 8 metals in 12 point dilution series. (1mM, 333µM, 111µM, 37µM, 12.3µM, 4.1µM, 1.37µM, 457nM, 152nM, 51nM, 17nM, 6nM)
+    Titrates 8 metals in 12 point dilution series. 
+    For 1:2 dultion - (1mM, 333µM, 111µM, 37µM, 12.3µM, 4.1µM, 1.37µM, 457nM, 152nM, 51nM, 17nM, 6nM)
+    For 1:1 dilution - (100µM, 50.0µM, 25.0µM, 12.5µM, 6.25µM, 3.13µM, 1.56µM, 781nM, 391nM, 195nM, 97.7nM, 48.8nM)
     * can do 6 metals, EDTA and then a buffer (aka Apo protein)
     Stocks:
-    -   metal: 5x (5mM) -> 1mM final (50µL into wells)
-    -   EDTA: 5x (5mM) -> 1mM final (50µL into wells)
+    -   metal: 5x (5mM or 500µM) -> 1mM or 100µM final (50µL into wells)
+    -   EDTA: 5x (5mM or 500µM) -> 1mM or 100µM final (50µL into wells)
     -   Buff: 5x -> won't change dilution
     -   protein + sypro + rox: 5x (25µM, 50x, 250nM) -> 5µM, 10x, 50nM final (2mL total -> 250µL into wells)
 
@@ -48,7 +50,7 @@ def setup(protocol):
     # rows
     global rxn_vol, start_vol, dilution_factor
     rxn_vol = 20   
-    dilution_factor = 2 # i.e. 1:2, not 1 in 2
+    dilution_factor = 1 # i.e. 1:2, not 1 in 2
     start_vol = rxn_vol + (rxn_vol/dilution_factor)
 
 def pickup_tips(number, pipette, protocol):
