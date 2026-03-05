@@ -14,7 +14,6 @@ metadata = {
     'description': '''
     Adds buff + spyro + protein
     Titrates 30 metals in 12 point dilution series. (1mM, 333µM, 111µM, 37µM, 12.3µM, 4.1µM, 1.37µM, 457nM, 152nM, 51nM, 17nM, 6nM)
-    Titrates EDTA in 11 point dilution series. (1mM, 333µM, 111µM, 37µM, 12.3µM, 4.1µM, 1.37µM, 457nM, 152nM, 51nM, 17nM, 0)
 
     Stocks:
     -   metal: 5x (5mM) -> 1mM final (50µL into wells A1-H1, A2-H2, A3-H3, A4-F4)
