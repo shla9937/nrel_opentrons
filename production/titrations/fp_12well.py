@@ -70,11 +70,11 @@ def add_buff_and_dna(protocol):
         p20m.transfer(start_vol*(3/5), buff, plate.rows()[row][col], new_tip='never')
         p20m.transfer(rxn_vol*(4/5), buff, plate.rows()[row][col+1:col+12], new_tip='never')
     p20m.return_tip()
-    pickup_tips(8, p20m, protocol)
     for row, col, dna_col in zip(rows, cols, dna_col):
+        pickup_tips(8, p20m, protocol)
         p20m.transfer(start_vol*(1/5), dnas.rows()[0][dna_col], plate.rows()[row][col], new_tip='never')
         p20m.transfer(rxn_vol*(1/5), dnas.rows()[0][dna_col], plate.rows()[row][col+1:col+12], new_tip='never')
-    p20m.return_tip()
+        p20m.return_tip()
 
 def add_protein_and_titrate(protocol):
     rows = [0,1,0,1]
