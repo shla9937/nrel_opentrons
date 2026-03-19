@@ -20,7 +20,7 @@ metadata = {
     Stocks:
     -   metal: 5x (5mM/500µM) -> 1mM/100µM final (into 15mL Falcons)
     -   EDTA: 5x (500mM/500µM) -> 100mM/100µM final (into last 15mL Falcon)
-    -   Apo: buff (50µL into well H4)
+    -   Apo: buff (need ~10mL in wells 1 and 2 of trough)
     -   protein + sypro + rox: 5x (25µM, 50x, 250nM) -> 5µM, 10x, 50nM final (2mL total -> 250µL into wells)
 
     Buff should be ~100mM buff, 150mM NaCl (10mL in trough)''',
@@ -48,8 +48,9 @@ def setup(protocol):
     tubes2 = protocol.load_labware('opentrons_15_tuberack_falcon_15ml_conical', 8)
          
     # reagents     
-    global buff, protein_and_sypro
+    global buff, buff2, protein_and_sypro
     buff = trough.wells()[0]
+    buff2 = trough.wells()[1]
     protein_and_sypro = metals.rows()[0][11]
 
     # rows
@@ -72,8 +73,8 @@ def pickup_tips(number, pipette, protocol):
 def dilute_metals(protocol):
     # add buff to wells
     p300s.pick_up_tip()
-    p300s.transfer(190, buff, metals.wells()[0:31], new_tip='never')
-    p300s.transfer(200, buff, metals.wells()[31], new_tip='never')
+    p300s.transfer(190, buff2, metals.wells()[0:31], new_tip='never')
+    p300s.transfer(200, buff2, metals.wells()[31], new_tip='never')
     p300s.return_tip()
 
     # add metal to buffs
