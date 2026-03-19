@@ -27,18 +27,23 @@ metadata = {
 def run(protocol):
     protocol.set_rail_lights(True)
     setup(protocol)
+    dilute_metals(protocol)
     add_protein_and_sypro(protocol) 
     add_metal_and_titrate(protocol) # titrate into protein/buff wells, diluted in protein/buff
     protocol.set_rail_lights(False)
 
 def setup(protocol):
     # equiptment
-    global tips20, metals, plate, trough, p20m
+    global tips20, tips300, metals, plate, trough, p20m, p300s, tubes1, tubes2
     tips20 = protocol.load_labware('opentrons_96_tiprack_20ul', 2)
+    tips300 = protocol.load_labware('opentrons_96_tiprack_300ul', 1)
     metals = protocol.load_labware('greiner_96_wellplate_300ul', 4)
     plate = protocol.load_labware('corning_384_wellplate_112ul_flat', 5) 
     trough = protocol.load_labware('nest_12_reservoir_15ml', 6)
     p20m = protocol.load_instrument('p20_multi_gen2', 'right', tip_racks=[tips20])
+    p300s = protocol.load_instrument('p300_single_gen2', 'left', tip_racks=[tips300])
+    tubes1 = protocol.load_labware('opentrons_15_tuberack_falcon_15ml_conical', 7)
+    tubes2 = protocol.load_labware('opentrons_15_tuberack_falcon_15ml_conical', 8)
          
     # reagents     
     global buff, protein_and_sypro
@@ -61,6 +66,27 @@ def pickup_tips(number, pipette, protocol):
         else:
             p20m.configure_nozzle_layout(style=ALL)
         p20m.pick_up_tip(tips20)
+
+def dilute_metals(protocol):
+    # add buff to wells
+    p300s.pick_up_tip()
+    p300s.transfer(95, buff, metals.wells()[0:31], new_tip='never')
+    p300s.transfer(100, buff, metals.wells()[31], new_tip='never')
+    p300s.return_tip()
+
+    # add metal to buffs
+    well = 0
+    for rack in [tubes1, tubes2]:
+        for tube in range(15):
+            p300s.pick_up_tip()
+            p300s.transfer(5, rack.wells()[tube], metals.wells()[well], new_tip='never', mix_after=(3,50))         
+            p300s.return_tip()   
+            well += 1
+            
+    # add extra EDTA well
+    p300s.pick_up_tip()
+    p300s.transfer(5, tubes2.wells()[14], metals.wells()[30], new_tip='never', mix_after=(3,50))         
+    p300s.return_tip()   
 
 def add_protein_and_sypro(protocol):
     rows = [0,1,0,1]
