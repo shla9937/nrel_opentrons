@@ -13,11 +13,13 @@ metadata = {
     'author': 'Shawn Laursen',
     'description': '''
     Adds buff + spyro + protein
-    Titrates 30 metals in 12 point dilution series. (1mM, 333µM, 111µM, 37µM, 12.3µM, 4.1µM, 1.37µM, 457nM, 152nM, 51nM, 17nM, 6nM)
+    Titrates 29 metals in 12 point dilution series. 
+    For 1:2 dultion - (1mM, 333µM, 111µM, 37µM, 12.3µM, 4.1µM, 1.37µM, 457nM, 152nM, 51nM, 17nM, 6nM)
+    For 1:1 dilution - (100µM, 50.0µM, 25.0µM, 12.5µM, 6.25µM, 3.13µM, 1.56µM, 781nM, 391nM, 195nM, 97.7nM, 48.8nM)
 
     Stocks:
-    -   metal: 5x (5mM) -> 1mM final (50µL into wells A1-H1, A2-H2, A3-H3, A4-F4)
-    -   EDTA: 5x (500mM) -> 100mM final (50µL into well G4)
+    -   metal: 5x (5mM/500µM) -> 1mM/100µM final (into 15mL Falcons)
+    -   EDTA: 5x (500mM/500µM) -> 100mM/100µM final (into last 15mL Falcon)
     -   Apo: buff (50µL into well H4)
     -   protein + sypro + rox: 5x (25µM, 50x, 250nM) -> 5µM, 10x, 50nM final (2mL total -> 250µL into wells)
 
@@ -53,7 +55,7 @@ def setup(protocol):
     # rows
     global rxn_vol, start_vol, dilution_factor
     rxn_vol = 20   
-    dilution_factor = 2 # i.e. 1:2, not 1 in 2
+    dilution_factor = 1 # i.e. 1:2, not 1 in 2
     start_vol = rxn_vol + (rxn_vol/dilution_factor)
 
 def pickup_tips(number, pipette, protocol):
@@ -70,8 +72,8 @@ def pickup_tips(number, pipette, protocol):
 def dilute_metals(protocol):
     # add buff to wells
     p300s.pick_up_tip()
-    p300s.transfer(95, buff, metals.wells()[0:31], new_tip='never')
-    p300s.transfer(100, buff, metals.wells()[31], new_tip='never')
+    p300s.transfer(190, buff, metals.wells()[0:31], new_tip='never')
+    p300s.transfer(200, buff, metals.wells()[31], new_tip='never')
     p300s.return_tip()
 
     # add metal to buffs
@@ -79,13 +81,13 @@ def dilute_metals(protocol):
     for rack in [tubes1, tubes2]:
         for tube in range(15):
             p300s.pick_up_tip()
-            p300s.transfer(5, rack.wells()[tube], metals.wells()[well], new_tip='never', mix_after=(3,50))         
+            p300s.transfer(10, rack.wells()[tube], metals.wells()[well], new_tip='never', mix_after=(3,50))         
             p300s.return_tip()   
             well += 1
             
     # add extra EDTA well
     p300s.pick_up_tip()
-    p300s.transfer(5, tubes2.wells()[14], metals.wells()[30], new_tip='never', mix_after=(3,50))         
+    p300s.transfer(10, tubes2.wells()[14], metals.wells()[30], new_tip='never', mix_after=(3,50))         
     p300s.return_tip()   
 
 def add_protein_and_sypro(protocol):
