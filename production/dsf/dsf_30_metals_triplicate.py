@@ -62,7 +62,7 @@ def setup(protocol):
         buffs.append(buff_i)
     proteins = []
     for i in [9,10,11]:
-        protein = metals.rows()[0][11]
+        protein = metals.rows()[0][i]
         proteins.append(protein)
 
     # rows
