@@ -24,9 +24,9 @@ n_rows         = 3;      // Number of rows     (front ↔ back)
 tube_edge      = 25.4;   // Tube centre to outer box edge  (1.00 in)
 
 // — Outside dimensions (fixed) ───────────────────────────────────
-ob_w           = 95.25;  // 3.75 in
-ob_d           = 125.35; // 5.25 in minus barcode tab protrusion (133.35 - 8.0 mm)
-ob_h           = 101.6;  // 4.00 in
+ob_w           = 95.25;   // 3.75 in
+ob_d           = 133.35;  // 5.25 in (full length, notches cut into end wall)
+ob_h           = 101.6;   // 4.00 in
 
 // — Wall thicknesses ─────────────────────────────────────────────
 outer_wall     = 3.0;    // Outer box wall & floor thickness (mm)
@@ -37,10 +37,10 @@ wall           = 3.0;    // Tube cylinder wall thickness (mm)
 base_t         = 2.5;    // Floor thickness inside each tube cylinder (mm)
 chamfer        = 1.2;    // Top-edge chamfer on tube bore (mm)
 
-// — Barcode tab ──────────────────────────────────────────────────
-bc_tab_proj    = 8.0;    // Protrusion of triangular brace from short end face (mm)
+// — Barcode notches (cut into short end wall) ───────────────────
 bc_notch_w     = 3.175;  // Notch width  (1/8 in)
-bc_notch_len   = 3.175;  // Notch depth into tab from tip (1/8 in)
+bc_notch_h     = 25.4;   // Notch height (1.00 in) — runs along the 4 in tall axis
+bc_notch_depth = 3.175 + 0.2;  // Notch depth into wall face (1/8 in + overshoot)
 // Left edge of each notch from the right edge of the outer box (mm):
 // 5/8", 1.25", 1.5", 1-15/16", 2.5", 2-7/8"
 bc_notch_offsets = [15.875, 31.75, 38.1, 49.2125, 63.5, 73.025];
@@ -132,25 +132,41 @@ module ice_tray() {
     }
 }
 
-// ── Barcode tab (short +Y face, top) ──────────────────────────
-module barcode_tab() {
-    end_y = ob_d / 2;
+// ── Gap fill on +Y side (barcode wall), top 1in+3mm ─────────────
+//   Fills the gap between inner tray and +Y outer wall for the top section.
+//   Bottom transitions via a 45° triangle ramp for printability.
+//   Called inside translate([0,0,outer_wall]) block.
+module gap_fill_y_plus() {
+    rect_h = 25.4 + 3.0;          // 1 in + 3 mm tall in Z (solid rectangular fill)
+    ramp_h = gap;                  // ramp height below the rectangle = gap width
+    y0     = tray_outer_d / 2;    // inner edge of +Y gap (inner tray outer wall)
+    y1     = ob_inner_d / 2;      // outer edge of +Y gap (outer box inner face)
+    z_rect = body_h - rect_h;     // z of bottom of rectangular fill (local coords)
+    z_ramp = z_rect - ramp_h;     // z of bottom of ramp
 
-    difference() {
-        translate([-ob_w / 2, end_y, ob_h])
-            rotate([0, 90, 0])
-                linear_extrude(height = ob_w)
-                    polygon([[0, 0], [bc_tab_proj, 0], [0, bc_tab_proj]]);
+    // 45° ramp below the rectangle
+    hull() {
+        translate([-ob_inner_w / 2, y1 - 0.001, z_ramp])
+            cube([ob_inner_w, 0.001, 0.001]);
+        translate([-ob_inner_w / 2, y0, z_rect - 0.001])
+            cube([ob_inner_w, gap, 0.001]);
+    }
+    // Rectangular fill: 1 in + 3 mm tall
+    translate([-ob_inner_w / 2, y0, z_rect])
+        cube([ob_inner_w, gap, rect_h]);
+}
 
-        for (offset = bc_notch_offsets) {
-            nx = ob_w / 2 - offset - bc_notch_w;
-            translate([nx,
-                       end_y + bc_tab_proj - bc_notch_len - 0.1,
-                       ob_h - bc_tab_proj - 0.1])
-                cube([bc_notch_w,
-                      bc_notch_len + 0.2,
-                      bc_tab_proj + 0.2]);
-        }
+// ── Barcode notches (cut into short +Y end wall) ──────────────
+//   Rectangular slots cut from the outside face through the wall,
+//   positioned at the top of the wall.
+module barcode_notches() {
+    end_y = ob_d / 2;   // outer face of +Y wall
+    nz    = ob_h - bc_notch_h;  // notch sits at the top of the wall
+
+    for (offset = bc_notch_offsets) {
+        nx = ob_w / 2 - offset - bc_notch_w;
+        translate([nx, end_y - bc_notch_depth + 0.1, nz])
+            cube([bc_notch_w, bc_notch_depth, bc_notch_h]);
     }
 }
 
@@ -158,12 +174,17 @@ module barcode_tab() {
 //  ASSEMBLY
 // ================================================================
 
-outer_box();
-barcode_tab();
-
-// Inner tray + cylinders + ribs all sit on the outer box floor
-translate([0, 0, outer_wall]) {
-    ice_tray();
-    cassette_body();
-    support_ribs();
+// Notches are subtracted at the top level so they cut both the outer
+// wall and the gap fill behind it.
+difference() {
+    union() {
+        outer_box();
+        translate([0, 0, outer_wall]) {
+            ice_tray();
+            cassette_body();
+            support_ribs();
+            gap_fill_y_plus();
+        }
+    }
+    barcode_notches();
 }
