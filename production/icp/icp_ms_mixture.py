@@ -46,8 +46,8 @@ def setup(protocol):
     # equiptment
     global p300m, tips300, tips300_1, tips300_2, desalt_plate, res1, rxn_plate, icp_plate, proteins, res2, trough
     tips300 = protocol.load_labware('opentrons_96_tiprack_300ul', 3)
-    tips300_1 = protocol.load_labware('opentrons_96_tiprack_300ul', 9)
-    tips300_2 = protocol.load_labware('opentrons_96_tiprack_300ul', 6)
+    tips300_1 = protocol.load_labware('opentrons_96_tiprack_300ul', 6)
+    tips300_2 = protocol.load_labware('opentrons_96_tiprack_300ul', 9)
     p300m = protocol.load_instrument('p300_multi_gen2', 'left', tip_racks=[tips300, tips300_1, tips300_2])
     desalt_plate = protocol.load_labware('nest_96_wellplate_2ml_deep', 1)
     res1 = protocol.load_labware('nest_1_reservoir_195ml', 2)
