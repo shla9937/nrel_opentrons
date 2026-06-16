@@ -90,7 +90,7 @@ def add_protein(protocol):
     # add protein to wells 1-9
     for col in range(3):
         p300m.transfer(rxn_vol*(1/5), proteins.rows()[0][col], rxn_plate.rows()[0][col*3:(col*3)+3], 
-                       new_tip='always', trash=False, mix_after=(3,100))
+                       new_tip='always', trash=False, mix_before=(3,50), mix_after=(3,100))
 
 def incubate(protocol):
     global start_time
