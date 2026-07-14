@@ -1,0 +1,51 @@
+{
+    "ordering": [["A1"]],
+    "brand": {
+        "brand": "shawn",
+        "brandId": []
+    },
+    "metadata": {
+        "displayName": "Shawn 24-Well Permanent Magnet Adapter",
+        "displayCategory": "adapter",
+        "displayVolumeUnits": "µL",
+        "tags": []
+    },
+    "dimensions": {
+        "xDimension": 127.76,
+        "yDimension": 85.48,
+        "zDimension": 8.25
+    },
+    "wells": {
+        "A1": {
+            "depth": 0,
+            "totalLiquidVolume": 0,
+            "shape": "rectangular",
+            "xDimension": 127.76,
+            "yDimension": 85.48,
+            "x": 63.88,
+            "y": 42.74,
+            "z": 8.25
+        }
+    },
+    "groups": [
+        {
+            "metadata": {},
+            "wells": ["A1"]
+        }
+    ],
+    "parameters": {
+        "format": "irregular",
+        "quirks": [],
+        "isTiprack": false,
+        "isMagneticModuleCompatible": false,
+        "loadName": "shawn_24well_magnet_adapter"
+    },
+    "namespace": "custom_beta",
+    "version": 1,
+    "schemaVersion": 2,
+    "cornerOffsetFromSlot": {"x": 0, "y": 0, "z": 0},
+    "allowedRoles": ["adapter"],
+    "stackingOffsetWithLabware": {
+        "thomsoninstrument_24_wellplate_10400ul": {"x": 0, "y": 0, "z": 0}
+    }
+}
