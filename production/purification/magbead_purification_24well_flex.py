@@ -27,8 +27,8 @@ def run(protocol):
 def setup(protocol):
     # equipment
     global trash, pipette, tips1000, tips1000_1, empty_tiprack, tips1000_24well, tips24_adapter, buff, lysis_plate, mag_24well, bead_plate, liquid_waste
-    trash = protocol.load_trash_bin ('A3')
-    tips1000 = protocol.load_labware('opentrons_flex_96_tiprack_1000ul', 'D1')
+    trash = protocol.load_trash_bin ('D1')
+    tips1000 = protocol.load_labware('opentrons_flex_96_tiprack_1000ul', 'A1')
     tips1000_1 = protocol.load_labware('opentrons_flex_96_tiprack_1000ul', 'D4')
     empty_tiprack = protocol.load_labware('opentrons_flex_96_tiprack_1000ul', 'B1')
     tips1000_24well = protocol.load_labware('opentrons_flex_96_tiprack_1000ul', 'A1')
@@ -93,7 +93,7 @@ def fill_24well(protocol):
 
 def wash(protocol):
     pickup_24(protocol)
-    pipette.transfer(2000, lysis_plate.wells()[0].bottom(3), bead_plate.wells()[0], new_tip='never')
+    # pipette.transfer(2000, lysis_plate.wells()[0].bottom(3), bead_plate.wells()[0], new_tip='never')
     pipette.drop_tip()
     
     # p1000.move_to(deep_well.wells()[sample_well].top(10))
