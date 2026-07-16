@@ -28,7 +28,7 @@ def setup(protocol):
     # equipment
     global trash, pipette, tips1000, tips1000_1, empty_tiprack, tips1000_24well, tips24_adapter, buff, lysis_plate, mag_24well, bead_plate, liquid_waste
     trash = protocol.load_trash_bin ('D1')
-    tips1000 = protocol.load_labware('opentrons_flex_96_tiprack_1000ul', 'A1')
+    tips1000 = protocol.load_labware('opentrons_flex_96_tiprack_1000ul', 'D3')
     tips1000_1 = protocol.load_labware('opentrons_flex_96_tiprack_1000ul', 'D4')
     empty_tiprack = protocol.load_labware('opentrons_flex_96_tiprack_1000ul', 'B1')
     tips1000_24well = protocol.load_labware('opentrons_flex_96_tiprack_1000ul', 'A1')
