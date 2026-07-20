@@ -71,6 +71,6 @@ def lyse(protocol):
     protocol.pause("Make sure to centrifuge cultures and decant.")
     pickup_24(protocol)
     pipette.transfer(2000, lysis_buff.wells()[0], plate24.wells()[0].top(), new_tip='never')
-    pipette.mix(10, 1000, plate24.wells()[0].bottom(5)) # show use liquid detection to find right level
+    pipette.mix(10, 1000, plate24.wells()[0].bottom(5))
     pipette.drop_tip()
     protocol.pause("Shake for ~2 hrs in cold room.")
