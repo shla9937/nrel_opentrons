@@ -168,18 +168,14 @@
         "y": 0,
         "z": 0
     },
-    "stackLimit": 16,
-    "gripperOffsets": {
-        "default": {
-            "pickUpOffset": {"x": 0, "y": 0, "z": 0},
-            "dropOffset": {"x": 0, "y": 0, "z": 0}
-        }
-    },
+    "stackLimit": 3,
+    "gripForce": 15,
+    "gripHeightFromLabwareBottom": 21.9,
     "stackingOffsetWithLabware": {
         "shawn_nest_96_wellplate_2ml_deep_stackable": {
             "x": 0,
             "y": 0,
-            "z": 41
+            "z": 2.75
         }
     }
 }

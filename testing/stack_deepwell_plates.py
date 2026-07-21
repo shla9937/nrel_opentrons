@@ -36,7 +36,7 @@ def run(protocol):
 
 def setup(protocol):
     global trash, plates
-    trash = protocol.load_trash_bin('A3')
+    trash = protocol.load_trash_bin('D1')
     plates = []
     for i in range(NUM_PLATES):
         plate = protocol.load_labware(
