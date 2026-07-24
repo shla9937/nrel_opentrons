@@ -29,20 +29,24 @@ def run(protocol):
 def setup(protocol):
     # equipment
     global trash, pipette, tips1000, tips1000_1, empty_tiprack, tips1000_24well, tips24_adapter, wash_buff, elution_buff, lysis_plate, mag_24well, bead_plate, collection_plate, liquid_waste
-    trash = protocol.load_trash_bin ('D1')
-    tips1000 = protocol.load_labware('opentrons_flex_96_tiprack_1000ul', 'D3')
-    tips1000_1 = protocol.load_labware('opentrons_flex_96_tiprack_1000ul', 'D4')
-    empty_tiprack = protocol.load_labware('opentrons_flex_96_tiprack_1000ul', 'B1')
     tips1000_24well = protocol.load_labware('opentrons_flex_96_tiprack_1000ul', 'A1')
     tips24_adapter = protocol.load_adapter('opentrons_flex_96_tiprack_adapter', 'A2')
-    pipette = protocol.load_instrument('flex_96channel_1000')
-    wash_buff = protocol.load_labware('nest_1_reservoir_195ml', 'C3')
-    elution_buff = protocol.load_labware('nest_1_reservoir_195ml', 'B4')
-    mag_24well = protocol.load_adapter('shawn_24well_magnet_adapter', 'C2')
-    lysis_plate = protocol.load_labware('thomsoninstrument_24_wellplate_10400ul', 'B2')
-    bead_plate = protocol.load_labware('thomsoninstrument_24_wellplate_10400ul', 'C1')
     collection_plate = protocol.load_labware('greiner_96_wellplate_300ul', 'A3')
-    liquid_waste = protocol.load_labware('nest_1_reservoir_195ml', 'B3')
+
+    empty_tiprack = protocol.load_labware('opentrons_flex_96_tiprack_1000ul', 'B1')
+    bead_plate = protocol.load_labware('thomsoninstrument_24_wellplate_10400ul', 'B2')
+    elution_buff = protocol.load_labware('nest_1_reservoir_195ml', 'B3')
+
+    liquid_waste = protocol.load_labware('nest_1_reservoir_195ml', 'C1')
+    mag_24well = protocol.load_adapter('shawn_24well_magnet_adapter', 'C2')
+    wash_buff = protocol.load_labware('nest_1_reservoir_195ml', 'C3')
+
+    trash = protocol.load_trash_bin ('D1')
+    lysis_plate = protocol.load_labware('thomsoninstrument_24_wellplate_10400ul', 'D2')
+    tips1000 = protocol.load_labware('opentrons_flex_96_tiprack_1000ul', 'D3')
+    tips1000_1 = protocol.load_labware('opentrons_flex_96_tiprack_1000ul', 'D4')
+    
+    pipette = protocol.load_instrument('flex_96channel_1000')
 
     global half_filled
     half_filled = False
@@ -104,7 +108,9 @@ def bind(protocol):
     pipette.transfer(1000, bead_plate.wells()[0], liquid_waste.wells()[0], new_tip='never') # likely suspended in buff
     pipette.transfer(2000, lysis_plate.wells()[0].bottom(3), bead_plate.wells()[0], new_tip='never')
     pipette.drop_tip()
-    protocol.pause("Bind beads by shaking in cold room for 10 min.")
+    protocol.move_labware(labware=lysis_plate,new_location='A4',use_gripper=True)
+    protocol.move_labware(labware=bead_plate,new_location='D2',use_gripper=True)
+    protocol.pause("Bind beads by shaking in cold room for 10 min. Replace to D2.")
 
 def wash(protocol):
     protocol.move_labware(labware=bead_plate,new_location=mag_24well,use_gripper=True)
@@ -116,47 +122,22 @@ def wash(protocol):
     for rep in range(3):
         pickup_24(protocol)
         pipette.transfer(1000, wash_buff.wells()[0], bead_plate.wells()[0], new_tip='never', mix_after=(5, 500))
+        protocol.delay(minutes=0.5)
         pipette.transfer(1000, bead_plate.wells()[0], liquid_waste.wells()[0], new_tip='never')
         pipette.drop_tip()
 
 def elute(protocol):
-    protocol.move_labware(labware=bead_plate,new_location='C1',use_gripper=True)
-    # elution_buff was staged at B4 (unreachable by pipette); free B2 by parking the now-unused lysis_plate on staging, then bring elution_buff onto the deck
-    protocol.move_labware(labware=lysis_plate, new_location='A4', use_gripper=True)
-    protocol.move_labware(labware=elution_buff, new_location='B2', use_gripper=True)
+    protocol.move_labware(labware=bead_plate,new_location='D2',use_gripper=True)
     pickup_24(protocol)
     pipette.transfer(200, elution_buff.wells()[0], bead_plate.wells()[0], new_tip='never', mix_after=(5, 100))
     pipette.drop_tip()
-    protocol.pause("Elute proteins by shaking in cold room for 10 min.")
+    protocol.pause("Elute proteins by shaking in cold room for 10 min. Replace to D2.")
 
 def collect(protocol):
     protocol.move_labware(labware=bead_plate,new_location=mag_24well,use_gripper=True)
-    protocol.delay(minutes=1)
-    # empty_tiprack at B1 collides with the 96-channel head body during single-tip access to C2; park it on staging
-    protocol.move_labware(labware=empty_tiprack, new_location='B4', use_gripper=True)
-    # H12 single-nozzle cannot reach A3 (out of bounds); move collection_plate next to bead_plate at C1
-    protocol.move_labware(labware=collection_plate, new_location='C1', use_gripper=True)
+    protocol.move_labware(labware=empty_tiprack,new_location='A1',use_gripper=True)
+    protocol.move_labware(labware=collection_plate,new_location='D2',use_gripper=True)
+    protocol.delay(minutes=0.5)
     pipette.configure_nozzle_layout(style=protocol_api.SINGLE,start="H12",tip_racks=[tips1000, tips1000_1])
-
     for well in range(24):
         pipette.transfer(200, bead_plate.wells()[well], collection_plate.wells()[well], new_tip='always')
-
-
-    # p1000.move_to(deep_well.wells()[sample_well].top(10))
-    # mag_mod.engage(height_from_base=mag_height)
-    # protocol.delay(seconds=mag_time)
-
-    # for sample_well in range(0,24): 
-    #     find_offset(sample_well)
-    #     p1000.transfer(1500, pickup_pos, well24.wells()[sample_well].bottom(3))
-
-    # # wash beads
-    # p1000.pick_up_tip()
-    # for sample_well in range(0,24):
-    #     find_offset(sample_well)
-    #     for i in range(0,3):
-    #         p1000.transfer(1500, buff, deep_well.wells()[sample_well].top(), new_tip="never")
-    #         p1000.transfer(1550, pickup_pos, waste.top(), new_tip="never")
-    #         clean_tips(p1000, 1000, protocol)
-    # p1000.drop_tip()
-    # mag_mod.disengage()
