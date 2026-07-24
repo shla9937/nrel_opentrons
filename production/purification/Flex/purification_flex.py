@@ -23,7 +23,6 @@ def run(protocol):
     wash(protocol)
     elute(protocol)
     collect(protocol)
-    # cleanup(protocol)
     protocol.set_rail_lights(False)
 
 def setup(protocol):
@@ -71,6 +70,13 @@ def define_liquids(protocol):
         display_color="#38B55D")
     for well in elution_buff.wells():
         well.load_liquid(liquid=elution_liquid, volume=2000)
+
+    bead_liquid = protocol.define_liquid(
+        name="Bead suspension",
+        description="StrepXT mag bead suspension",
+        display_color="#B57EDC")
+    for well in bead_plate.wells():
+        well.load_liquid(liquid=bead_liquid, volume=1000)
 
 def pickup_24(protocol):
     global half_filled
