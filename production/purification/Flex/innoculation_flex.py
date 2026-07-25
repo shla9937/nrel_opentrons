@@ -109,8 +109,8 @@ def add_dna(plate, twist_start_well, twist_end_well, protocol):
     pipette.configure_nozzle_layout(style=protocol_api.SINGLE, start="A12", tip_racks=[tips200])
     for well in range(twist_start_well, twist_end_well):
         pipette.pick_up_tip()
-        pipette.transfer(50, tubes.wells()[plate], twist_plate.wells()[well], new_tip="never")
-        pipette.transfer(5, twist_plate.wells()[well], expression_plates[plate].wells()[0:twist_end_well - twist_start_well], new_tip='never', mix_before=(5, 25), mix_after=(3, 25))
+        pipette.transfer(50, tubes.wells()[plate], twist_plate.wells()[well], new_tip="never", mix_after=(3, 25))
+        pipette.transfer(5, twist_plate.wells()[well], expression_plates[plate].wells()[well%24], new_tip='never', mix_after=(3, 25))
         pipette.drop_tip()
 
 def add_media(plate, protocol):
