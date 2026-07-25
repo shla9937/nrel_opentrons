@@ -9,7 +9,7 @@ import subprocess
 
 
 metadata = {
-    'protocolName': 'Lyse 24 well plate',
+    'protocolName': 'Lyssis - 24well',
     'author': 'Shawn Laursen',
     'description': '''Perform the lysis step of 24 well purification.'''}
 

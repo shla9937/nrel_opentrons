@@ -9,7 +9,7 @@ import subprocess
 
 
 metadata = {
-    'protocolName': 'Magnetic purification - 24well',
+    'protocolName': 'Clean beads - 24well',
     'author': 'Shawn Laursen',
     'description': '''Purify protein from 24 well plate using StrepXT mag beads'''}
 

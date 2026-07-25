@@ -9,73 +9,87 @@ import subprocess
 
 
 metadata = {
-    'protocolName': 'Magnetic purification - 24well',
+    'protocolName': 'Innoculation - 24well',
     'author': 'Shawn Laursen',
     'description': '''Purify protein from 24 well plate using StrepXT mag beads'''}
 
 requirements = {'robotType': 'Flex','apiLevel': '2.28'}
 
+def add_parameters(parameters: protocol_api.Parameters):
+    parameters.add_int(
+        variable_name="constructs",
+        display_name="Number of constructs",
+        description="Number of constructs to test",
+        default=96,
+        minimum=1,
+        maximum=96,
+        unit="constructs")
+
 def run(protocol):
     protocol.set_rail_lights(True)
     setup(protocol)
+    rack_24well(protocol)
     define_liquids(protocol)
-    wash(protocol)
-    # elute(protocol)
-    # cleanup(protocol)
+    for plate in range(num_plates):
+        twist_start_well = plate * 24
+        twist_end_well = min(twist_start_well + 24, protocol.params.constructs)
+        add_cells(plate, twist_start_well, twist_end_well, protocol)
+        add_dna(plate, twist_start_well, twist_end_well, protocol)
+        add_media(plate, protocol)
     protocol.set_rail_lights(False)
 
 def setup(protocol):
     # equipment
-    global trash, pipette, tips1000, tips1000_1, empty_tiprack, tips1000_24well, tips24_adapter, buff, lysis_plate, mag_24well, bead_plate, liquid_waste
-    trash = protocol.load_trash_bin ('D1')
-    tips1000 = protocol.load_labware('opentrons_flex_96_tiprack_1000ul', 'D3')
-    tips1000_1 = protocol.load_labware('opentrons_flex_96_tiprack_1000ul', 'D4')
-    empty_tiprack = protocol.load_labware('opentrons_flex_96_tiprack_1000ul', 'B1')
+    global trash, pipette, tips1000, tips200, empty_tiprack, tips1000_24well, tips24_adapter, expression_plates, twist_plate, tubes, media, num_plates
+    # A row
     tips1000_24well = protocol.load_labware('opentrons_flex_96_tiprack_1000ul', 'A1')
     tips24_adapter = protocol.load_adapter('opentrons_flex_96_tiprack_adapter', 'A2')
+
+    # B row
+    empty_tiprack = protocol.load_labware('opentrons_flex_96_tiprack_1000ul', 'B1')
+    media = protocol.load_labware('nest_1_reservoir_195ml', 'B2')
+    tips200 = protocol.load_labware('opentrons_flex_96_tiprack_200ul', 'B3')
+
+    # C row
+    twist_plate = protocol.load_labware('greiner_96_wellplate_300ul', 'C1')
+    tubes = protocol.load_labware('opentrons_24_tuberack_nest_1.5ml_screwcap', 'C3')
+
+    # D row
+    trash = protocol.load_trash_bin ('D1') 
+    tips1000 = protocol.load_labware('opentrons_flex_96_tiprack_1000ul', 'D3')
+   
     pipette = protocol.load_instrument('flex_96channel_1000')
-    buff = protocol.load_labware('nest_1_reservoir_195ml', 'C3')
-    mag_24well = protocol.load_adapter('shawn_24well_magnet_adapter', 'C2')
-    lysis_plate = protocol.load_labware('thomsoninstrument_24_wellplate_10400ul', 'B2')
-    bead_plate = protocol.load_labware('thomsoninstrument_24_wellplate_10400ul', 'C1')
-    liquid_waste = protocol.load_labware('nest_1_reservoir_195ml', 'B3')
+
+    num_plates = math.ceil(protocol.params.constructs / 24)
+    expression_plates = [protocol.load_labware('thomsoninstrument_24_wellplate_10400ul', ['A4', 'B4', 'C4', 'D4'][i])
+        for i in range(num_plates)]
 
 def define_liquids(protocol):
-    buffer_liquid = protocol.define_liquid(
-        name="Buff",
-        description="Buffer mixture",
-        display_color="#50C878")
-    buff['A1'].load_liquid(liquid=buffer_liquid,volume=195000)
+    water = protocol.define_liquid(
+        name="DEPC water",
+        description="water",
+        display_color="#4054B9")
+    for well in tubes.wells()[0:num_plates]:
+        well.load_liquid(liquid=water,volume=2000)
 
-    lysate_liquid = protocol.define_liquid(
-        name="Lysate",
-        description="Lysed cells",
-        display_color="#FFB347")
-    for well in lysis_plate.wells():
-        well.load_liquid(liquid=lysate_liquid, volume=2000)
+    cells = protocol.define_liquid(
+        name="Isothermal comp cells",
+        description="comp cells",
+        display_color="#D59227")
+    for well in tubes.wells()[4:num_plates+4]:
+        well.load_liquid(liquid=cells,volume=2000)
 
-def pickup_24(protocol):
-    global half_filled
-    half_filled = False
-    try:
-        protocol.move_labware(tips1000_24well, "A1", use_gripper=True)
-    except:
-        None
+    auto_tb = protocol.define_liquid(
+        name="Auto TB",
+        description="Auto TB + metals + glycerol + AMP",
+        display_color="#DFEB36")
+    media.wells()[0].load_liquid(liquid=auto_tb, volume=195000)
 
-    if half_filled is False:
-        pipette.configure_nozzle_layout(style=protocol_api.ROW,start="H1",tip_racks=[tips1000, tips1000_1])
-        for row in range(4):
-            try:
-                pipette.pick_up_tip()
-            except:
-                # active rack ran out; swap the staging-area rack into D1
-                protocol.move_labware(tips1000, "C4", use_gripper=True)
-                protocol.move_labware(tips1000_1, "D1", use_gripper=True)
-                pipette.pick_up_tip()
-            pipette.drop_tip(empty_tiprack.rows()[row*2][0])
-        half_filled = True
-    else:    
-        half_filled = False
+def rack_24well(protocol):
+    pipette.configure_nozzle_layout(style=protocol_api.ROW,start="H1",tip_racks=[tips1000])
+    for row in range(4):
+        pipette.pick_up_tip()
+        pipette.drop_tip(empty_tiprack.rows()[row*2][0])
 
     pipette.configure_nozzle_layout(style=protocol_api.COLUMN,start="A12")
     for col in range(6):
@@ -83,34 +97,30 @@ def pickup_24(protocol):
         pipette.drop_tip(tips1000_24well.rows()[0][col*2])
 
     protocol.move_labware(tips1000_24well, tips24_adapter, use_gripper=True)
+    protocol.move_labware(labware=tips1000,new_location='A1',use_gripper=True)
+
+def add_cells(plate, twist_start_well, twist_end_well, protocol):
+    pipette.configure_nozzle_layout(style=protocol_api.SINGLE, start="A1", tip_racks=[empty_tiprack])
+    cells_lc = protocol.get_liquid_class("glycerol_50")
+    protocol.move_labware(labware=expression_plates[plate],new_location='C2',use_gripper=True)
+    pipette.distribute_with_liquid_class(cells_lc, 50, tubes.wells()[plate+4], expression_plates[plate].wells()[0:twist_end_well - twist_start_well], new_tip="once")
+
+def add_dna(plate, twist_start_well, twist_end_well, protocol):
+    pipette.configure_nozzle_layout(style=protocol_api.SINGLE, start="A12", tip_racks=[tips200])
+    for well in range(twist_start_well, twist_end_well):
+        pipette.pick_up_tip()
+        pipette.transfer(50, tubes.wells()[plate], twist_plate.wells()[well], new_tip="never")
+        pipette.transfer(5, twist_plate.wells()[well], expression_plates[plate].wells()[0:twist_end_well - twist_start_well], new_tip='never', mix_before=(5, 25), mix_after=(3, 25))
+        pipette.drop_tip()
+
+def add_media(plate, protocol):
     pipette.configure_nozzle_layout(style=protocol_api.ALL)
     pipette.pick_up_tip(tips1000_24well.rows()[0][0])
-    
-def fill_24well(protocol):
-    pickup_24(protocol)
-    pipette.transfer(50, buff.wells()[0], plate.wells()[0], new_tip='never')
-    pipette.drop_tip()
 
-def wash(protocol):
-    pickup_24(protocol)
-    # pipette.transfer(2000, lysis_plate.wells()[0].bottom(3), bead_plate.wells()[0], new_tip='never')
-    pipette.drop_tip()
-    
-    # p1000.move_to(deep_well.wells()[sample_well].top(10))
-    # mag_mod.engage(height_from_base=mag_height)
-    # protocol.delay(seconds=mag_time)
+    pipette.transfer(5000, media.wells()[0], expression_plates[plate].wells()[0].top(), new_tip='never')
+    if plate == (num_plates-1):
+        pipette.drop_tip()
+    else:
+        pipette.return_tip()
 
-    # for sample_well in range(0,24): 
-    #     find_offset(sample_well)
-    #     p1000.transfer(1500, pickup_pos, well24.wells()[sample_well].bottom(3))
-
-    # # wash beads
-    # p1000.pick_up_tip()
-    # for sample_well in range(0,24):
-    #     find_offset(sample_well)
-    #     for i in range(0,3):
-    #         p1000.transfer(1500, buff, deep_well.wells()[sample_well].top(), new_tip="never")
-    #         p1000.transfer(1550, pickup_pos, waste.top(), new_tip="never")
-    #         clean_tips(p1000, 1000, protocol)
-    # p1000.drop_tip()
-    # mag_mod.disengage()
+    protocol.move_labware(labware=expression_plates[plate],new_location=['A4', 'B4', 'C4', 'D4'][plate],use_gripper=True)
