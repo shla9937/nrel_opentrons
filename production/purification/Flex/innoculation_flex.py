@@ -47,7 +47,7 @@ def setup(protocol):
 
     # B row
     empty_tiprack = protocol.load_labware('opentrons_flex_96_tiprack_1000ul', 'B1')
-    media = protocol.load_labware('nest_1_reservoir_195ml', 'B2')
+    media = protocol.load_labware('omega_1_reservoir_600ml', 'B2')
     tips200 = protocol.load_labware('opentrons_flex_96_tiprack_200ul', 'B3')
 
     # C row
@@ -83,7 +83,7 @@ def define_liquids(protocol):
         name="Auto TB",
         description="Auto TB + metals + glycerol + AMP",
         display_color="#DFEB36")
-    media.wells()[0].load_liquid(liquid=auto_tb, volume=195000)
+    media.wells()[0].load_liquid(liquid=auto_tb, volume=600000)
 
 def rack_24well(protocol):
     pipette.configure_nozzle_layout(style=protocol_api.ROW,start="H1",tip_racks=[tips1000])
