@@ -52,7 +52,7 @@ def setup(protocol):
 
     # C row
     twist_plate = protocol.load_labware('greiner_96_wellplate_300ul', 'C1')
-    tubes = protocol.load_labware('opentrons_24_tuberack_nest_1.5ml_screwcap', 'C3')
+    tubes = protocol.load_labware('opentrons_24_tuberack_eppendorf_2ml_safelock_snapcap', 'C3')
 
     # D row
     trash = protocol.load_trash_bin ('D1') 
@@ -103,7 +103,9 @@ def add_cells(plate, twist_start_well, twist_end_well, protocol):
     pipette.configure_nozzle_layout(style=protocol_api.SINGLE, start="A1", tip_racks=[empty_tiprack])
     cells_lc = protocol.get_liquid_class("glycerol_50")
     protocol.move_labware(labware=expression_plates[plate],new_location='C2',use_gripper=True)
-    pipette.distribute_with_liquid_class(cells_lc, 50, tubes.wells()[plate+4], expression_plates[plate].wells()[0:twist_end_well - twist_start_well], new_tip="once")
+    pipette.pick_up_tip(empty_tiprack.rows()[6][11-plate])
+    pipette.distribute_with_liquid_class(cells_lc, 50, tubes.wells()[plate+4], expression_plates[plate].wells()[0:twist_end_well - twist_start_well], new_tip="never")
+    pipette.drop_tip()
 
 def add_dna(plate, twist_start_well, twist_end_well, protocol):
     pipette.configure_nozzle_layout(style=protocol_api.SINGLE, start="A12", tip_racks=[tips200])
