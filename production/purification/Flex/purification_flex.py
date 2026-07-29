@@ -44,11 +44,11 @@ def setup(protocol):
 
     empty_tiprack = protocol.load_labware('opentrons_flex_96_tiprack_1000ul', 'B1')
     wash_buff = protocol.load_labware('thomsoninstrument_24_wellplate_10400ul', 'B2')
-    elution_buff = protocol.load_labware('nest_1_reservoir_195ml', 'B3')
+    elution_buff = protocol.load_labware('nest_1_reservoir_290ml', 'B3')
     
 
     temp_mod = protocol.load_module('temperature module gen2', 'C1')
-    liquid_waste = protocol.load_labware('nest_1_reservoir_195ml', 'C3')
+    liquid_waste = protocol.load_labware('nest_1_reservoir_290ml', 'C3')
     mag_24well = protocol.load_adapter('shawn_24well_magnet_adapter', 'C2')
     collection_plate = protocol.load_labware('greiner_96_wellplate_300ul', 'C4')
     
@@ -136,7 +136,7 @@ def wash(protocol):
     protocol.move_labware(labware=bead_plate,new_location=mag_24well,use_gripper=True)
     protocol.delay(minutes=1)
     pipette.pick_up_tip(tips1000_24well.rows()[0][0])
-    pipette.transfer(2000, bead_plate.wells()[0].top(), liquid_waste.wells()[0].top(), new_tip='never')
+    pipette.transfer(2000, bead_plate.wells()[0], liquid_waste.wells()[0].top(), new_tip='never')
     pipette.drop_tip()
 
     pickup_24(protocol)
