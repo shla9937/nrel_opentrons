@@ -110,7 +110,10 @@ def pickup_24(protocol):
     pipette.pick_up_tip(tips1000_24well.rows()[0][0])
 
 def bind(protocol):
+    protocol.move_labware(labware=bead_plate,new_location=mag_24well,use_gripper=True)
     pickup_24(protocol)
+    pipette.mix(3, 250, bead_plate.wells()[0])
+    protocol.delay(minutes=0.33)
     pipette.transfer(1000, bead_plate.wells()[0], liquid_waste.wells()[0], new_tip='never') # likely suspended in buff
     pipette.transfer(2000, lysis_plate.wells()[0].bottom(3), bead_plate.wells()[0], new_tip='never')
     pipette.drop_tip()
