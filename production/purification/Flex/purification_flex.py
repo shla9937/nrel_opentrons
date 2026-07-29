@@ -136,7 +136,7 @@ def wash(protocol):
     protocol.move_labware(labware=bead_plate,new_location=mag_24well,use_gripper=True)
     protocol.delay(minutes=1)
     pipette.pick_up_tip(tips1000_24well.rows()[0][0])
-    pipette.transfer(2000, bead_plate.wells()[0].top(), liquid_waste.wells()[0], new_tip='never')
+    pipette.transfer(2000, bead_plate.wells()[0].top(), liquid_waste.wells()[0].top(), new_tip='never')
     pipette.drop_tip()
 
     pickup_24(protocol)
