@@ -93,15 +93,15 @@ def add_naoh(protocol):
     protocol.move_labware(labware=bead_plate,new_location=mag_24well,use_gripper=True)
     protocol.delay(minutes=2)    
     pipette.pick_up_tip(tips1000_24well.rows()[0][0])
-    pipette.transfer(1000, bead_plate.wells()[0].bottom(1).move(Point(x=2.25)), liquid_waste.wells()[0].top(), new_tip='never')
+    pipette.transfer(2000, bead_plate.wells()[0].bottom(1).move(Point(x=2.25)), liquid_waste.wells()[0].top(), new_tip='never')
     pipette.drop_tip()
 
 def wash_beads(protocol):
     pickup_24(protocol)
     for rep in range(3):
-        pipette.transfer(1000, wash_buff.wells()[0], bead_plate.wells()[0].bottom(1).move(Point(x=2.25)), new_tip='never', mix_after=(5, 500))
+        pipette.transfer(2000, wash_buff.wells()[0], bead_plate.wells()[0].bottom(1).move(Point(x=2.25)), new_tip='never', mix_after=(5, 500))
         if rep < 2:
             protocol.delay(minutes=0.5)
-            pipette.transfer(1000, bead_plate.wells()[0].bottom(1).move(Point(x=2.25)), liquid_waste.wells()[0].top(), new_tip='never')
+            pipette.transfer(2000, bead_plate.wells()[0].bottom(1).move(Point(x=2.25)), liquid_waste.wells()[0].top(), new_tip='never')
     pipette.drop_tip()
     protocol.move_labware(labware=bead_plate,new_location='D2',use_gripper=True)

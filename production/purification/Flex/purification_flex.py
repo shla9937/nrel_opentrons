@@ -153,7 +153,7 @@ def elute(protocol):
     protocol.move_labware(labware=bead_plate,new_location='D2',use_gripper=True)
     pickup_24(protocol)
     pipette.transfer(200, elution_buff.wells()[0].bottom(1).move(Point(x=2.25)), bead_plate.wells()[0].bottom(1).move(Point(x=2.25)), new_tip='never')
-    for bind in range(10):
+    for elution in range(10):
         pipette.mix(3,100, bead_plate.wells()[0].bottom(1).move(Point(x=2.25)))
         protocol.delay(minutes=0.75)
     pipette.drop_tip()
