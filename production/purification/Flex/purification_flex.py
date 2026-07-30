@@ -46,7 +46,7 @@ def setup(protocol):
 
     empty_tiprack = protocol.load_labware('opentrons_flex_96_tiprack_1000ul', 'B1')
     wash_buff = protocol.load_labware('thomsoninstrument_24_wellplate_10400ul', 'B2')
-    elution_buff = protocol.load_labware('nest_1_reservoir_290ml', 'B3')
+    elution_buff = protocol.load_labware('thomsoninstrument_24_wellplate_10400ul', 'B3')
     
 
     temp_mod = protocol.load_module('temperature module gen2', 'C1')
@@ -152,7 +152,7 @@ def wash(protocol):
 def elute(protocol):
     protocol.move_labware(labware=bead_plate,new_location='D2',use_gripper=True)
     pickup_24(protocol)
-    pipette.transfer(200, elution_buff.wells()[0], bead_plate.wells()[0].bottom(1).move(Point(x=2.25)), new_tip='never')
+    pipette.transfer(200, elution_buff.wells()[0].bottom(1).move(Point(x=2.25)), bead_plate.wells()[0].bottom(1).move(Point(x=2.25)), new_tip='never')
     for bind in range(10):
         pipette.mix(3,100, bead_plate.wells()[0].bottom(1).move(Point(x=2.25)))
         protocol.delay(minutes=0.75)
