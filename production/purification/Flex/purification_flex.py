@@ -127,7 +127,7 @@ def bind(protocol):
     pipette.transfer(2000, lysis_plate.wells()[0].bottom(3), bead_plate.wells()[0].bottom(1).move(Point(x=2.25)), new_tip='never')
     pipette.drop_tip(tips1000_24well.rows()[0][0])
     protocol.move_labware(labware=lysis_plate,new_location='A4',use_gripper=True)
-    protocol.move_labware(labware=bead_plate,new_location=temp_mod,use_gripper=True,drop_offset={'x':2,'y':0,'z':0})
+    protocol.move_labware(labware=bead_plate,new_location=temp_mod,use_gripper=True,drop_offset={'x':1,'y':0,'z':0})
     pipette.pick_up_tip(tips1000_24well.rows()[0][0])
     pipette.touch_tip(bead_plate.wells()[0])
     for bind in range(10):
@@ -160,11 +160,12 @@ def elute(protocol):
 
 def collect(protocol):
     protocol.move_labware(labware=bead_plate,new_location=mag_24well,use_gripper=True)
-    protocol.move_labware(labware=collection_plate,new_location=temp_mod,use_gripper=True)
+    protocol.move_labware(labware=collection_plate,new_location=temp_mod,use_gripper=True,drop_offset={'x':1,'y':0,'z':0})
     protocol.move_labware(labware=tips1000,new_location='D4',use_gripper=True)
     protocol.delay(minutes=0.5)
     pipette.configure_nozzle_layout(style=protocol_api.SINGLE,start="A1")
     for well in range(protocol.params.samples):
         pipette.pick_up_tip(empty_tiprack.rows()[6 - 2 * (well // 6)][11 - (well % 6)])
-        pipette.transfer(200, bead_plate.wells()[well], collection_plate.wells()[well], new_tip='never')
+        pipette.transfer(200, bead_plate.wells()[well].bottom(0.5), collection_plate.wells()[well], new_tip='never')
         pipette.drop_tip()
+
