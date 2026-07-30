@@ -32,9 +32,9 @@ def setup(protocol):
     empty_tiprack = protocol.load_labware('opentrons_flex_96_tiprack_1000ul', 'B1')
     naoh = protocol.load_labware('nest_1_reservoir_195ml', 'B2')
 
-    liquid_waste = protocol.load_labware('nest_1_reservoir_195ml', 'C1')
+    liquid_waste = protocol.load_labware('nest_1_reservoir_290ml', 'C1')
     mag_24well = protocol.load_adapter('shawn_24well_magnet_adapter', 'C2')
-    wash_buff = protocol.load_labware('nest_1_reservoir_195ml', 'C3')
+    wash_buff = protocol.load_labware('nest_1_reservoir_290ml', 'C3')
 
     trash = protocol.load_trash_bin ('D1')
     bead_plate = protocol.load_labware('thomsoninstrument_24_wellplate_10400ul', 'D2')    
@@ -72,12 +72,14 @@ def pickup_24(protocol):
             pipette.pick_up_tip()
             pipette.drop_tip(empty_tiprack.rows()[row*2][0])
         half_filled = True
+        half = 0
     else:    
         half_filled = False
+        half = 6
 
     pipette.configure_nozzle_layout(style=protocol_api.COLUMN,start="A12")
     for col in range(6):
-        pipette.pick_up_tip(empty_tiprack.rows()[0][col])
+        pipette.pick_up_tip(empty_tiprack.rows()[0][col+half])
         pipette.drop_tip(tips1000_24well.rows()[0][col*2])
 
     protocol.move_labware(tips1000_24well, tips24_adapter, use_gripper=True)
@@ -87,17 +89,17 @@ def pickup_24(protocol):
 def add_naoh(protocol):
     protocol.move_labware(labware=bead_plate,new_location=mag_24well,use_gripper=True)
     pickup_24(protocol)
-    pipette.transfer(1000, naoh.wells()[0], bead_plate.wells()[0], mix_after=(3,500), new_tip='never')
+    pipette.transfer(1000, naoh.wells()[0], bead_plate.wells()[0].bottom(1).move(Point(x=2.25)), mix_after=(3,500), new_tip='never')
     protocol.delay(minutes=2)    
-    pipette.transfer(1000, bead_plate.wells()[0], liquid_waste.wells()[0], new_tip='never')
+    pipette.transfer(1000, bead_plate.wells()[0].bottom(1).move(Point(x=2.25)), liquid_waste.wells()[0].top(), new_tip='never')
     pipette.drop_tip()
 
 def wash_beads(protocol):
+    pickup_24(protocol)
     for rep in range(3):
-        pickup_24(protocol)
-        pipette.transfer(1000, wash_buff.wells()[0], bead_plate.wells()[0], new_tip='never', mix_after=(5, 500))
+        pipette.transfer(1000, wash_buff.wells()[0], bead_plate.wells()[0].bottom(1).move(Point(x=2.25)), new_tip='never', mix_after=(5, 500))
         if rep < 2:
             protocol.delay(minutes=0.5)
-            pipette.transfer(1000, bead_plate.wells()[0], liquid_waste.wells()[0], new_tip='never')
-        pipette.drop_tip()
+            pipette.transfer(1000, bead_plate.wells()[0].bottom(1).move(Point(x=2.25)), liquid_waste.wells()[0].top(), new_tip='never')
+    pipette.drop_tip()
     protocol.move_labware(labware=bead_plate,new_location='D2',use_gripper=True)

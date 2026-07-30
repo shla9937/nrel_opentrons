@@ -28,11 +28,13 @@ def add_parameters(parameters: protocol_api.Parameters):
 def run(protocol):
     protocol.set_rail_lights(True)
     setup(protocol)
+    temp_mod.start_set_temperature(4)
     define_liquids(protocol)
     bind(protocol)
     wash(protocol)
     elute(protocol)
     collect(protocol)
+    temp_mod.deactivate()
     protocol.set_rail_lights(False)
 
 def setup(protocol):
@@ -81,7 +83,7 @@ def define_liquids(protocol):
         description="Buff for elution (biotin)",
         display_color="#38B55D")
     for well in elution_buff.wells():
-        well.load_liquid(liquid=elution_liquid, volume=2000)
+        well.load_liquid(liquid=elution_liquid, volume=200000)
 
     bead_liquid = protocol.define_liquid(
         name="Bead suspension",
