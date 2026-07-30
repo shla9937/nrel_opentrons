@@ -42,6 +42,8 @@ def setup(protocol):
     
     pipette = protocol.load_instrument('flex_96channel_1000')
 
+    temp_mod = protocol.load_module('temperature module gen2', 'C1')
+    
     global half_filled
     half_filled = False
 
