@@ -123,7 +123,7 @@ def bind(protocol):
     pipette.mix(3, 250, bead_plate.wells()[0].bottom(1).move(Point(x=2.25)))
     protocol.delay(minutes=0.33)
     pipette.transfer(1000, bead_plate.wells()[0].bottom(1).move(Point(x=2.25)), liquid_waste.wells()[0].top(), new_tip='never')
-    pipette.transfer(2000, lysis_plate.wells()[0].bottom(3), bead_plate.wells()[0].bottom(1).move(Point(x=2.25)), new_tip='never')
+    pipette.transfer(2000, lysis_plate.wells()[0].bottom(1), bead_plate.wells()[0].bottom(1).move(Point(x=2.25)), new_tip='never')
     pipette.drop_tip(tips1000_24well.rows()[0][0])
     protocol.move_labware(labware=lysis_plate,new_location='A4',use_gripper=True)
     protocol.move_labware(labware=bead_plate,new_location=temp_mod,use_gripper=True,drop_offset={'x':1,'y':0,'z':0})
