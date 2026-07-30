@@ -87,10 +87,12 @@ def pickup_24(protocol):
     pipette.pick_up_tip(tips1000_24well.rows()[0][0])
 
 def add_naoh(protocol):
-    protocol.move_labware(labware=bead_plate,new_location=mag_24well,use_gripper=True)
     pickup_24(protocol)
-    pipette.transfer(1000, naoh.wells()[0], bead_plate.wells()[0].bottom(1).move(Point(x=2.25)), mix_after=(3,500), new_tip='never')
+    pipette.transfer(1000, naoh.wells()[0], bead_plate.wells()[0].bottom(1).move(Point(x=2.25)), mix_after=(5,500), new_tip='never')
+    pipette.drop_tip(tips1000_24well.rows()[0][0])
+    protocol.move_labware(labware=bead_plate,new_location=mag_24well,use_gripper=True)
     protocol.delay(minutes=2)    
+    pipette.pick_up_tip(tips1000_24well.rows()[0][0])
     pipette.transfer(1000, bead_plate.wells()[0].bottom(1).move(Point(x=2.25)), liquid_waste.wells()[0].top(), new_tip='never')
     pipette.drop_tip()
 
