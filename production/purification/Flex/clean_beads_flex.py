@@ -25,14 +25,15 @@ def run(protocol):
 
 def setup(protocol):
     # equipment
-    global trash, pipette, tips1000, empty_tiprack, tips1000_24well, tips24_adapter, wash_buff, naoh, mag_24well, bead_plate, liquid_waste
+    global trash, pipette, tips1000, empty_tiprack, tips1000_24well, tips24_adapter, wash_buff, naoh, mag_24well, bead_plate, liquid_waste, temp_mod
     tips1000_24well = protocol.load_labware('opentrons_flex_96_tiprack_1000ul', 'A1')
     tips24_adapter = protocol.load_adapter('opentrons_flex_96_tiprack_adapter', 'A2')
 
     empty_tiprack = protocol.load_labware('opentrons_flex_96_tiprack_1000ul', 'B1')
     naoh = protocol.load_labware('nest_1_reservoir_195ml', 'B2')
 
-    liquid_waste = protocol.load_labware('nest_1_reservoir_290ml', 'C1')
+    temp_mod = protocol.load_module('temperature module gen2', 'C1')
+    liquid_waste = temp_mod.load_labware('nest_1_reservoir_290ml')
     mag_24well = protocol.load_adapter('shawn_24well_magnet_adapter', 'C2')
     wash_buff = protocol.load_labware('nest_1_reservoir_290ml', 'C3')
 
@@ -42,8 +43,6 @@ def setup(protocol):
     
     pipette = protocol.load_instrument('flex_96channel_1000')
 
-    temp_mod = protocol.load_module('temperature module gen2', 'C1')
-    
     global half_filled
     half_filled = False
 
