@@ -50,14 +50,14 @@ def define_liquids(protocol):
         name="wash_buff",
         description="Wash buff",
         display_color="#405DBC")
-    wash_buff['A1'].load_liquid(liquid=wash_liquid,volume=195000)
+    wash_buff['A1'].load_liquid(liquid=wash_liquid,volume=290000)
 
     naoh_liquid = protocol.define_liquid(
         name="100mM NaOH",
         description="NaOH for regeneration",
         display_color="#F62A18")
     for well in naoh.wells():
-        well.load_liquid(liquid=naoh_liquid, volume=195000)
+        well.load_liquid(liquid=naoh_liquid, volume=290000)
 
 def pickup_24(protocol):
     global half_filled
@@ -88,7 +88,7 @@ def pickup_24(protocol):
 
 def add_naoh(protocol):
     pickup_24(protocol)
-    pipette.transfer(1000, naoh.wells()[0], bead_plate.wells()[0].bottom(1).move(Point(x=2.25)), mix_after=(5,500), new_tip='never')
+    pipette.transfer(2000, naoh.wells()[0], bead_plate.wells()[0].bottom(1).move(Point(x=2.25)), mix_after=(5,500), new_tip='never')
     pipette.drop_tip(tips1000_24well.rows()[0][0])
     protocol.move_labware(labware=bead_plate,new_location=mag_24well,use_gripper=True)
     protocol.delay(minutes=2)    
@@ -98,10 +98,10 @@ def add_naoh(protocol):
 
 def wash_beads(protocol):
     pickup_24(protocol)
-    for rep in range(3):
+    for rep in range(2):
         pipette.transfer(2000, wash_buff.wells()[0], bead_plate.wells()[0].bottom(1).move(Point(x=2.25)), new_tip='never', mix_after=(5, 500))
-        if rep < 2:
-            protocol.delay(minutes=0.5)
-            pipette.transfer(2000, bead_plate.wells()[0].bottom(1).move(Point(x=2.25)), liquid_waste.wells()[0].top(), new_tip='never')
+        protocol.delay(minutes=0.5)
+        pipette.transfer(2000, bead_plate.wells()[0].bottom(1).move(Point(x=2.25)), liquid_waste.wells()[0].top(), new_tip='never')
+    pipette.transfer(1000, wash_buff.wells()[0], bead_plate.wells()[0].bottom(1).move(Point(x=2.25)), new_tip='never', mix_after=(5, 500))
     pipette.drop_tip()
     protocol.move_labware(labware=bead_plate,new_location='D2',use_gripper=True)
