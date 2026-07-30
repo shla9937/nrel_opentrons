@@ -58,9 +58,9 @@ def pickup_24(protocol):
 def lyse(protocol):
     protocol.pause("Make sure to centrifuge cultures and decant.")
     pickup_24(protocol)
-    pipette.transfer(2000, lysis_buff.wells()[0], plate24.wells()[0].top(), new_tip='never')
+    pipette.transfer(2000, lysis_buff.wells()[0], plate24.wells()[0].top().move(Point(x=2.25)), new_tip='never')
     pipette.flow_rate.aspirate = 500
     pipette.flow_rate.dispense = 500
-    pipette.mix(10, 1000, plate24.wells()[0].bottom(5))
+    pipette.mix(10, 1000, plate24.wells()[0].bottom(5).move(Point(x=2.25)))
     pipette.drop_tip()
     protocol.pause("Shake for ~2 hrs in cold room.")
