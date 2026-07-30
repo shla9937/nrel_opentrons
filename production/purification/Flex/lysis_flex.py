@@ -9,7 +9,7 @@ import subprocess
 
 
 metadata = {
-    'protocolName': 'Lyssis - 24well',
+    'protocolName': 'Lysis - 24well',
     'author': 'Shawn Laursen',
     'description': '''Perform the lysis step of 24 well purification.'''}
 
@@ -28,10 +28,11 @@ def setup(protocol):
     pipette = protocol.load_instrument('flex_96channel_1000')
     tips1000 = protocol.load_labware('opentrons_flex_96_tiprack_1000ul', 'B2')
     empty_tiprack = protocol.load_labware('opentrons_flex_96_tiprack_1000ul', 'B1')
-    tips1000_24well = protocol.load_labware('opentrons_flex_96_tiprack_1000ul', 'C1')
-    tips24_adapter = protocol.load_adapter('opentrons_flex_96_tiprack_adapter', 'C2')
-    lysis_buff = protocol.load_labware('nest_1_reservoir_195ml', 'D2')
-    plate24 = protocol.load_labware('thomsoninstrument_24_wellplate_10400ul', 'D3')
+    tips1000_24well = protocol.load_labware('opentrons_flex_96_tiprack_1000ul', 'A1')
+    tips24_adapter = protocol.load_adapter('opentrons_flex_96_tiprack_adapter', 'C3')
+    lysis_buff = protocol.load_labware('nest_1_reservoir_195ml', 'C2')
+    plate24 = protocol.load_labware('thomsoninstrument_24_wellplate_10400ul', 'D2')
+    temp_mod = protocol.load_module('temperature module gen2', 'C1')
 
 def define_liquids(protocol):
     buffer_liquid = protocol.define_liquid(
@@ -40,24 +41,11 @@ def define_liquids(protocol):
         display_color="#50C878")
     lysis_buff['A1'].load_liquid(liquid=buffer_liquid,volume=60000)
 
-
 def pickup_24(protocol):
-    global half_filled
-    half_filled = False
-    try:
-        protocol.move_labware(tips1000_24well, "C1", use_gripper=True)
-    except:
-        None
-
-    if half_filled is False:
-        pipette.configure_nozzle_layout(style=protocol_api.ROW,start="H1",tip_racks=[tips1000])
-        for row in range(4):
-            pipette.pick_up_tip()
-            pipette.drop_tip(empty_tiprack.rows()[row*2][0])
-        half_filled = True
-    else:    
-        half_filled = False
-
+    pipette.configure_nozzle_layout(style=protocol_api.ROW,start="H1",tip_racks=[tips1000])
+    for row in range(4):
+        pipette.pick_up_tip()
+        pipette.drop_tip(empty_tiprack.rows()[row*2][0])
     pipette.configure_nozzle_layout(style=protocol_api.COLUMN,start="A12")
     for col in range(6):
         pipette.pick_up_tip(empty_tiprack.rows()[0][col])

@@ -127,6 +127,7 @@ def bind(protocol):
     protocol.move_labware(labware=lysis_plate,new_location='A4',use_gripper=True)
     protocol.move_labware(labware=bead_plate,new_location=temp_mod,use_gripper=True)
     pipette.pick_up_tip(tips1000_24well.rows()[0][0])
+    pipette.touch_tip(bead_plate.wells()[0])
     for bind in range(10):
         pipette.mix(3,500, bead_plate.wells()[0])
         protocol.delay(minutes=0.75)
