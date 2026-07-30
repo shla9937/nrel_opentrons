@@ -30,7 +30,7 @@ def setup(protocol):
     empty_tiprack = protocol.load_labware('opentrons_flex_96_tiprack_1000ul', 'B1')
     tips1000_24well = protocol.load_labware('opentrons_flex_96_tiprack_1000ul', 'A1')
     tips24_adapter = protocol.load_adapter('opentrons_flex_96_tiprack_adapter', 'C3')
-    lysis_buff = protocol.load_labware('nest_1_reservoir_195ml', 'C2')
+    lysis_buff = protocol.load_labware('omega_1_reservoir_600ml', 'C2')
     plate24 = protocol.load_labware('thomsoninstrument_24_wellplate_10400ul', 'D2')
     temp_mod = protocol.load_module('temperature module gen2', 'C1')
 
@@ -39,7 +39,7 @@ def define_liquids(protocol):
         name="Lysis buff",
         description="50mM Tris/Hepes pH 7.5, 300mM NaCl, 5\%\ glycerol, 0.1\%\ B-OG, 0.1mg/mL DNaseI, 1mg/mL Lysozyme",
         display_color="#50C878")
-    lysis_buff['A1'].load_liquid(liquid=buffer_liquid,volume=60000)
+    lysis_buff['A1'].load_liquid(liquid=buffer_liquid,volume=600000)
 
 def pickup_24(protocol):
     pipette.configure_nozzle_layout(style=protocol_api.ROW,start="H1",tip_racks=[tips1000])
