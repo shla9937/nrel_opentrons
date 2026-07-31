@@ -165,11 +165,7 @@ def collect(protocol):
     pipette.configure_nozzle_layout(style=protocol_api.SINGLE,start="A1")
     for well in range(protocol.params.samples):
         pipette.pick_up_tip(empty_tiprack.rows()[6 - 2 * (well // 6)][11 - (well % 6)])
-        try:
-            pipette.measure_liquid_height(bead_plate.wells()[well])
-            pipette.aspirate(200, bead_plate.wells()[well].meniscus(z=-1), meniscus_tracking='dynamic_meniscus')
-        except Exception:
-            pipette.aspirate(200, bead_plate.wells()[well].bottom(0.5))
+        pipette.aspirate(200, bead_plate.wells()[well].bottom())
         pipette.dispense(200, collection_plate.wells()[well])
         pipette.drop_tip()
 
