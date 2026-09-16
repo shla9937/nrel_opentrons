@@ -92,7 +92,7 @@ def touch_upper_wall(destination, side):
     p20m.move_to(destination.top(z=-1).move(wall_offset), speed=10)
     p20m.move_to(destination.top(z=1).move(wall_offset), speed=10)
 
-def distribute_reagent(source, destinations, side, waste):
+def distribute_reagent(source, destinations, side):
     dispense_volume = 2
     disposal_volume = 2
     batch_size = 9
@@ -103,16 +103,17 @@ def distribute_reagent(source, destinations, side, waste):
             location = destination.top(z=-1).move(Point(x=side * 0.5, y=0, z=0))
             p20m.dispense(dispense_volume, location)
             touch_upper_wall(destination, side)
-        p20m.blow_out(waste)
+        p20m.blow_out(source.top(z=-2))
+        p20m.touch_tip(source, v_offset=-2, speed=20)
 
 def add_sypro(protocol):
     p20m.pick_up_tip()
     destinations = [destination for group in protein_destinations for destination in group]
-    distribute_reagent(sypro[0], destinations, side=-1, waste=protocol.fixed_trash)
+    distribute_reagent(sypro[0], destinations, side=-1)
     p20m.drop_tip()
 
 def add_protein(protocol):
     for protein_column, destinations in zip(proteins, protein_destinations):
         p20m.pick_up_tip()
-        distribute_reagent(protein_column[0], destinations, side=1, waste=protocol.fixed_trash)
+        distribute_reagent(protein_column[0], destinations, side=1)
         p20m.drop_tip()
