@@ -8,7 +8,7 @@ metadata = {
     'description': '''
     Adds 21µL of screen to the bottom of each well.
     2µL protein (62.5µM -> 5µM)
-    2µL sypro (62.5x -> 5x), dispensed on opposite upper sides.
+    2µL sypro (62.5x -> 5x), dispensed with one-sided upper-wall touches.
     Proteins 1-4 use interleaved sets starting at A1, B1, A2, B2.
     Uses 96 x 300µL tips and 8 x (1 + number of proteins) 20µL tips.
     Seal and centrifuge the plate to combine reagents before the assay.''',
@@ -85,24 +85,34 @@ def add_buffer(protocol):
         p300m.aspirate(21 * len(proteins), screen_column[0].bottom(1))
         for destinations in protein_destinations:
             p300m.dispense(21, destinations[column_index].bottom(1))
-        p300m.drop_tip()
+        p300m.return_tip()
+
+def touch_upper_wall(destination, side):
+    wall_offset = Point(x=side * (destination.diameter / 2 - 0.3), y=0, z=0)
+    p20m.move_to(destination.top(z=-1).move(wall_offset), speed=10)
+    p20m.move_to(destination.top(z=1).move(wall_offset), speed=10)
+
+def distribute_reagent(source, destinations, side, waste):
+    dispense_volume = 2
+    disposal_volume = 2
+    batch_size = 9
+    for batch_start in range(0, len(destinations), batch_size):
+        batch = destinations[batch_start:batch_start + batch_size]
+        p20m.aspirate(dispense_volume * len(batch) + disposal_volume, source)
+        for destination in batch:
+            location = destination.top(z=-1).move(Point(x=side * 0.5, y=0, z=0))
+            p20m.dispense(dispense_volume, location)
+            touch_upper_wall(destination, side)
+        p20m.blow_out(waste)
 
 def add_sypro(protocol):
     p20m.pick_up_tip()
-    for destinations in protein_destinations:
-        for destination in destinations:
-            location = destination.top(z=-1).move(Point(x=-0.5, y=0, z=0))
-            p20m.aspirate(2, sypro[0])
-            p20m.dispense(2, location)
-            p20m.blow_out(location)
+    destinations = [destination for group in protein_destinations for destination in group]
+    distribute_reagent(sypro[0], destinations, side=-1, waste=protocol.fixed_trash)
     p20m.drop_tip()
 
 def add_protein(protocol):
     for protein_column, destinations in zip(proteins, protein_destinations):
         p20m.pick_up_tip()
-        for destination in destinations:
-            location = destination.top(z=-1).move(Point(x=0.5, y=0, z=0))
-            p20m.aspirate(2, protein_column[0])
-            p20m.dispense(2, location)
-            p20m.blow_out(location)
+        distribute_reagent(protein_column[0], destinations, side=1, waste=protocol.fixed_trash)
         p20m.drop_tip()
