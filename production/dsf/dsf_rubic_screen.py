@@ -82,9 +82,9 @@ def define_liquids(protocol):
 def add_buffer(protocol):
     for column_index, screen_column in enumerate(screen.columns()):
         p300m.pick_up_tip()
-        p300m.aspirate(21 * len(proteins), screen_column[0].bottom(1))
+        p300m.aspirate(21 * len(proteins), screen_column[0])
         for destinations in protein_destinations:
-            p300m.dispense(21, destinations[column_index].bottom(1))
+            p300m.dispense(21, destinations[column_index])
         p300m.return_tip()
 
 def touch_upper_wall(destination, side):
