@@ -63,7 +63,7 @@ def setup(protocol):
     temp_mod.start_set_temperature(4)
     temp_block = temp_mod.load_labware('opentrons_24_aluminumblock_nest_1.5ml_snapcap')
     twist_plate = protocol.load_labware('greiner_96_wellplate_300ul', 'C2')
-    tubes = protocol.load_labware('opentrons_24_tuberack_eppendorf_2ml_safelock_snapcap', 'C3')
+    tubes = protocol.load_labware('opentrons_24_tuberack_eppendorf_1.5ml_safelock_snapcap', 'C3')
 
     # D row
     trash = protocol.load_trash_bin ('D1') 
@@ -133,18 +133,17 @@ def add_cells(protocol):
 
 def add_dna(protocol):
     pipette.configure_nozzle_layout(style=protocol_api.SINGLE, start="A1", tip_racks=[tips1000])
-    # tips walked bottom-right → left, then up a row: H12, H11, ..., H1, G12, G11, ...
     tip_order = [w for row in reversed(tips1000.rows()) for w in reversed(row)]
     if protocol.params.recon_dna is True: 
         for i, well in enumerate(range(twist_start_well, twist_end_well + 1)):
             pipette.pick_up_tip(tip_order[i+1])
-            pipette.transfer(50, tubes.columns()[0], twist_plate.wells()[well], new_tip="never", mix_after=(3, 25))
-            pipette.transfer(10, twist_plate.wells()[well], temp_block.wells()[well%24], new_tip='never', mix_after=(3, 25))
+            pipette.transfer(50, tubes['A1'], twist_plate.wells()[well], new_tip="never", mix_after=(3, 25))
+            pipette.transfer(5, twist_plate.wells()[well], temp_block.wells()[i], new_tip='never', mix_after=(3, 25))
             pipette.drop_tip()
     else:
         for i, well in enumerate(range(twist_start_well, twist_end_well + 1)):
             pipette.pick_up_tip(tip_order[i+1])
-            pipette.transfer(10, twist_plate.wells()[well], temp_block.wells()[well%24], new_tip='never', mix_after=(3, 25))
+            pipette.transfer(5, twist_plate.wells()[well], temp_block.wells()[i], new_tip='never', mix_after=(3, 25))
             pipette.drop_tip()
 
 def add_media(protocol):

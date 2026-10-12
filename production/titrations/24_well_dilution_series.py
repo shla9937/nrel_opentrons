@@ -18,7 +18,9 @@ metadata = {
 
     At the default rxn_vol = 40, load 100 uL stock in each source well
     (80 uL transferred, 20 uL extra). Load at least 10 mL diluent in
-    EACH of reservoir wells A1 and A2. Each destination well finishes
+    EACH of reservoir wells A1 and A2, and 2 mL buffer in A12 for the
+    column 24 blanks. Fill the blanks first, reusing tips for diluent.
+    Each destination well finishes
     with 40 uL, reaching 80 uL during dilution. Mixing uses 40 uL strokes. Excess
     from column 23 is discarded into the fixed trash.''',
     'apiLevel': '2.26'}
@@ -41,8 +43,9 @@ def setup(protocol):
     p300m = protocol.load_instrument('p300_multi_gen2', 'left', tip_racks=[tips300])
 
     # reagents
-    global buff
+    global buff, blank_buff
     buff = trough.wells()[:2]
+    blank_buff = trough.wells()[-1]
 
     # volumes
     global rxn_vol, start_vol, mix_vol, mix_repetitions
@@ -59,6 +62,12 @@ def define_liquids(protocol):
     for well in buff:
         well.load_liquid(liquid=buff_liquid, volume=10000)
 
+    blank_liquid = protocol.define_liquid(
+        name='Blank buffer',
+        description='Load 2 mL buffer in reservoir well A12 for column 24.',
+        display_color='#00BFFF')
+    blank_buff.load_liquid(liquid=blank_liquid, volume=2000)
+
     for sample_column in samples.columns()[:2]:
         for well in sample_column:
             sample_liquid = protocol.define_liquid(
@@ -72,8 +81,9 @@ def add_buff(protocol):
     rows = [0,1]
 
     p300m.pick_up_tip()
+    p300m.transfer(rxn_vol, blank_buff, [plate.rows()[row][23] for row in rows], new_tip='never')
     for row, buff_well in zip(rows, buff):
-        p300m.transfer(rxn_vol, buff_well, plate.rows()[row][1:24], new_tip='never')
+        p300m.transfer(rxn_vol, buff_well, plate.rows()[row][1:23], new_tip='never')
     p300m.drop_tip()
 
 def add_samples_and_titrate(protocol):
