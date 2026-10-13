@@ -35,7 +35,7 @@ def run(protocol):
     setup(protocol)
     protocol.set_rail_lights(True)
     define_liquids(protocol)
-    temp_mod.await_temperature(4)
+    temp_mod.start_set_temperature(4)
     add_cells(protocol)
     add_dna(protocol)
     add_media(protocol)
