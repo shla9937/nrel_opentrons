@@ -55,7 +55,7 @@ def setup(protocol):
     media_vol = 5000
 
     tips1000_column = protocol.load_labware('opentrons_flex_96_tiprack_1000ul', 'A1')
-    media = protocol.load_labware('omega_1_reservoir_600ml', 'A2')
+    media = protocol.load_labware('omega_1_reservoir_600ml', 'D4')
     tips24_adapter = protocol.load_adapter('opentrons_flex_96_tiprack_adapter', 'A3')
     tips1000_media = tips24_adapter.load_labware('opentrons_flex_96_tiprack_1000ul', label='Empty media-tip pickup rack')
 
@@ -146,7 +146,8 @@ def add_dna(protocol):
 
 def add_media(protocol):
     global single_nozzle, single_tiprack, tip_order, single_tip
-    protocol.move_labware(tips1000_column, 'D3', use_gripper=True)
+    protocol.move_labware(media, 'A2', use_gripper=True)
+    protocol.move_labware(tips1000_column, 'D4', use_gripper=True)
     protocol.move_labware(tips1000_media, 'A1', use_gripper=True)
     pickup_24(protocol)
     pipette.transfer(media_vol, media.wells()[0], expression_plate.wells()[0], new_tip='never')
