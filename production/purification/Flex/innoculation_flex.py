@@ -70,7 +70,7 @@ def setup(protocol):
     trash = protocol.load_trash_bin ('D1') 
     
     expression_plate = protocol.load_labware('thomsoninstrument_24_wellplate_10400ul', 'D2')
-    media = protocol.load_labware('omega_1_reservoir_600ml', 'D3')
+    media = protocol.load_labware('omega_1_reservoir_600ml', 'D4')
    
     pipette = protocol.load_instrument('flex_96channel_1000')
 
@@ -130,7 +130,7 @@ def add_cells(protocol):
     pipette.configure_nozzle_layout(style=protocol_api.SINGLE, start="A1", tip_racks=[tips1000])
     cells_lc = protocol.get_liquid_class("glycerol_50")
     pipette.pick_up_tip(tips1000.wells()[-1])
-    pipette.distribute_with_liquid_class(cells_lc, 50, tubes['B1'], transformation_wells, new_tip="never")
+    pipette.distribute_with_liquid_class(cells_lc, 50, tubes['B1'], transformation_wells[:constructs], new_tip="never")
     pipette.drop_tip()
 
 def add_dna(protocol):
@@ -149,6 +149,7 @@ def add_dna(protocol):
             pipette.drop_tip()
 
 def add_media(protocol):
+    protocol.move_labware(media, 'D3', use_gripper=True)
     pickup_24(protocol)
     pipette.transfer(5000, media.wells()[0], expression_plate.wells()[0], new_tip='never')
     pipette.transfer(50, temp_block.wells()[0], expression_plate.wells()[0], mix_after=(3, 100), new_tip='never')

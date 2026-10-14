@@ -55,4 +55,6 @@ Import the Greiner and Omega definitions from [custom_labware](custom_labware). 
 
 ## Flex 24-well base
 
+Load the 24-well base script's media reservoir in **D4**, with the D4 staging fixture installed and **D3 initially empty**. The gripper moves it to D3 after DNA addition and before media-tip pickup, clearing the single-nozzle approach to the DNA plate in C2. Verify filled-reservoir handling and pickup clearance with a supervised dry run.
+
 The separate 24-well base is [innoculation_flex.py](production/purification/Flex/innoculation_flex.py), adapted to a PCR plate with rows A/C/E/G and columns 1/3/5/7/9/11 for its 24-tip arrangement. It is not changed by the 96-well acceleration. The experimental [innoculation_24well_flex.py](production/purification/Flex/innoculation_24well_flex.py) is not the current 24-well base; the 96-well loading instructions above do not apply to either 24-well script.
