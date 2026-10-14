@@ -11,7 +11,7 @@ import subprocess
 metadata = {
     'protocolName': 'Innoculation - 24well',
     'author': 'Shawn Laursen',
-    'description': '''Purify protein from 24 well plate using StrepXT mag beads'''}
+    'description': 'Transform cells in a chilled 96 well PCR plate and inoculate a 24 well culture plate.'}
 
 requirements = {'robotType': 'Flex','apiLevel': '2.28'}
 
@@ -49,7 +49,7 @@ def run(protocol):
 
 def setup(protocol):
     # equipment
-    global trash, pipette, tips1000, empty_tiprack, tips1000_24well, tips24_adapter, expression_plate, twist_plate, tubes, media, temp_mod, temp_block, twist_start_well, twist_end_well, constructs
+    global trash, pipette, tips1000, empty_tiprack, tips1000_24well, tips24_adapter, expression_plate, twist_plate, tubes, media, temp_mod, temp_block, transformation_wells, twist_start_well, twist_end_well, constructs
     # A row
     tips1000_24well = protocol.load_labware('opentrons_flex_96_tiprack_1000ul', 'A1')
     tips24_adapter = protocol.load_adapter('opentrons_flex_96_tiprack_adapter', 'A3')
@@ -61,7 +61,8 @@ def setup(protocol):
     # C row
     temp_mod = protocol.load_module('temperature module gen2', 'C1')
     temp_mod.start_set_temperature(4)
-    temp_block = temp_mod.load_labware('opentrons_24_aluminumblock_nest_1.5ml_snapcap')
+    temp_block = temp_mod.load_labware('opentrons_96_aluminumblock_biorad_wellplate_200ul')
+    transformation_wells = [temp_block.columns()[column][row] for column in range(0, 12, 2) for row in range(0, 8, 2)]
     twist_plate = protocol.load_labware('greiner_96_wellplate_300ul', 'C2')
     tubes = protocol.load_labware('opentrons_24_tuberack_eppendorf_1.5ml_safelock_snapcap', 'C3')
 
@@ -76,6 +77,8 @@ def setup(protocol):
     constructs = protocol.params.constructs
     twist_start_well = protocol.params.twist_start_well - 1
     twist_end_well = twist_start_well + protocol.params.constructs - 1
+    if not 1 <= constructs <= 24 or twist_start_well < 0 or twist_end_well > 95:
+        raise ValueError('Select 1 to 24 constructs within DNA wells 1 to 96.')
 
 def define_liquids(protocol):
     water = protocol.define_liquid(
@@ -88,7 +91,7 @@ def define_liquids(protocol):
         name="Isothermal comp cells",
         description="comp cells",
         display_color="#D59227")
-    temp_block.wells()[0].load_liquid(liquid=cells,volume=1500)
+    tubes['B1'].load_liquid(liquid=cells,volume=1500)
 
     auto_tb = protocol.define_liquid(
         name="Auto TB",
@@ -124,11 +127,10 @@ def pickup_24(protocol):
     pipette.pick_up_tip(tips1000_24well.rows()[0][0])
 
 def add_cells(protocol):
-    # distribute from first tube in block
     pipette.configure_nozzle_layout(style=protocol_api.SINGLE, start="A1", tip_racks=[tips1000])
     cells_lc = protocol.get_liquid_class("glycerol_50")
     pipette.pick_up_tip(tips1000.wells()[-1])
-    pipette.distribute_with_liquid_class(cells_lc, 50, temp_block.wells()[0], temp_block.wells()[1:constructs], new_tip="never")
+    pipette.distribute_with_liquid_class(cells_lc, 50, tubes['B1'], transformation_wells, new_tip="never")
     pipette.drop_tip()
 
 def add_dna(protocol):
@@ -138,12 +140,12 @@ def add_dna(protocol):
         for i, well in enumerate(range(twist_start_well, twist_end_well + 1)):
             pipette.pick_up_tip(tip_order[i+1])
             pipette.transfer(50, tubes['A1'], twist_plate.wells()[well], new_tip="never", mix_after=(3, 25))
-            pipette.transfer(5, twist_plate.wells()[well], temp_block.wells()[i], new_tip='never', mix_after=(3, 25))
+            pipette.transfer(5, twist_plate.wells()[well], transformation_wells[i], new_tip='never', mix_after=(3, 25))
             pipette.drop_tip()
     else:
         for i, well in enumerate(range(twist_start_well, twist_end_well + 1)):
             pipette.pick_up_tip(tip_order[i+1])
-            pipette.transfer(5, twist_plate.wells()[well], temp_block.wells()[i], new_tip='never', mix_after=(3, 25))
+            pipette.transfer(5, twist_plate.wells()[well], transformation_wells[i], new_tip='never', mix_after=(3, 25))
             pipette.drop_tip()
 
 def add_media(protocol):

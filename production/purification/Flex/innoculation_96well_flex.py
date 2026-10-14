@@ -13,7 +13,7 @@ def add_parameters(parameters: protocol_api.Parameters):
         variable_name="constructs",
         display_name="Number of constructs",
         description="Number of constructs to test",
-        default=24,
+        default=86,
         minimum=1,
         maximum=96,
         unit="constructs")
@@ -44,19 +44,32 @@ def run(protocol):
 
 def setup(protocol):
     global trash, pipette, tips1000, tips1000_column, tip_order, single_tip, column_tip, expression_plate, twist_plate, tubes, water_res, media, temp_mod, temp_plate, twist_start_well, twist_end_well, constructs, media_vol, transfer_groups
-    global tips1000_media, tips96_adapter, single_nozzle, column_nozzle, column_tip_order
+    global tips1000_media, tips96_adapter, single_nozzle, column_nozzle, column_tip_order, spare_tip_racks, empty_tip_slot
     constructs = protocol.params.constructs
     twist_start_well = protocol.params.twist_start_well - 1
     twist_end_well = twist_start_well + constructs - 1
     transfer_groups = plan_transfers(protocol.params.twist_start_well, constructs)
     media_vol = 1000
 
-    tips1000_column = protocol.load_labware('opentrons_flex_96_tiprack_1000ul', 'A1')
     tips96_adapter = protocol.load_adapter('opentrons_flex_96_tiprack_adapter', 'A3')
-    tips1000_media = tips96_adapter.load_labware('opentrons_flex_96_tiprack_1000ul', label='Empty media-tip pickup rack')
+    if constructs == 96:
+        tips1000_column = tips96_adapter.load_labware('opentrons_flex_96_tiprack_1000ul')
+        tips1000_media = tips1000_column
+    else:
+        tips1000_column = protocol.load_labware('opentrons_flex_96_tiprack_1000ul', 'A1')
+        tips1000_media = tips96_adapter.load_labware('opentrons_flex_96_tiprack_1000ul', label='Empty media-tip pickup rack')
+
+    column_groups = sum(channels == 8 for well, channels in transfer_groups)
+    spare_count = max(0, (3 * column_groups + 11) // 12 - 1)
+    spare_tip_racks = [protocol.load_labware('opentrons_flex_96_tiprack_1000ul', slot)
+                      for slot in ['A4', 'C4'][:spare_count]]
+    empty_tip_slot = 'D4'
 
     tips1000 = protocol.load_labware('opentrons_flex_96_tiprack_1000ul', 'B2')
-    water_res = protocol.load_labware('nest_12_reservoir_15ml', 'B3')
+    if constructs >= 48:
+        water_res = protocol.load_labware('omega_1_reservoir_600ml', 'B1' if constructs == 96 else 'B4')
+    else:
+        water_res = protocol.load_labware('nest_12_reservoir_15ml', 'B3')
 
     temp_mod = protocol.load_module('temperature module gen2', 'C1')
     temp_mod.start_set_temperature(4)
@@ -89,7 +102,7 @@ def define_liquids(protocol):
         description="water",
         display_color="#4054B9")
     if protocol.params.recon_dna is True:
-        water_res['A1'].load_liquid(liquid=water, volume=10000)
+        water_res['A1'].load_liquid(liquid=water, volume=30000 if constructs >= 48 else 10000)
 
     auto_tb = protocol.define_liquid(
         name="Auto TB",
@@ -101,40 +114,78 @@ def define_liquids(protocol):
         name="DNA",
         description="Selected constructs",
         display_color="#27D435")
+    start_well = protocol.define_liquid(
+        name="Start well",
+        description="Where in twist plate to start picking from",
+        display_color="#27D435")
+    end_well = protocol.define_liquid(
+        name="End well",
+        description="Where in twist plate to start picking from",
+        display_color="#D42727")
     for well in range(twist_start_well, twist_end_well + 1):
-        twist_plate.wells()[well].load_liquid(liquid=dna, volume=0 if protocol.params.recon_dna else 50)
+        liquid = dna
+        volume = 0 if protocol.params.recon_dna else 50
+        if well == twist_end_well:
+            liquid = end_well
+        elif well == twist_start_well:
+            liquid = start_well
+        if protocol.params.recon_dna and well in (twist_start_well, twist_end_well):
+            volume = 1
+        twist_plate.wells()[well].load_liquid(liquid=liquid, volume=volume)
+
+def replace_column_tips(protocol):
+    global tips1000_column, tips1000_media, empty_tip_slot, column_tip_order, column_tip
+    if not spare_tip_racks:
+        raise RuntimeError('No staged column-tip racks remain; check the tip plan.')
+    next_rack = spare_tip_racks.pop(0)
+    staging_slot = next_rack.parent
+    pickup_location = tips1000_column.parent
+    protocol.move_labware(tips1000_column, empty_tip_slot, use_gripper=True)
+    protocol.move_labware(next_rack, pickup_location, use_gripper=True)
+    tips1000_column = next_rack
+    empty_tip_slot = staging_slot
+    if constructs == 96:
+        tips1000_media = next_rack
+    columns = reversed(tips1000_column.columns()) if column_nozzle == "A1" else tips1000_column.columns()
+    column_tip_order = [column[0] for column in columns]
+    column_tip = 0
 
 def pickup_tips(protocol, channels):
     global single_tip, column_tip, tip_order, column_tip_order
     if channels == 8:
-        pipette.configure_nozzle_layout(style=protocol_api.COLUMN, start=column_nozzle, tip_racks=[tips1000_column])
         if column_tip == len(column_tip_order):
-            protocol.pause(f'Replace the column-tip rack in {tips1000_column.parent} with a full 1000ul rack, without an adapter, then resume.')
-            tips1000_column.reset()
-            columns = reversed(tips1000_column.columns()) if column_nozzle == "A1" else tips1000_column.columns()
-            column_tip_order = [column[0] for column in columns]
-            column_tip = 0
+            replace_column_tips(protocol)
+        pipette.configure_nozzle_layout(style=protocol_api.COLUMN, start=column_nozzle, tip_racks=[tips1000_column])
         pipette.pick_up_tip(column_tip_order[column_tip])
         column_tip += 1
     else:
         pipette.configure_nozzle_layout(style=protocol_api.SINGLE, start=single_nozzle, tip_racks=[tips1000])
         if single_tip == len(tip_order):
-            protocol.pause(f'Replace the single-tip rack in {tips1000.parent} with a full 1000ul rack, without an adapter, then resume.')
-            tips1000.reset()
-            tip_order = ([well for row in reversed(tips1000.rows()) for well in reversed(row)] if single_nozzle == "A1"
-                         else [well for row in tips1000.rows() for well in row])
-            single_tip = 0
+            raise RuntimeError('Single-tip supply exhausted; check the tip plan.')
         pipette.pick_up_tip(tip_order[single_tip])
         single_tip += 1
 
 def add_cells(protocol):
+    pickup_tips(protocol, 1)
     for offset in range(0, constructs, 24):
-        pickup_tips(protocol, 1)
         destinations = temp_plate.wells()[twist_start_well + offset:min(twist_start_well + offset + 24, twist_end_well + 1)]
         pipette.distribute(50, tubes.wells()[offset // 24], destinations, new_tip="never", mix_before=(1, 25), disposal_volume=0)
-        pipette.drop_tip()
+    pipette.drop_tip()
 
 def add_dna(protocol):
+    if constructs >= 48:
+        prepare_plate_tips(protocol)
+        if constructs < 96 and protocol.params.recon_dna:
+            protocol.move_labware(water_res, 'B1', use_gripper=True)
+        pipette.configure_nozzle_layout(style=protocol_api.ALL)
+        pipette.pick_up_tip(tips1000_media['A1'])
+        if protocol.params.recon_dna:
+            pipette.transfer(50, water_res['A1'], twist_plate['A1'], new_tip='never', mix_after=(3, 25))
+        pipette.transfer(5, twist_plate['A1'], temp_plate['A1'], new_tip='never', mix_after=(3, 25))
+        pipette.drop_tip()
+        if constructs < 96 and protocol.params.recon_dna:
+            protocol.move_labware(water_res, 'B4', use_gripper=True)
+        return
     column_setup = False
     media_parked = any(channels == 1 for well, channels in transfer_groups)
     if media_parked is True:
@@ -160,6 +211,13 @@ def add_dna(protocol):
 
 def add_media(protocol):
     global single_nozzle, tip_order, single_tip, column_nozzle, column_tip_order, column_tip
+    if constructs >= 48:
+        prepare_plate_tips(protocol)
+        pipette.configure_nozzle_layout(style=protocol_api.ALL)
+        pipette.pick_up_tip(tips1000_media['A1'])
+        pipette.transfer(media_vol, media.wells()[0], expression_plate['A1'], new_tip='never')
+        pipette.drop_tip()
+        return
     protocol.move_labware(tips1000_media, 'B1', use_gripper=True)
     pickup_96(protocol)
     pipette.transfer(media_vol, media.wells()[0], expression_plate.wells()[0], new_tip='never')
@@ -175,7 +233,17 @@ def add_media(protocol):
     column_tip_order = [column[0] for column in tips1000_column.columns() if all(well.has_tip for well in column)]
     column_tip = 0
 
-def pickup_96(protocol):
+def prepare_plate_tips(protocol):
+    global column_tip
+    if constructs == 96:
+        if column_tip:
+            replace_column_tips(protocol)
+        column_tip = 12
+    else:
+        protocol.move_labware(tips1000_media, 'B1', use_gripper=True)
+        pickup_96(protocol, pick_up=False)
+
+def pickup_96(protocol, pick_up=True):
     column_setup = any(channels == 8 for well, channels in transfer_groups)
     if column_setup is True:
         protocol.move_labware(tips1000, 'A2', use_gripper=True)
@@ -194,10 +262,18 @@ def pickup_96(protocol):
             pipette.drop_tip(tips1000_media.wells()[well])
 
     protocol.move_labware(tips1000_media, tips96_adapter, use_gripper=True)
-    pipette.configure_nozzle_layout(style=protocol_api.ALL)
-    pipette.pick_up_tip(tips1000_media.rows()[0][0])
+    if pick_up:
+        pipette.configure_nozzle_layout(style=protocol_api.ALL)
+        pipette.pick_up_tip(tips1000_media.rows()[0][0])
 
 def inoculate(protocol):
+    if constructs >= 48:
+        prepare_plate_tips(protocol)
+        pipette.configure_nozzle_layout(style=protocol_api.ALL)
+        pipette.pick_up_tip(tips1000_media['A1'])
+        pipette.transfer(50, temp_plate['A1'], expression_plate['A1'], new_tip='never', mix_after=(3, 100))
+        pipette.drop_tip()
+        return
     column_setup = False
     for well, channels in sorted(transfer_groups, key=lambda group: group[1]):
         if channels == 8 and column_setup is False:

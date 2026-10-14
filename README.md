@@ -2,61 +2,57 @@
 
 This repository is all of Shawn Laursen's scripts for Opentrons robots at NREL.
 
-## Flex PCR-plate inoculation
+## Flex 96-well inoculation
 
-Both standalone protocols use a chilled 96-well PCR plate, the Flex 96-channel head and gripper:
+[innoculation_96well_flex.py](production/purification/Flex/innoculation_96well_flex.py) is a standalone protocol using the Flex 96-channel head, chilled PCR plate and NEST 96-well 2 mL culture plate. Select the DNA start well, construct count and reconstitution setting at runtime. Well numbering is column-wise: A1=1, B1=2, H1=8, A2=9. Selections cannot extend beyond H12.
 
-- [innoculation_24well_flex.py](production/purification/Flex/innoculation_24well_flex.py): Thomson 24-well culture, up to 24 constructs, 5 mL media per well using `pickup_24`, and sequential single-tip inoculation.
-- [innoculation_96well_flex.py](production/purification/Flex/innoculation_96well_flex.py): NEST 96-well 2 mL culture, up to 96 constructs, 1 mL media per selected well using the staged tip pattern, and position-matched column/edge inoculation.
+### Transfer modes
 
-The original [innoculation_flex.py](production/purification/Flex/innoculation_flex.py) with the 24-well temperature block is unchanged. Neither new script requires the other file to run.
+- **96 constructs:** direct full-rack pickup on the A3 adapter. DNA reconstitution, DNA transfer and inoculation each treat the whole plate simultaneously. Fresh racks are preloaded in A4 and C4 and automatically moved onto A3 before media and inoculation. Four gripper moves replace both spent racks; there are no manual refill pauses.
+- **48-95 constructs:** the robot prepares the selected tip pattern automatically, using columns and edge singles, then picks it up with `ALL`. Each liquid-handling step treats all selected wells together, including shifted selections. Fresh patterns are prepared for DNA, media and inoculation.
+- **1-47 constructs:** the existing column/single-tip DNA and inoculation workflow remains. Media uses the selected tips together.
 
-Choose the script for your culture plate before uploading. Select the DNA start well, construct count and reconstitution setting at runtime; there is no culture-format parameter. Well numbering is column-wise: A1=1, B1=2, H1=8, A2=9. Selections cannot extend beyond H12.
+Cell distribution uses one tip across all stock tubes, discarding it only after all selected PCR wells receive cells. A separate stock tube supplies each batch of up to 24 constructs; all tubes should contain the same cell suspension. Tip staging is still required for partial plates because the API has no native half-plate nozzle layout.
 
 ### Starting deck
 
 | Slot | Labware |
 | --- | --- |
-| A1 | Full Flex 1000 uL column-tip rack, without an adapter |
-| A2 | Empty; receives the media reservoir later |
-| A3 | Flex tip-rack adapter with an entirely empty media-tip pickup rack |
-| B1 | Entirely empty Flex 1000 uL staging rack for 24-well culture; leave empty for 96-well culture |
-| B2 | Full Flex 1000 uL tip rack for single-tip pickup and 24-tip preparation, without an adapter |
-| B3 | NEST 12-channel 15 mL reservoir; water in A1 |
-| C1 | Temperature module with the 96-well aluminium block and Bio-Rad 200 uL PCR plate |
+| A1 | Full Flex 1000 uL column-tip rack for fewer than 96 constructs; empty for 96 |
+| A2 | Empty parking position |
+| A3 | Flex tip-rack adapter; full 1000 uL rack for 96 constructs, physically empty pickup rack otherwise |
+| A4 | Full Flex 1000 uL spare rack when at least five complete DNA columns are selected |
+| B1 | Additional Omega 600 mL water reservoir for 96 constructs; empty otherwise |
+| B2 | Full Flex 1000 uL single-tip rack, without an adapter |
+| B3 | NEST 12-channel 15 mL water reservoir for 1-47 constructs; empty for larger runs |
+| B4 | Additional Omega 600 mL water reservoir for 48-95 constructs; unused otherwise |
+| C1 | Temperature module with `opentrons_96_aluminumblock_biorad_wellplate_200ul` |
 | C2 | Greiner 96-well 300 uL DNA plate |
 | C3 | Opentrons 24-position Eppendorf 1.5 mL snap-cap tube rack; cell stocks |
-| D1 | Trash bin; stays here throughout the run |
-| D2 | Thomson 24-well 10400 uL culture plate or NEST 96-well 2 mL deep-well culture plate |
-| D3 | Empty for 24-well culture; Omega 600 mL media reservoir for 96-well culture |
-| D4 | Omega 600 mL media reservoir for 24-well culture; unused for 96-well culture |
+| C4 | Second full Flex 1000 uL spare rack when at least nine complete DNA columns are selected |
+| D1 | Trash bin; no waste chute required |
+| D2 | NEST 96-well 2 mL deep-well culture plate |
+| D3 | Omega 600 mL media reservoir |
+| D4 | Empty parking position for the first spent tip rack |
 
-All required racks and the adapter are on deck from the beginning. There is no separate media-tip donor rack and no planned off-deck loading. The 24-well script needs two full boxes (A1 for DNA columns and B2 for singles/media preparation) and two empty racks, with no refill. The 96-well script retains its column-tip refill prompts. The gripper moves labware to maintain pipette clearance; do not rearrange it manually.
+Install/configure the column-four staging fixtures used by the selected layout, including D4 whenever a spare rack is loaded. Leave D4 empty initially. For 48-95 constructs, B4 holds water, which moves B4 -> B1 only after the DNA tip pattern is prepared, then returns to B4 after DNA transfer. No pipetting occurs in staging slots and no gripper moves occur with tips attached. Culture and media stay in D2 and D3 for all runs of 48 or more constructs.
 
-For the 24-well script, install and configure the staging-area fixture providing D4 before loading the protocol. Fourth-column slots are gripper-accessible staging positions, not pipetting positions. The reservoir moves to A2 before aspiration; the column-tip rack moves to D4 only after its last pickup.
+Full 96-well runs start with full racks in A3, A4, C4 and B2. The B2 rack supplies the single cell-dispensing tip. Before media, the gripper moves the spent A3 rack to D4 and the fresh A4 rack onto A3. Before inoculation, it moves the spent A3 rack to the now-empty A4 and the fresh C4 rack onto A3.
 
-The empty pickup rack on the A3 adapter and the 24-well staging rack in B1 must physically contain no tips. The protocol uses explicit locations to stage sparse media-tip patterns rather than automatic tip tracking in these racks.
+For other counts, the protocol preloads only the required column-tip spares. Each complete selected DNA column needs three sets of eight tips across DNA, media and inoculation: up to four columns need no spare, five to eight need A4, and nine to twelve need both A4 and C4. Column-tip racks are swapped automatically at their current pickup position, using D4 first and then the vacated spare slot for spent racks. The original B2 rack has enough single tips for cells and all edge wells. No rack is refilled or reset in software. Do not prefill the empty pickup rack: it must contain only the tips staged by the protocol.
 
-In the 24-well script, single tips are taken from B2 starting at H12 and proceeding backwards across each row, preserving the top four rows for `pickup_24`. Cells and incomplete DNA columns use single tips. Complete DNA columns use direct eight-tip pickup from the full rack in A1, consuming columns from right to left with the A1 nozzle column. There is no DNA-tip reformatting. Both DNA reconstitution and transfer into the matching PCR column use those eight tips. At 24 constructs, 73 tips are consumed across the two boxes: one for cells, 24 for DNA, 24 for media and 24 for inoculation.
+For fewer than 48 constructs, the existing clearance moves remain: media may park in A2 for DNA edge transfers, and tip racks swap positions for column handling. After media addition, culture moves to B1, media to D2 and the single-tip rack to D3; the column-tip rack moves through B2 and A1 for inoculation.
 
-In the 96-well script, DNA edge wells are handled before full columns. When needed, the media reservoir temporarily parks in A2 during edge transfers; for column transfers, the single-tip rack parks in A2 and the column-tip rack moves to B2. Both return to their starting locations after DNA addition.
+### Liquids and mapping
 
-In the 24-well script, the media reservoir starts in D4, leaving A2 clear throughout DNA handling. After DNA addition, the reservoir moves to A2, the column-tip rack moves from A1 to the now-empty D4, and the empty media-tip pickup rack moves from the A3 adapter to A1. The original `pickup_24` row-to-column sequence uses the untouched upper rows of the single-tip rack and prepares the pickup rack in A1, then moves it back onto the A3 adapter. For 96-well media, the pickup rack moves to B1 while selected columns and edge tips are staged from the existing supplies, then returns to the adapter. Both formats use `ALL` for final media-tip pickup and dispensing.
+- Load 1500 uL cells per stock tube: A1 for samples 1-24, B1 for 25-48, C1 for 49-72 and D1 for 73-96. These are sample numbers within the selected range, not absolute DNA well numbers. Half plates use two tubes; full plates use four.
+- With reconstitution enabled, load **30 mL water in the additional Omega reservoir for 48-96 constructs**, or **10 mL in NEST reservoir channel A1 for 1-47 constructs**. The full-width Omega allows simultaneous aspiration. Do not substitute the 12-channel reservoir in the large-run layout. With reconstitution off, DNA wells are assumed to contain 50 uL hydrated DNA each.
+- Load media at 1 mL per selected construct plus a 20 mL reservoir allowance: 68 mL for 48 constructs or 116 mL for 96. Confirm water and media loading allowances against actual reservoir dead volume and aspiration height.
+- PCR wells start empty. The protocol waits for 4 C, then distributes 50 uL cells per selected well, with a small source mix and no disposal volume. Reconstitution adds 50 uL water per DNA well; 5 uL DNA is transferred to each matching PCR position.
+- DNA, PCR and culture positions match exactly. Sparse `ALL` pickup retains the selected positions; unselected wells are not pipetted. Inoculation transfers 50 uL per culture well, giving 1050 uL final volume. There is no additional incubation or heat-shock step.
 
-The 24-well workflow has four gripper moves, with only one move of the filled reservoir. The staging rack stays in B1 and the culture plate stays in D2, including during inoculation. The staging rack's untouched tips in rows A, C, E and G, columns 7-12, supply single-tip inoculation; the single-tip donor rack remains in B2. These tips were only relocated, never used for liquid handling.
+Import the Greiner and Omega definitions from [custom_labware](custom_labware). Eleven representative Opentrons 10.0.0/API 2.28 simulations passed, including full/half plates, shifted ranges and small-run rack swaps. A tip-inventory model checked all 9312 valid start/count/reconstitution combinations using only preloaded racks, verifying selected positions, fresh tips, slot occupancy and gripper timing. These checks do not establish physical clearance, sparse pickup or liquid-handling performance: perform a supervised dry run, especially for staged rack swaps, partial racks and the water reservoir.
 
-After 96-well media addition, the culture plate moves to B1, media to D2 and the single-tip rack to D3. The column-tip rack parks in B2 for single-tip inoculation and moves to A1 before column inoculation. No gripper moves occur with pipette tips attached. A full 96-construct run uses three full column-tip racks in total, including the starting rack, plus the starting single-tip rack; replacement racks are needed only at refill prompts.
+## Flex 24-well base
 
-Use the exact PCR plate/block combination defined by `opentrons_96_aluminumblock_biorad_wellplate_200ul`, not an arbitrary PCR plate with different geometry. Import the Greiner, Thomson (for 24-well culture) and Omega definitions from [custom_labware](custom_labware).
-
-### Liquid loading and mapping
-
-- Load 1500 uL cells per stock tube: A1 for constructs 1-24, B1 for 25-48, C1 for 49-72 and D1 for 73-96. These are construct numbers within the selected range, not absolute DNA well numbers.
-- With reconstitution enabled, load 10 mL water into reservoir channel A1. Otherwise, the selected DNA wells are assumed to contain 50 uL hydrated DNA each.
-- Load 140 mL media for 24-well culture: all 24 wells receive 5 mL, even with fewer constructs. For 96-well culture, load the construct count times 1 mL plus a 20 mL reservoir allowance; only selected wells receive media. Confirm the allowance is adequate for the physical reservoir and aspiration height.
-- The PCR plate starts empty. The 24-well script starts cooling to 4 C asynchronously without waiting; pre-chill if the cells require a cold plate on arrival. The 96-well script waits for 4 C. `distribute` delivers 50 uL cells to each matching DNA position, mixing the source once at 25 uL before each aspiration, with no disposal volume or destination mixing during cell dispensing. Reconstitution adds 50 uL water per DNA well, then 5 uL DNA transfers into the matching PCR well.
-- Both scripts use eight tips for complete DNA columns and individual tips at the edges. No unselected PCR or DNA wells are used.
-- All culture media is added before inoculation, using the 24-tip pattern or the selected 96-well tip pattern in one head pickup. For 24-well inoculation, single tips map selected PCR wells sequentially into A1, B1, C1, D1, A2, etc. For 96-well inoculation, matching well positions are retained using columns and edge singles.
-- Inoculum volume is 50 uL per culture well, giving 5050 uL total in the 24-well plate or 1050 uL in the 96-well plate. No additional incubation or heat-shock step is included.
-
-Simulated with Opentrons 10.0.0 at API 2.28, including both culture formats, mid-column selections, the final plate wells, reconstitution off and a full 96-construct run. Earlier simulations did not flag the reservoir's reported physical obstruction, so simulation alone does not establish physical clearance or sparse-tip pickup. Confirm the pickup paths, staged tip patterns, labware offsets, gripper handling (including the filled reservoir) and liquid behaviour with a supervised dry run before using cells or DNA.
+The separate 24-well base is [innoculation_flex.py](production/purification/Flex/innoculation_flex.py), adapted to a PCR plate with rows A/C/E/G and columns 1/3/5/7/9/11 for its 24-tip arrangement. It is not changed by the 96-well acceleration. The experimental [innoculation_24well_flex.py](production/purification/Flex/innoculation_24well_flex.py) is not the current 24-well base; the 96-well loading instructions above do not apply to either 24-well script.
