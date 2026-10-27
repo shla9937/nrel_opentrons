@@ -31,7 +31,7 @@ sun_r = 9;
 sun_z = 77;
 sun_depth = 8;
 materials = ["navy", "blue", "gold", "white"];
-palette = ["#003a69", "#0079C2", "#db9728", "#f2f4f5"];
+palette = ["#000000", "#0079C2", "#db9728", "#f2f4f5"];
 
 // Official source artwork coordinates: screen Y is down.
 // Tiny original curves are simplified; both coloured outlines stay unchanged.
