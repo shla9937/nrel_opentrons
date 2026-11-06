@@ -14,8 +14,8 @@ metadata = {
     - Slot 4 Greiner A1-H1: proteins 1-8, 200uL/well at 50uM.
     - Slot 6 trough A1: 12mL matching protein buffer.
     - Slot 6 trough A2: 2mL of 10mM Tb in matching buffer.
-    - Slot 3 NEST deep-well, slot 4 columns 2-3 and slot 5 Corning 384: empty.
-    Robot prepares 1000uL/well of protein diluent in slot 3 column 1.
+    - Slot 4 Greiner columns 2-7 and slot 5 Corning 384: empty.
+    Robot prepares 250uL/well of protein diluent in Greiner columns 4-7.
     OT-2, P300 multichannel Gen2 left, 300uL tips in slot 2, 80 tips used.''',
     'apiLevel': '2.28'}
 
@@ -30,9 +30,8 @@ def run(protocol):
 
 
 def setup(protocol):
-    global tips300, proteins, samples, plate, trough, p300m
+    global tips300, samples, plate, trough, p300m
     tips300 = protocol.load_labware('opentrons_96_tiprack_300ul', 2)
-    proteins = protocol.load_labware('nest_96_wellplate_2ml_deep', 3)
     samples = protocol.load_labware('greiner_96_wellplate_300ul', 4)
     plate = protocol.load_labware('corning_384_wellplate_112ul_flat', 5)
     trough = protocol.load_labware('nest_12_reservoir_15ml', 6, label='trough')
@@ -72,14 +71,16 @@ def define_liquids(protocol):
 
 def prepare_mixes(protocol):
     p300m.pick_up_tip()
-    p300m.transfer(900, trough['A1'], proteins['A1'], new_tip='never')
+    p300m.transfer(225, trough['A1'], samples.rows()[0][3:7], new_tip='never')
     p300m.transfer(160, trough['A1'], samples.rows()[0][1:3], new_tip='never')
     p300m.drop_tip()
 
     p300m.pick_up_tip()
-    p300m.transfer(100, samples['A1'], proteins['A1'],
-                   mix_before=(mix_repetitions, 160),
-                   mix_after=(mix_repetitions, 300), new_tip='never')
+    p300m.mix(mix_repetitions, 160, samples['A1'])
+    p300m.distribute(25, samples['A1'], [well.top() for well in samples.rows()[0][3:7]],
+                     disposal_volume=0, new_tip='never')
+    for destination in samples.rows()[0][3:7]:
+        p300m.mix(mix_repetitions, 200, destination)
     p300m.drop_tip()
 
     for sample in samples.rows()[0][1:3]:
@@ -92,13 +93,13 @@ def prepare_mixes(protocol):
 
 
 def add_samples_and_titrate(protocol):
-    for row, first_column in series_groups:
+    for column_index, (row, first_column) in enumerate(series_groups):
         destinations = [well.bottom(1) for well in plate.rows()[row][first_column + 1:first_column + 12]]
         dilution_wells = plate.rows()[row][first_column:first_column + 11]
         sample = samples.rows()[0][first_column // 12 + 1]
-        protein_source = proteins['A1']
+        protein_source = samples.rows()[0][column_index + 3]
         p300m.pick_up_tip()
-        p300m.mix(mix_repetitions, 300, protein_source)
+        p300m.mix(mix_repetitions, 200, protein_source)
         p300m.distribute(dilution_vol, protein_source, destinations,
                          disposal_volume=0, new_tip='never')
         p300m.transfer(start_vol, sample, dilution_wells[0],
