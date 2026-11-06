@@ -2,7 +2,7 @@ from opentrons import protocol_api
 
 
 metadata = {
-    'protocolName': 'UV metal titration into 16 proteins',
+    'protocolName': 'Terbium TRF 24 well dilution series',
     'author': 'Shawn Laursen',
     'description': '''
     One metal titrated into 16 proteins, one protein per 384-well row A-P.
