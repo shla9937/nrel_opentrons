@@ -5,17 +5,18 @@ metadata = {
     'protocolName': 'Metal dilution series - 8 proteins in quadruplicate',
     'author': 'Shawn Laursen',
     'description': '''
-    8 proteins, quadruplicate, 40uL/well, 100nM protein in every well.
+    8 proteins, quadruplicate, 40uL/well, 5uM protein in every well.
     Metal: 11 concentrations at 1.5-fold steps (1000 to 17.34153uM) + zero control.
     Proteins 1-8: row pairs A/B, C/D, E/F, G/H, I/J, K/L, M/N, O/P.
     Series: columns 1-12 and 13-24, zero metal in columns 12/24.
 
     LOAD:
-    - Slot 3 NEST deep-well A1-H1: proteins 1-8, 500uL/well at 1uM.
+    - Slot 3 NEST deep-well A1-H1: proteins 1-8, 300uL/well at 50uM.
     - Slot 6 trough A1: 10mL matching protein buffer.
     - Slot 6 trough A2: 12mL matching protein buffer.
     - Slot 6 trough A3: 2mL of 10mM metal in matching buffer.
-    - Slot 3 column 2, slot 4 Greiner and slot 5 Corning 384: empty.
+    - Slot 3 columns 2-3, slot 4 Greiner and slot 5 Corning 384: empty.
+    Robot prepares 1000uL/well of protein diluent in slot 3 columns 2-3.
     OT-2, P300 multichannel Gen2 left, 300uL tips in slot 2, 88 tips used.''',
     'apiLevel': '2.28'}
 
@@ -55,10 +56,10 @@ def define_liquids(protocol):
         destination_rows = 'ABCDEFGHIJKLMNOP'[protein_index * 2:protein_index * 2 + 2]
         protein_liquid = protocol.define_liquid(
             name=f'Protein {protein_number}',
-            description=(f'1 uM protein stock for rows {destination_rows}. '
-                         'Load 500 uL; 240 uL used. Robot dilutes to 100 nM.'),
+            description=(f'50uM protein stock for rows {destination_rows}. '
+                         'Load 300uL, 240uL used. Robot dilutes to 5uM.'),
             display_color='#E69F00')
-        well.load_liquid(liquid=protein_liquid, volume=500)
+        well.load_liquid(liquid=protein_liquid, volume=300)
     buffer_liquid = protocol.define_liquid(
         name='Buffer',
         description='Matching protein buffer. Trough A1: 10 mL; A2: 12 mL.',
@@ -75,12 +76,16 @@ def define_liquids(protocol):
 def prepare_mixes(protocol):
     p300m.pick_up_tip()
     p300m.transfer(900, trough['A1'], proteins['A2'], new_tip='never')
-    p300m.transfer(900, trough['A2'], proteins['A2'], new_tip='never')
+    p300m.transfer(900, trough['A2'], proteins['A3'], new_tip='never')
     p300m.transfer(140, trough['A2'], samples.rows()[0][:2], new_tip='never')
     p300m.drop_tip()
 
     p300m.pick_up_tip()
-    p300m.transfer(200, proteins['A1'], proteins['A2'], mix_after=(mix_repetitions, 300), new_tip='never')
+    p300m.mix(mix_repetitions, 200, proteins['A1'])
+    p300m.distribute(100, proteins['A1'], [proteins['A2'].top(), proteins['A3'].top()],
+                     disposal_volume=0, new_tip='never')
+    for destination in proteins.rows()[0][1:3]:
+        p300m.mix(mix_repetitions, 300, destination)
     p300m.drop_tip()
 
     for sample in samples.rows()[0][:2]:
@@ -97,9 +102,10 @@ def add_samples_and_titrate(protocol):
         destinations = plate.rows()[row][first_column + 1:first_column + 12]
         dilution_wells = plate.rows()[row][first_column:first_column + 11]
         sample = samples.rows()[0][first_column // 12]
+        protein_source = proteins.rows()[0][first_column // 12 + 1]
         p300m.pick_up_tip()
-        p300m.mix(mix_repetitions, 300, proteins['A2'])
-        p300m.distribute(dilution_vol, proteins['A2'], destinations,
+        p300m.mix(mix_repetitions, 300, protein_source)
+        p300m.distribute(dilution_vol, protein_source, destinations,
                          disposal_volume=0, new_tip='never')
         p300m.transfer(start_vol, sample, dilution_wells[0],
                        mix_before=(mix_repetitions, start_vol), new_tip='never')
@@ -115,7 +121,8 @@ def top_up_proteins(protocol):
     p300m.pick_up_tip()
     for row, first_column in series_groups:
         destinations = [well.top() for well in plate.rows()[row][first_column:first_column + 12]]
-        p300m.mix(mix_repetitions, 300, proteins['A2'])
-        p300m.distribute(rxn_vol - dilution_vol, proteins['A2'], destinations,
+        protein_source = proteins.rows()[0][first_column // 12 + 1]
+        p300m.mix(mix_repetitions, 300, protein_source)
+        p300m.distribute(rxn_vol - dilution_vol, protein_source, destinations,
                          disposal_volume=0, new_tip='never')
     p300m.drop_tip()
