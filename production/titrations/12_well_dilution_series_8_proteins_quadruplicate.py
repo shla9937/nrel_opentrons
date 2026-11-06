@@ -16,7 +16,7 @@ metadata = {
     - Slot 6 trough A2: 12mL matching protein buffer.
     - Slot 6 trough A3: 2mL of 10mM metal in matching buffer.
     - Slot 3 column 2, slot 4 Greiner and slot 5 Corning 384: empty.
-    OT-2, P300 multichannel Gen2 left, 300uL tips in slot 2, 96 tips used.''',
+    OT-2, P300 multichannel Gen2 left, 300uL tips in slot 2, 88 tips used.''',
     'apiLevel': '2.28'}
 
 
@@ -25,7 +25,6 @@ def run(protocol):
     setup(protocol)
     define_liquids(protocol)
     prepare_mixes(protocol)
-    add_proteins(protocol)
     add_samples_and_titrate(protocol)
     top_up_proteins(protocol)
     protocol.set_rail_lights(False)
@@ -93,20 +92,17 @@ def prepare_mixes(protocol):
         p300m.drop_tip()
 
 
-def add_proteins(protocol):
-    p300m.pick_up_tip()
-    for row, first_column in series_groups:
-        destinations = plate.rows()[row][first_column + 1:first_column + 12]
-        p300m.transfer(dilution_vol, proteins['A2'], destinations, new_tip='never')
-    p300m.drop_tip()
-
-
 def add_samples_and_titrate(protocol):
     for row, first_column in series_groups:
+        destinations = plate.rows()[row][first_column + 1:first_column + 12]
         dilution_wells = plate.rows()[row][first_column:first_column + 11]
         sample = samples.rows()[0][first_column // 12]
         p300m.pick_up_tip()
-        p300m.transfer(start_vol, sample, dilution_wells[0], new_tip='never')
+        p300m.mix(mix_repetitions, 300, proteins['A2'])
+        p300m.distribute(dilution_vol, proteins['A2'], destinations,
+                         disposal_volume=0, new_tip='never')
+        p300m.transfer(start_vol, sample, dilution_wells[0],
+                       mix_before=(mix_repetitions, start_vol), new_tip='never')
         for source, destination in zip(dilution_wells[:-1], dilution_wells[1:]):
             p300m.transfer(transfer_vol, source, destination, mix_before=(mix_repetitions, mix_vol), new_tip='never')
         p300m.mix(mix_repetitions, mix_vol, dilution_wells[-1])
@@ -119,5 +115,7 @@ def top_up_proteins(protocol):
     p300m.pick_up_tip()
     for row, first_column in series_groups:
         destinations = [well.top() for well in plate.rows()[row][first_column:first_column + 12]]
-        p300m.transfer(rxn_vol - dilution_vol, proteins['A2'], destinations, new_tip='never')
+        p300m.mix(mix_repetitions, 300, proteins['A2'])
+        p300m.distribute(rxn_vol - dilution_vol, proteins['A2'], destinations,
+                         disposal_volume=0, new_tip='never')
     p300m.drop_tip()
