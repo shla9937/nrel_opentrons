@@ -77,8 +77,7 @@ def prepare_mixes(protocol):
 
     p300m.pick_up_tip()
     p300m.mix(mix_repetitions, 160, trough['A2'])
-    p300m.distribute(25, trough['A2'], samples.rows()[0][3:7],
-                     disposal_volume=0, new_tip='never')
+    p300m.distribute(25, trough['A2'], samples.rows()[0][3:7], disposal_volume=0, new_tip='never')
     for destination in samples.rows()[0][3:7]:
         p300m.mix(mix_repetitions, 200, destination)
     p300m.drop_tip()
