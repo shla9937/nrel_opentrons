@@ -9,7 +9,7 @@ metadata = {
         'Replicates selected by num_plates at runtime: GFP/RFP pairs at 2, 4, ..., 20 mL Auto-TB; column 6 empty. '
         'Media: nonstandard SINGLE/H12 pickup at D1 takes A1-D1, two tips per well; verify physical pickup and clearance. '
         'Reset tracked volumes after filling; inoculation uses tips E1/F1. '
-        'Bulk-aspirate each strain once with one tip, then dispense 10 uL per well using glycerol_50. '
+        'Bulk-aspirate each strain once with one tip, then dispense 10 uL per well using glycerol_50; 20 uL disposal per strain. '
         'Dispense 5 mm below the tracked surface; reused tips carry medium between same-strain wells. '
         'C1: 1.5 mL Eppendorf tubes, A1 GFP/B1 RFP; 100 uL per plate + 50 uL allowance each; 4 C without waiting. '
         'Auto-TB: 220 mL per plate + 60 mL reserve; current reservoir supports up to two plates. '
@@ -66,6 +66,7 @@ def setup(protocol):
     glycerol_settings.aspirate.aspirate_position.offset = (0, 0, -1)
     glycerol_settings.multi_dispense.dispense_position.position_reference = 'liquid-meniscus'
     glycerol_settings.multi_dispense.dispense_position.offset = (0, 0, -5)
+    glycerol_settings.multi_dispense.disposal_by_volume.set_for_all_volumes(20)
 
     destinations = []
     for plate in plates:
