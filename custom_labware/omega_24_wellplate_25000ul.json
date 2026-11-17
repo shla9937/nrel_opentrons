@@ -20,7 +20,8 @@
             "Manufacturer working limit 21 mL; maximum fill 24 mL",
             "Estimated apex 1 mm and taper top 3 mm above plate base",
             "Estimated 18.7 mm XY pitch from 112.2 mm / 6; array assumed centred",
-            "Assumes straight 17.2 mm square walls above pyramid; verify coordinates and clearance"
+            "Assumes straight 17.2 mm square walls above pyramid; verify coordinates and clearance",
+            "Universal Flat Adapter overlap derived from measured OT-2 deck-to-rim height 163 mm: 68.275 + 12 + 88.3 - 163 = 5.575 mm; verify XY alignment"
         ]
     },
     "dimensions": {"xDimension": 127.4, "yDimension": 85.0, "zDimension": 88.3},
@@ -88,5 +89,8 @@
     "namespace": "custom_beta",
     "version": 1,
     "schemaVersion": 2,
-    "cornerOffsetFromSlot": {"x": 0, "y": 0, "z": 0}
+    "cornerOffsetFromSlot": {"x": 0, "y": 0, "z": 0},
+    "stackingOffsetWithLabware": {
+        "opentrons_universal_flat_adapter": {"x": 0, "y": 0, "z": 5.575}
+    }
 }

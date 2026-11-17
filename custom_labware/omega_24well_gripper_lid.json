@@ -1,0 +1,49 @@
+{
+    "$otSharedSchema": "#/labware/schemas/3",
+    "schemaVersion": 3,
+    "namespace": "custom_beta",
+    "version": 1,
+    "allowedRoles": ["labware", "lid"],
+    "ordering": [],
+    "brand": {"brand": "Custom 3D-printed prototype", "brandId": []},
+    "metadata": {
+        "displayName": "Omega 24 Well Gripper Lid (Estimated Fit Prototype)",
+        "displayCategory": "lid",
+        "displayVolumeUnits": "µL",
+        "tags": [
+            "Estimated-fit PETG lift-release prototype; not robot-ready or OEM-approved",
+            "3 mm splash collars only; not sealed; breathable film thickness excluded",
+            "CAD envelope 116.4 x 88 x 23.15 mm; seated top 2.4 mm above plate rim",
+            "Fixed jaw planes 88 mm apart; grip 20.25 mm above lowest clip feet",
+            "15 N is the SDK default, PROVISIONAL and uncalibrated; verify before physical robot use",
+            "Only park on another empty Omega plate; unstable on bare deck and not self-stackable",
+            "SDK 10.1: when parking on a deck-mounted Omega plate, use +0.75 mm Z drop_offset to cancel the deck drop bias; not for the Heater-Shaker adapter",
+            "Stop shaking before lid movement; keep Heater-Shaker latch closed",
+            "Fit, retention, extraction, collisions, film adhesion and 37 C / 900 rpm / 48 h performance unverified"
+        ]
+    },
+    "extents": {
+        "total": {
+            "backLeftBottom": {"x": 0, "y": 0, "z": 0},
+            "frontRightTop": {"x": 116.4, "y": -88, "z": 23.15}
+        }
+    },
+    "features": {},
+    "wells": {},
+    "groups": [{"metadata": {}, "wells": []}],
+    "parameters": {
+        "format": "irregular",
+        "quirks": [],
+        "isTiprack": false,
+        "isMagneticModuleCompatible": false,
+        "isDeckSlotCompatible": false,
+        "loadName": "omega_24well_gripper_lid"
+    },
+    "legacyStackingOffsetWithLabware": {
+        "omega_24_wellplate_25000ul": {"x": 5.5, "y": -1.5, "z": 20.75}
+    },
+    "compatibleParentLabware": ["omega_24_wellplate_25000ul"],
+    "stackLimit": 2,
+    "gripHeightFromLabwareOrigin": 20.25,
+    "gripForce": 15
+}

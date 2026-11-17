@@ -43,3 +43,55 @@ For a 0.4 mm nozzle, use 0.16–0.20 mm layers, 3–4 walls, and 15–20% infill
 This model **must be sliced and physically test printed** before any intended use. Check imported part registration, support needs, purge strategy, colour interfaces, filament assignments, clearances, grip, collisions, and material behaviour on the actual machine. The model is not certified for Bambu A1 printing, Opentrons Flex, BioGripper, or any robotic handling workflow.
 
 No assembly clearance, pins, or press fits are provided. Treat this as a display ornament and validate any handling or mechanical use independently.
+
+## Omega 24-well friction lid — unverified fit prototype
+
+- [Parametric source](omega_24well_friction_lid.scad)
+- [Full print STL](omega_24well_friction_lid.stl)
+
+This separate design leaves the legacy gripper lid, robot definitions and
+protocols unchanged. It has **no side clips, tabs or gripping pads**.
+
+The confirmed upper body is 111.2 × 74.8 mm, with 6×4 nominal 17 mm square
+openings and 3.5 mm corner posts flush with the rim. **Grid centring and
+18.0 mm uniform pitch are provisional**: the same-edge 89.8 mm span suggests
+17.96 mm pitch; the reported 108 × 71 mm spans do not fully agree. Approximate
+1 mm internal / 2 mm external walls are consistent with this starting layout,
+not independent proof of fit.
+
+The 2.4 mm roof provides flat film lands around 24 open, 13.8 mm rounded-square
+passages (2.4 mm corner radius). Assumed straight 16.4 mm collars extend 5 mm
+below the seating plane, with 0.3 mm clearance per flat side and a 0.8 mm axial
+lead-in reducing each side by 0.4 mm. Reliefs around the nominal opening
+vertices allow 1.75 mm post radius plus 0.3 mm clearance. The 4 mm skirt has
+0.5 mm external clearance per side, 1.6 mm walls and a 0.6 mm lead-in.
+Actual well taper, insertion depth, post positions and skirt obstructions
+remain unmeasured.
+
+Only zero-based wells `(1,1), (4,1), (1,2), (4,2)` carry opposing X-wall ribs:
+17.1 mm across their extrema, or nominal 0.05 mm interference per side.
+Adjust `retention_interference` and `retention_depth` in the source; these are
+geometry settings, **not retention-force guarantees**. Ribs have rounded edges
+and ramps at both ends; no feature projects into a passage.
+
+Assembly coordinates are centred XY, with the rim at Z=0 and film face at
+Z=2.4. The STL is already rotated 180° about X and translated so the
+**film lands lie on the bed at Z=0**, with inserts upwards. Full size:
+115.4 × 79 × 7.4 mm.
+
+Regenerate from the repository root (`openscad` may be replaced by
+`/Applications/OpenSCAD.app/Contents/MacOS/OpenSCAD`):
+
+```sh
+openscad --export-format binstl -o 3d_parts/omega_24well_friction_lid.stl 3d_parts/omega_24well_friction_lid.scad
+```
+
+The CLI-rendered mesh was checked as a single connected, watertight solid with
+24 through-passages. Mesh sections confirmed rib spans and approximately
+1.206 mm minimum relieved wall thickness away from the lead-in; flat tip
+walls are 0.9 mm. Nominal plate intersection contained only the eight intended
+rib contacts, with no corner-post clearance-envelope collisions.
+These checks do **not** validate the physical plate. Inspect sliced walls and
+bed-side passage dimensions, then trial the printed lid gently without forcing
+it onto the plate. Material shrinkage, film adhesion, sealing, removal force, retention,
+shaking and robotic handling remain unqualified; no film or seal is included.
