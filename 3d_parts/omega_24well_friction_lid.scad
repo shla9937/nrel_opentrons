@@ -10,7 +10,7 @@ body_y = 74.8;
 pitch = 18.0; // provisional: 89.8 / 5 = 17.96; centred grid is unmeasured
 well_opening = 17;
 roof_thickness = 2.4;
-collar_clearance = 0.3;
+collar_clearance = 0.6;
 collar_depth = 5;
 collar_lead = 0.8;
 collar_tip_inset = 0.4;
@@ -18,7 +18,7 @@ passage = 13.8;
 passage_radius = 2.4; // retains >1.2 mm wall at relieved collar corners
 post_radius = 1.75;
 post_clearance = 0.3;
-skirt_clearance = 0.5;
+skirt_clearance = 1;
 skirt_wall = 1.6;
 skirt_depth = 4;
 skirt_lead = 0.6;
