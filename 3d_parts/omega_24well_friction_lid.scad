@@ -24,7 +24,7 @@ skirt_depth = 4;
 skirt_lead = 0.6;
 retention_interference = 0.05; // per side, geometric only; no force prediction
 retention_depth = 2.3; // centre below rim; ribs have 2.6 mm total axial length
-retaining_wells = [[1,1],[4,1],[1,2],[4,2]]; // zero-based column,row
+retaining_wells = 0; // zero-based column,row
 
 collar_outer = well_opening - 2*collar_clearance;
 frame_x = body_x + 2*(skirt_clearance+skirt_wall);
