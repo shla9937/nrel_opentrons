@@ -30,6 +30,13 @@ metadata = {
     *use Nunc 96 well deep plates, not Nest'''}
 requirements = {'robotType': 'Flex','apiLevel': '2.29'}
 
+def add_parameters(parameters: protocol_api.Parameters):
+    parameters.add_bool(
+        variable_name='temp',
+        display_name='Temp mod?',
+        description='Is the temp mod installed in C1?',
+        default=False)
+
 def run(protocol):
     protocol.set_rail_lights(True)
     setup(protocol)
@@ -48,6 +55,9 @@ def setup(protocol):
     tips1000 = protocol.load_labware('opentrons_flex_96_tiprack_1000ul', 'A2')
     tips200 = protocol.load_labware('opentrons_flex_96_tiprack_200ul', 'A1', adapter='opentrons_flex_96_tiprack_adapter')
     pipette = protocol.load_instrument('flex_96channel_1000')
+    if protocol.params.temp is True:
+        temp_mod = protocol.load_module('temperature module gen2', 'C1')
+        desalt_plate = temp_mod.load_labware('nest_96_wellplate_2ml_deep')
     desalt_plate = protocol.load_labware('nest_96_wellplate_2ml_deep', 'C1')
     res1 = protocol.load_labware('nest_1_reservoir_195ml', 'B1')
     rxn_plate = protocol.load_labware('greiner_96_wellplate_300ul', 'C2')
