@@ -39,29 +39,29 @@ def run(protocol: protocol_api.ProtocolContext):
 
         # pull from 5ml 
         p300.move_to(plate24['A1'].top(35))
-        p300.aspirate(20, plate24['A1'].bottom())
+        p300.aspirate(20, plate24['A1'].bottom(-15))
         p300.move_to(plate24['A1'].top(35))
 
         # put into 96 well
         p300.move_to(plate96.wells()[hour].top(35))
-        p300.dispense(20, plate96.wells()[hour].bottom())
+        p300.dispense(20, plate96.wells()[hour].bottom(-20))
         p300.mix(3,20, plate96.wells()[hour])
 
         # wash tip off
-        p300.mix(5,20, res['A1'].bottom())
+        p300.mix(5,20, res['A1'].bottom(-15))
 
         # pull from 15ml 
         p300.move_to(plate24['A2'].top(35))
-        p300.aspirate(20, plate24['A2'].bottom(20))
+        p300.aspirate(20, plate24['A2'].bottom(10))
         p300.move_to(plate24['A2'].top(35))
 
         # put into 96 well
         p300.move_to(plate96.wells()[hour+48].top(35))
-        p300.dispense(20, plate96.wells()[hour+48].bottom())
+        p300.dispense(20, plate96.wells()[hour+48].bottom(-15))
         p300.mix(3,20, plate96.wells()[hour+48])
 
         # wash tip off
-        p300.mix(5,20, res['A1'])
+        p300.mix(5,20, res['A1'].bottom(-15))
         p300.move_to(res['A1'].top(35))
 
         hs_mod.set_and_wait_for_shake_speed(900)
