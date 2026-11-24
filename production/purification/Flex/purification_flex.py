@@ -55,42 +55,12 @@ def setup(protocol):
     
     trash = protocol.load_trash_bin ('D1')
     lysis_plate = protocol.load_labware('thomsoninstrument_24_wellplate_10400ul', 'D2')
-    tips1000 = protocol.load_labware('opentrons_flex_96_tiprack_1000ul', 'D3')
+    tips1000 = protocooptrons_flex_96_tiprack_1000ul', 'D3')
     
-    pipette = protocol.load_instrument('flex_96channel_1000')
+    pipette = protocol.load_instrument('fl
 
     global half_filled
-    half_filled = False
-
-def define_liquids(protocol):
-    wash_liquid = protocol.define_liquid(
-        name="wash_buff",
-        description="Wash buff",
-        display_color="#405DBC")
-    for well in wash_buff.wells():
-        well.load_liquid(liquid=wash_liquid,volume=10000)
-
-    lysate_liquid = protocol.define_liquid(
-        name="Lysate",
-        description="Lysed cells",
-        display_color="#FFB347")
-    for well in lysis_plate.wells():
-        well.load_liquid(liquid=lysate_liquid, volume=2000)
-
-    elution_liquid = protocol.define_liquid(
-        name="Elution buff",
-        description="Buff for elution (biotin)",
-        display_color="#38B55D")
-    for well in elution_buff.wells():
-        well.load_liquid(liquid=elution_liquid, volume=200000)
-
-    bead_liquid = protocol.define_liquid(
-        name="Bead suspension",
-        description="StrepXT mag bead suspension",
-        display_color="#B57EDC")
-    for well in bead_plate.wells():
-        well.load_liquid(liquid=bead_liquid, volume=1000)
-
+    hal
 def pickup_24(protocol):
     global half_filled
     try:
